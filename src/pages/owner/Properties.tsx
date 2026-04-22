@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { properties as seed } from "@/lib/mockData";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { toast } from "sonner";
 
 export default function Properties() {
-  const [list, setList] = useState(seed);
+  const [list, setList] = useLocalStorage("domicilo:properties", seed);
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");

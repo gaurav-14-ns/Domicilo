@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,8 +9,8 @@ import { toast } from "sonner";
 
 export default function Settings() {
   const { user } = useAuth();
-  const [name, setName] = useState("");
-  const [notif, setNotif] = useState(true);
+  const [name, setName] = useLocalStorage("domicilo:settings:name", "");
+  const [notif, setNotif] = useLocalStorage("domicilo:settings:notif", true);
   const [busy, setBusy] = useState(false);
 
   const save = async (e: React.FormEvent) => {

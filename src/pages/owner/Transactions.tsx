@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { transactions } from "@/lib/mockData";
+import { transactions as seed } from "@/lib/mockData";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +9,7 @@ import { toast } from "sonner";
 
 export default function Transactions() {
   const [q, setQ] = useState("");
+  const [transactions] = useLocalStorage("domicilo:transactions", seed);
   const filtered = transactions.filter((t) => `${t.tenant} ${t.type}`.toLowerCase().includes(q.toLowerCase()));
 
   const exportCsv = () => {
