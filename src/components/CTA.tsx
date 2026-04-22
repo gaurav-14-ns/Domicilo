@@ -1,7 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+import { ContactDialog } from "./ContactDialog";
 
 export const CTA = () => {
   const nav = useNavigate();
@@ -22,9 +22,14 @@ export const CTA = () => {
               <Button variant="glass" size="xl" className="text-primary-foreground border-white/30 hover:bg-white/20 group" onClick={() => nav("/auth")}>
                 Start free trial <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Button>
-              <Button variant="ghost" size="xl" className="text-primary-foreground hover:bg-white/10" onClick={() => toast.success("Demo requested", { description: "Our team will be in touch within 1 business day." })}>
-                Book a demo
-              </Button>
+              <ContactDialog
+                variant="demo"
+                trigger={
+                  <Button variant="ghost" size="xl" className="text-primary-foreground hover:bg-white/10">
+                    Book a demo
+                  </Button>
+                }
+              />
             </div>
           </div>
         </div>
