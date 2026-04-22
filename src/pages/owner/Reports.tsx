@@ -1,6 +1,8 @@
-import { properties } from "@/lib/mockData";
+import { useDataStore } from "@/store/DataStore";
 
 export default function Reports() {
+  const { data } = useDataStore();
+  const properties = data.properties;
   const totalRevenue = properties.reduce((s, p) => s + p.revenue, 0);
   const totalUnits = properties.reduce((s, p) => s + p.units, 0);
   const totalOccupied = properties.reduce((s, p) => s + p.occupied, 0);
@@ -22,14 +24,14 @@ export default function Reports() {
         </div>
         <div className="rounded-xl border border-border bg-gradient-card p-5">
           <div className="text-xs uppercase text-muted-foreground">Occupancy</div>
-          <div className="text-2xl font-bold font-display mt-1">{((totalOccupied / totalUnits) * 100).toFixed(1)}%</div>
+          <div className="text-2xl font-bold font-display mt-1">{totalUnits ? ((totalOccupied / totalUnits) * 100).toFixed(1) : "0.0"}%</div>
         </div>
       </div>
       <div className="rounded-xl border border-border bg-gradient-card p-5">
         <div className="text-sm font-semibold mb-4">Revenue by property</div>
         <div className="space-y-3">
           {properties.map((p) => {
-            const pct = (p.revenue / totalRevenue) * 100;
+            const pct = totalRevenue ? (p.revenue / totalRevenue) * 100 : 0;
             return (
               <div key={p.id}>
                 <div className="flex justify-between text-sm mb-1">

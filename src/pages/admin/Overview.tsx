@@ -1,7 +1,9 @@
-import { adminOrgs } from "@/lib/mockData";
+import { useDataStore } from "@/store/DataStore";
 import { Building2, Users, DollarSign, Activity } from "lucide-react";
 
 export default function AdminOverview() {
+  const { data } = useDataStore();
+  const adminOrgs = data.adminOrgs;
   const totalMrr = adminOrgs.reduce((s, o) => s + o.mrr, 0);
   const totalUsers = adminOrgs.reduce((s, o) => s + o.users, 0);
   return (

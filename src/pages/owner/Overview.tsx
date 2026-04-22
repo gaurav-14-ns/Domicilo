@@ -1,4 +1,4 @@
-import { kpis, transactions, properties } from "@/lib/mockData";
+import { useDataStore } from "@/store/DataStore";
 import { TrendingUp, Users, DollarSign, AlertCircle } from "lucide-react";
 
 const KpiCard = ({ icon: Icon, label, value, delta }: any) => (
@@ -13,6 +13,18 @@ const KpiCard = ({ icon: Icon, label, value, delta }: any) => (
 );
 
 export default function OwnerOverview() {
+  const { data } = useDataStore();
+  const { properties, tenants, transactions } = data;
+
+  const activeTenants = tenants.filter((t) => t.status === "active").length;
+  const monthlyRevenue = properties.reduce((s, p) => s + p.revenue, 0);
+  const totalUnits = properties.reduce((s, p) => s + p.units, 0);
+  const totalOccupied = properties.reduce((s, p) => s + p.occupied, 0);
+  const occupancy = totalUnits ? (totalOccupied / totalUnits) * 100 : 0;
+  const pendingDues = transactions
+    .filter((t) => t.status === "pending")
+    .reduce((s, t) => s + Math.max(0, t.amount), 0);
+
   return (
     <div className="space-y-6">
       <div>
@@ -20,10 +32,10 @@ export default function OwnerOverview() {
         <p className="text-muted-foreground">Here's what's happening across your portfolio.</p>
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <KpiCard icon={Users} label="Active tenants" value={kpis.activeTenants.toLocaleString()} delta="+12.4% MoM" />
-        <KpiCard icon={DollarSign} label="Monthly revenue" value={`$${(kpis.monthlyRevenue / 1000).toFixed(0)}K`} delta="+8.1% MoM" />
-        <KpiCard icon={TrendingUp} label="Occupancy" value={`${kpis.occupancy}%`} delta="+2.3%" />
-        <KpiCard icon={AlertCircle} label="Pending dues" value={`$${kpis.pendingDues.toLocaleString()}`} delta="-18%" />
+        <KpiCard icon={Users} label="Active tenants" value={activeTenants.toLocaleString()} delta="+12.4% MoM" />
+        <KpiCard icon={DollarSign} label="Monthly revenue" value={`$${(monthlyRevenue / 1000).toFixed(0)}K`} delta="+8.1% MoM" />
+        <KpiCard icon={TrendingUp} label="Occupancy" value={`${occupancy.toFixed(1)}%`} delta="+2.3%" />
+        <KpiCard icon={AlertCircle} label="Pending dues" value={`$${pendingDues.toLocaleString()}`} delta="-18%" />
       </div>
       <div className="grid lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 rounded-xl border border-border bg-gradient-card p-5">
