@@ -1,5 +1,6 @@
 import { useDataStore } from "@/store/DataStore";
 import { TrendingUp, Users, DollarSign, AlertCircle } from "lucide-react";
+import { formatINR, formatINRCompact } from "@/lib/format";
 
 const KpiCard = ({ icon: Icon, label, value, delta }: any) => (
   <div className="rounded-xl border border-border bg-gradient-card p-5">
@@ -32,10 +33,10 @@ export default function OwnerOverview() {
         <p className="text-muted-foreground">Here's what's happening across your portfolio.</p>
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <KpiCard icon={Users} label="Active tenants" value={activeTenants.toLocaleString()} delta="+12.4% MoM" />
-        <KpiCard icon={DollarSign} label="Monthly revenue" value={`$${(monthlyRevenue / 1000).toFixed(0)}K`} delta="+8.1% MoM" />
-        <KpiCard icon={TrendingUp} label="Occupancy" value={`${occupancy.toFixed(1)}%`} delta="+2.3%" />
-        <KpiCard icon={AlertCircle} label="Pending dues" value={`$${pendingDues.toLocaleString()}`} delta="-18%" />
+        <KpiCard icon={Users} label="Active tenants" value={activeTenants.toLocaleString()} delta="Live" />
+        <KpiCard icon={DollarSign} label="Monthly revenue" value={formatINRCompact(monthlyRevenue)} delta="Live" />
+        <KpiCard icon={TrendingUp} label="Occupancy" value={`${occupancy.toFixed(1)}%`} delta="Live" />
+        <KpiCard icon={AlertCircle} label="Pending dues" value={formatINR(pendingDues)} delta="Live" />
       </div>
       <div className="grid lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 rounded-xl border border-border bg-gradient-card p-5">
@@ -51,9 +52,9 @@ export default function OwnerOverview() {
           <div className="space-y-3">
             {transactions.slice(0, 5).map((t) => (
               <div key={t.id} className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground truncate">{t.tenant}</span>
+                <span className="text-muted-foreground truncate">{t.tenant || t.type}</span>
                 <span className={`font-medium ${t.amount > 0 ? "text-primary" : "text-destructive"}`}>
-                  {t.amount > 0 ? "+" : ""}${t.amount}
+                  {formatINR(t.amount)}
                 </span>
               </div>
             ))}
