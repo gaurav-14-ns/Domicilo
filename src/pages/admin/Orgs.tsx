@@ -1,9 +1,9 @@
-import { adminOrgs as seed } from "@/lib/mockData";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useDataStore } from "@/store/DataStore";
 import { Badge } from "@/components/ui/badge";
 
 export default function Orgs() {
-  const [adminOrgs] = useLocalStorage("domicilo:adminOrgs", seed);
+  const { data } = useDataStore();
+  const adminOrgs = data.adminOrgs;
   return (
     <div className="space-y-6">
       <h1 className="text-2xl md:text-3xl font-display font-bold">Organizations</h1>

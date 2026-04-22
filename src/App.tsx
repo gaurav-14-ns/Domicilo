@@ -5,6 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
+import { DataStoreProvider } from "@/store/DataStore";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import DashboardLayout from "@/layouts/DashboardLayout";
 
@@ -39,6 +40,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <AuthProvider>
+            <DataStoreProvider>
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
@@ -90,6 +92,7 @@ const App = () => (
               <Route path="/dashboard" element={<Navigate to="/auth" replace />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            </DataStoreProvider>
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>

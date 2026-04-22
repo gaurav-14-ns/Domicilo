@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useDataStore } from "@/store/DataStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,8 +9,7 @@ import { toast } from "sonner";
 
 export default function Settings() {
   const { user } = useAuth();
-  const [name, setName] = useLocalStorage("domicilo:settings:name", "");
-  const [notif, setNotif] = useLocalStorage("domicilo:settings:notif", true);
+  const { data, updateSettings } = useDataStore();
   const [busy, setBusy] = useState(false);
 
   const save = async (e: React.FormEvent) => {
@@ -29,13 +28,13 @@ export default function Settings() {
       </div>
       <form onSubmit={save} className="rounded-xl border border-border bg-gradient-card p-6 space-y-5">
         <div className="space-y-2"><Label>Email</Label><Input value={user?.email ?? ""} disabled /></div>
-        <div className="space-y-2"><Label>Display name</Label><Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" /></div>
+        <div className="space-y-2"><Label>Display name</Label><Input value={data.settings.displayName} onChange={(e) => updateSettings({ displayName: e.target.value })} placeholder="Your name" /></div>
         <div className="flex items-center justify-between rounded-lg border border-border p-4">
           <div>
             <div className="font-medium text-sm">Email notifications</div>
             <div className="text-xs text-muted-foreground">Receive billing & tenant updates.</div>
           </div>
-          <Switch checked={notif} onCheckedChange={setNotif} />
+          <Switch checked={data.settings.emailNotifications} onCheckedChange={(v) => updateSettings({ emailNotifications: v })} />
         </div>
         <Button type="submit" variant="hero" disabled={busy}>{busy ? "Saving…" : "Save changes"}</Button>
       </form>

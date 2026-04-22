@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { properties as seed } from "@/lib/mockData";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useDataStore } from "@/store/DataStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,7 +8,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { toast } from "sonner";
 
 export default function Properties() {
-  const [list, setList] = useLocalStorage("domicilo:properties", seed);
+  const { data, addProperty, removeProperty } = useDataStore();
+  const list = data.properties;
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
@@ -17,17 +17,14 @@ export default function Properties() {
 
   const add = (e: React.FormEvent) => {
     e.preventDefault();
-    setList((prev) => [
-      ...prev,
-      { id: `p${Date.now()}`, name, address, units: Number(units), occupied: 0, revenue: 0 },
-    ]);
+    addProperty({ name, address, units: Number(units) });
     toast.success("Property added", { description: name });
     setName(""); setAddress(""); setUnits("10");
     setOpen(false);
   };
 
   const remove = (id: string, n: string) => {
-    setList((p) => p.filter((x) => x.id !== id));
+    removeProperty(id);
     toast.success("Property removed", { description: n });
   };
 

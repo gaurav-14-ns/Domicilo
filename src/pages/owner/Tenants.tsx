@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { tenants as seed } from "@/lib/mockData";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useDataStore } from "@/store/DataStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -11,24 +10,23 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-type Tenant = typeof seed[number];
-
 export default function Tenants() {
-  const [list, setList] = useLocalStorage<Tenant[]>("domicilo:tenants", seed);
+  const { data, setTenantStatus, removeTenant } = useDataStore();
+  const list = data.tenants;
   const [q, setQ] = useState("");
 
   const filtered = list.filter((t) => `${t.name} ${t.room} ${t.property}`.toLowerCase().includes(q.toLowerCase()));
 
-  const togglePause = (id: string) => {
-    setList((prev) => prev.map((t) => t.id === id ? { ...t, status: t.status === "paused" ? "active" : "paused" } : t));
+  const togglePause = (id: string, current: string) => {
+    setTenantStatus(id, current === "paused" ? "active" : "paused");
     toast.success("Billing updated");
   };
   const deactivate = (id: string) => {
-    setList((prev) => prev.map((t) => t.id === id ? { ...t, status: "deactivated" } : t));
+    setTenantStatus(id, "deactivated");
     toast.success("Tenant deactivated", { description: "You can permanently delete after deactivation." });
   };
   const remove = (id: string, n: string) => {
-    setList((prev) => prev.filter((t) => t.id !== id));
+    removeTenant(id);
     toast.success("Tenant deleted", { description: n });
   };
 
@@ -70,7 +68,7 @@ export default function Tenants() {
                     <td className="p-3"><Badge className={statusColor(t.status)} variant="outline">{t.status}</Badge></td>
                     <td className="p-3">
                       <div className="flex items-center justify-end gap-1">
-                        <Button size="sm" variant="ghost" onClick={() => togglePause(t.id)} disabled={deactivated} title="Pause/resume">
+                        <Button size="sm" variant="ghost" onClick={() => togglePause(t.id, t.status)} disabled={deactivated} title="Pause/resume">
                           {t.status === "paused" ? <PlayCircle className="h-4 w-4" /> : <PauseCircle className="h-4 w-4" />}
                         </Button>
                         <Button size="sm" variant="ghost" onClick={() => deactivate(t.id)} disabled={deactivated} title="Deactivate">

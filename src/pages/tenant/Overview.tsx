@@ -1,9 +1,11 @@
 import { useAuth } from "@/hooks/useAuth";
-import { transactions } from "@/lib/mockData";
+import { useDataStore } from "@/store/DataStore";
 import { Wallet, Receipt, CalendarCheck } from "lucide-react";
 
 export default function TenantOverview() {
   const { user } = useAuth();
+  const { data } = useDataStore();
+  const transactions = data.transactions;
   return (
     <div className="space-y-6">
       <div>
