@@ -118,6 +118,11 @@
 
   html {
     scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
+
+  section[id] {
+    scroll-margin-top: 5rem;
   }
 
   body {
