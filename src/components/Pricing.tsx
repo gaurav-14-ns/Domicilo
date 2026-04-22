@@ -1,7 +1,7 @@
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+import { ContactDialog } from "./ContactDialog";
 
 const tiers = [
   {
@@ -39,10 +39,6 @@ const tiers = [
 
 export const Pricing = () => {
   const nav = useNavigate();
-  const handle = (a: "signup" | "contact", name: string) => {
-    if (a === "signup") nav("/auth");
-    else toast.success("Sales request received", { description: `We'll reach out about the ${name} plan.` });
-  };
   return (
     <section id="pricing" className="py-24 md:py-32 bg-muted/30">
       <div className="container">
@@ -72,7 +68,15 @@ export const Pricing = () => {
                 <span className="text-muted-foreground">{t.period}</span>
               </div>
               <p className="mt-2 text-sm text-muted-foreground">{t.desc}</p>
-              <Button variant={t.variant} className="w-full mt-6" onClick={() => handle(t.action, t.name)}>{t.cta}</Button>
+              {t.action === "signup" ? (
+                <Button variant={t.variant} className="w-full mt-6" onClick={() => nav("/auth")}>{t.cta}</Button>
+              ) : (
+                <ContactDialog
+                  variant="sales"
+                  context={t.name}
+                  trigger={<Button variant={t.variant} className="w-full mt-6">{t.cta}</Button>}
+                />
+              )}
               <ul className="mt-6 space-y-3">
                 {t.features.map((f) => (
                   <li key={f} className="flex items-start gap-2.5 text-sm">

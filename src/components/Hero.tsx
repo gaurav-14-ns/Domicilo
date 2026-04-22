@@ -1,7 +1,7 @@
 import { ArrowRight, Sparkles, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+import { ContactDialog } from "./ContactDialog";
 
 export const Hero = () => {
   const nav = useNavigate();
@@ -26,9 +26,14 @@ export const Hero = () => {
               Start 14-day trial
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
-            <Button variant="glass" size="xl" className="w-full sm:w-auto" onClick={() => toast.info("Demo video coming soon", { description: "We'll email you the link." })}>
-              Watch 2-min demo
-            </Button>
+            <ContactDialog
+              variant="video"
+              trigger={
+                <Button variant="glass" size="xl" className="w-full sm:w-auto">
+                  Watch 2-min demo
+                </Button>
+              }
+            />
           </div>
           <div className="mt-8 flex items-center justify-center gap-2 text-xs text-muted-foreground">
             <ShieldCheck className="h-4 w-4 text-primary" />
