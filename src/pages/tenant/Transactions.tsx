@@ -1,7 +1,9 @@
-import { transactions } from "@/lib/mockData";
+import { transactions as seed } from "@/lib/mockData";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { Badge } from "@/components/ui/badge";
 
 export default function TenantTransactions() {
+  const [transactions] = useLocalStorage("domicilo:transactions", seed);
   return (
     <div className="space-y-6">
       <h1 className="text-2xl md:text-3xl font-display font-bold">My transactions</h1>
