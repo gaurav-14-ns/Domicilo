@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { tenants as seed } from "@/lib/mockData";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +14,7 @@ import {
 type Tenant = typeof seed[number];
 
 export default function Tenants() {
-  const [list, setList] = useState<Tenant[]>(seed);
+  const [list, setList] = useLocalStorage<Tenant[]>("domicilo:tenants", seed);
   const [q, setQ] = useState("");
 
   const filtered = list.filter((t) => `${t.name} ${t.room} ${t.property}`.toLowerCase().includes(q.toLowerCase()));
