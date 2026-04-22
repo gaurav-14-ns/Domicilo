@@ -1,7 +1,10 @@
 import { ArrowRight, Sparkles, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export const Hero = () => {
+  const nav = useNavigate();
   return (
     <section className="relative pt-32 pb-20 md:pt-44 md:pb-28 overflow-hidden bg-hero">
       <div className="absolute inset-0 grid-pattern opacity-60" aria-hidden />
@@ -19,11 +22,11 @@ export const Hero = () => {
             Domicilo gives owners and operators a unified workspace for tenants, rooms, billing pauses, and rent collection — across every building.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Button variant="hero" size="xl" className="w-full sm:w-auto group">
+            <Button variant="hero" size="xl" className="w-full sm:w-auto group" onClick={() => nav("/auth")}>
               Start 14-day trial
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
-            <Button variant="glass" size="xl" className="w-full sm:w-auto">
+            <Button variant="glass" size="xl" className="w-full sm:w-auto" onClick={() => toast.info("Demo video coming soon", { description: "We'll email you the link." })}>
               Watch 2-min demo
             </Button>
           </div>
