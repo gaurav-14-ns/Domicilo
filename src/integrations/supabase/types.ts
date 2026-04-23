@@ -14,6 +14,111 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_orgs: {
+        Row: {
+          created_at: string
+          id: string
+          mrr: number
+          name: string
+          owner: string
+          plan: string
+          updated_at: string
+          users: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mrr?: number
+          name: string
+          owner?: string
+          plan?: string
+          updated_at?: string
+          users?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mrr?: number
+          name?: string
+          owner?: string
+          plan?: string
+          updated_at?: string
+          users?: number
+        }
+        Relationships: []
+      }
+      app_settings: {
+        Row: {
+          company_name: string
+          contact_email: string
+          created_at: string
+          currency_code: string
+          display_name: string
+          email_notifications: boolean
+          locale: string
+          sms_notifications: boolean
+          theme: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_name?: string
+          contact_email?: string
+          created_at?: string
+          currency_code?: string
+          display_name?: string
+          email_notifications?: boolean
+          locale?: string
+          sms_notifications?: boolean
+          theme?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_name?: string
+          contact_email?: string
+          created_at?: string
+          currency_code?: string
+          display_name?: string
+          email_notifications?: boolean
+          locale?: string
+          sms_notifications?: boolean
+          theme?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          company: string | null
+          created_at: string
+          email: string
+          id: string
+          message: string | null
+          name: string
+          source: string
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          message?: string | null
+          name: string
+          source?: string
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string | null
+          name?: string
+          source?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -37,6 +142,182 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      properties: {
+        Row: {
+          address: string
+          created_at: string
+          id: string
+          name: string
+          owner_id: string
+          units: number
+          updated_at: string
+        }
+        Insert: {
+          address?: string
+          created_at?: string
+          id?: string
+          name: string
+          owner_id: string
+          units?: number
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          id?: string
+          name?: string
+          owner_id?: string
+          units?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tenant_profiles: {
+        Row: {
+          created_at: string
+          email: string
+          emergency: string
+          phone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string
+          emergency?: string
+          phone?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          emergency?: string
+          phone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tenants: {
+        Row: {
+          created_at: string
+          deposit: number
+          email: string
+          id: string
+          name: string
+          owner_id: string
+          phone: string
+          property_id: string | null
+          rent: number
+          room: string
+          start_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deposit?: number
+          email?: string
+          id?: string
+          name: string
+          owner_id: string
+          phone?: string
+          property_id?: string | null
+          rent?: number
+          room?: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deposit?: number
+          email?: string
+          id?: string
+          name?: string
+          owner_id?: string
+          phone?: string
+          property_id?: string | null
+          rent?: number
+          room?: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenants_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transactions: {
+        Row: {
+          amount: number
+          auto: boolean
+          created_at: string
+          date: string
+          id: string
+          month_key: string | null
+          note: string | null
+          owner_id: string
+          property_id: string | null
+          status: string
+          tenant_id: string | null
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          auto?: boolean
+          created_at?: string
+          date?: string
+          id?: string
+          month_key?: string | null
+          note?: string | null
+          owner_id: string
+          property_id?: string | null
+          status?: string
+          tenant_id?: string | null
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          auto?: boolean
+          created_at?: string
+          date?: string
+          id?: string
+          month_key?: string | null
+          note?: string | null
+          owner_id?: string
+          property_id?: string | null
+          status?: string
+          tenant_id?: string | null
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
