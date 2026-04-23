@@ -1,6 +1,5 @@
 import { Building2 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ContactDialog } from "./ContactDialog";
 
 const sections = [
   { h: "Product", l: [
@@ -10,12 +9,12 @@ const sections = [
     { label: "Sign in", href: "/auth" },
   ]},
   { h: "Company", l: [
-    { label: "About", href: "/#features" },
-    { label: "Contact", href: "contact" as const },
+    { label: "About", href: "/about" },
+    { label: "Contact", href: "/contact" },
   ]},
   { h: "Legal", l: [
-    { label: "Privacy", href: "/#faq" },
-    { label: "Terms", href: "/#faq" },
+    { label: "Privacy", href: "/privacy" },
+    { label: "Terms", href: "/terms" },
   ]},
 ];
 
@@ -59,30 +58,17 @@ export const Footer = () => {
             <div key={c.h}>
               <div className="font-display font-semibold text-sm mb-3">{c.h}</div>
               <ul className="space-y-2">
-                {c.l.map((i) =>
-                  i.href === "contact" ? (
-                    <li key={i.label}>
-                      <ContactDialog
-                        variant="sales"
-                        trigger={
-                          <button className="text-sm text-muted-foreground hover:text-foreground transition-smooth">
-                            {i.label}
-                          </button>
-                        }
-                      />
-                    </li>
-                  ) : (
-                    <li key={i.label}>
-                      <Link
-                        to={i.href}
-                        onClick={(e) => onHashClick(e, i.href)}
-                        className="text-sm text-muted-foreground hover:text-foreground transition-smooth"
-                      >
-                        {i.label}
-                      </Link>
-                    </li>
-                  )
-                )}
+                {c.l.map((i) => (
+                  <li key={i.label}>
+                    <Link
+                      to={i.href}
+                      onClick={(e) => onHashClick(e, i.href)}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-smooth"
+                    >
+                      {i.label}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
           ))}

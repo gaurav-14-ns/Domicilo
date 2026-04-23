@@ -17,7 +17,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Download, Search, Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { formatINR, todayISO } from "@/lib/format";
+import { todayISO } from "@/lib/format";
+import { useCurrency } from "@/hooks/useCurrency";
 import type { Transaction, TransactionStatus, TransactionType } from "@/store/types";
 
 const TYPES: TransactionType[] = ["Rent", "Water", "Electricity", "Maintenance", "Penalty", "Refund", "Other"];
@@ -35,6 +36,7 @@ const emptyForm: FormState = {
 export default function Transactions() {
   const { data, addTransaction, updateTransaction, removeTransaction } = useDataStore();
   const { transactions, tenants, properties } = data;
+  const { fmt, symbol, code } = useCurrency();
 
   const [q, setQ] = useState("");
   const [propertyFilter, setPropertyFilter] = useState("all");
@@ -109,7 +111,7 @@ export default function Transactions() {
   };
 
   const exportCsv = () => {
-    const header = "Date,Tenant,Property,Type,Amount (INR),Status,Note\n";
+    const header = `Date,Tenant,Property,Type,Amount (${code}),Status,Note\n`;
     const escape = (v: string) => `"${(v ?? "").replace(/"/g, '""')}"`;
     const rows = filtered.map((t) =>
       [t.date, escape(t.tenant), escape(t.property ?? ""), t.type, t.amount, t.status, escape(t.note ?? "")].join(",")
@@ -158,7 +160,7 @@ export default function Transactions() {
                   </Select>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-2"><Label>Amount (₹)</Label><Input type="number" required value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} /></div>
+                  <div className="space-y-2"><Label>Amount ({symbol})</Label><Input type="number" required value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} /></div>
                   <div className="space-y-2">
                     <Label>Status</Label>
                     <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v as TransactionStatus })}>
@@ -202,8 +204,8 @@ export default function Transactions() {
           </SelectContent>
         </Select>
         <div className="flex gap-2">
-          <Input type="number" placeholder="Min ₹" value={minAmount} onChange={(e) => setMinAmount(e.target.value)} />
-          <Input type="number" placeholder="Max ₹" value={maxAmount} onChange={(e) => setMaxAmount(e.target.value)} />
+          <Input type="number" placeholder={`Min ${symbol}`} value={minAmount} onChange={(e) => setMinAmount(e.target.value)} />
+          <Input type="number" placeholder={`Max ${symbol}`} value={maxAmount} onChange={(e) => setMaxAmount(e.target.value)} />
         </div>
         <div className="flex gap-2 md:col-span-2">
           <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
@@ -238,7 +240,7 @@ export default function Transactions() {
                     <td className="p-3 font-medium">{t.tenant || "—"}</td>
                     <td className="p-3 text-muted-foreground hidden md:table-cell">{t.property ?? "—"}</td>
                     <td className="p-3">{t.type}{t.auto && <span className="ml-2 text-[10px] uppercase text-muted-foreground">auto</span>}</td>
-                    <td className={`p-3 font-medium ${t.amount < 0 ? "text-destructive" : ""}`}>{formatINR(t.amount)}</td>
+                    <td className={`p-3 font-medium ${t.amount < 0 ? "text-destructive" : ""}`}>{fmt(t.amount)}</td>
                     <td className="p-3"><Badge variant="outline" className="capitalize">{t.status}</Badge></td>
                     <td className="p-3">
                       <div className="flex items-center justify-end gap-1">

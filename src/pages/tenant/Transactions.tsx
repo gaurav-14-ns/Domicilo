@@ -1,12 +1,13 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useDataStore } from "@/store/DataStore";
+import { useCurrency } from "@/hooks/useCurrency";
 import { useCurrentTenant, useTenantTransactions } from "@/hooks/useTenantData";
 import { Badge } from "@/components/ui/badge";
-import { formatINR } from "@/lib/format";
 
 export default function TenantTransactions() {
   const { user } = useAuth();
   const { data } = useDataStore();
+  const { fmt } = useCurrency();
   const tenant = useCurrentTenant(data.tenants, user?.email);
   const txs = useTenantTransactions(data.transactions, tenant?.id);
 
@@ -29,7 +30,7 @@ export default function TenantTransactions() {
                 <tr key={t.id} className="border-t border-border">
                   <td className="p-3 text-muted-foreground">{t.date}</td>
                   <td className="p-3">{t.type}</td>
-                  <td className="p-3 font-medium">{formatINR(t.amount)}</td>
+                  <td className="p-3 font-medium">{fmt(t.amount)}</td>
                   <td className="p-3"><Badge variant="outline" className="capitalize">{t.status}</Badge></td>
                 </tr>
               ))}

@@ -1,6 +1,6 @@
 import { useDataStore } from "@/store/DataStore";
+import { useCurrency } from "@/hooks/useCurrency";
 import { TrendingUp, Users, DollarSign, AlertCircle } from "lucide-react";
-import { formatINR, formatINRCompact } from "@/lib/format";
 
 const KpiCard = ({ icon: Icon, label, value, delta }: any) => (
   <div className="rounded-xl border border-border bg-gradient-card p-5">
@@ -15,6 +15,7 @@ const KpiCard = ({ icon: Icon, label, value, delta }: any) => (
 
 export default function OwnerOverview() {
   const { data } = useDataStore();
+  const { fmt, fmtCompact } = useCurrency();
   const { properties, tenants, transactions } = data;
 
   const activeTenants = tenants.filter((t) => t.status === "active").length;
@@ -34,9 +35,9 @@ export default function OwnerOverview() {
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard icon={Users} label="Active tenants" value={activeTenants.toLocaleString()} delta="Live" />
-        <KpiCard icon={DollarSign} label="Monthly revenue" value={formatINRCompact(monthlyRevenue)} delta="Live" />
+        <KpiCard icon={DollarSign} label="Monthly revenue" value={fmtCompact(monthlyRevenue)} delta="Live" />
         <KpiCard icon={TrendingUp} label="Occupancy" value={`${occupancy.toFixed(1)}%`} delta="Live" />
-        <KpiCard icon={AlertCircle} label="Pending dues" value={formatINR(pendingDues)} delta="Live" />
+        <KpiCard icon={AlertCircle} label="Pending dues" value={fmt(pendingDues)} delta="Live" />
       </div>
       <div className="grid lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 rounded-xl border border-border bg-gradient-card p-5">
@@ -49,29 +50,37 @@ export default function OwnerOverview() {
         </div>
         <div className="rounded-xl border border-border bg-gradient-card p-5">
           <div className="text-sm font-semibold mb-4">Recent transactions</div>
-          <div className="space-y-3">
-            {transactions.slice(0, 5).map((t) => (
-              <div key={t.id} className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground truncate">{t.tenant || t.type}</span>
-                <span className={`font-medium ${t.amount > 0 ? "text-primary" : "text-destructive"}`}>
-                  {formatINR(t.amount)}
-                </span>
-              </div>
-            ))}
-          </div>
+          {transactions.length === 0 ? (
+            <div className="text-sm text-muted-foreground">No activity yet.</div>
+          ) : (
+            <div className="space-y-3">
+              {transactions.slice(0, 5).map((t) => (
+                <div key={t.id} className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground truncate">{t.tenant || t.type}</span>
+                  <span className={`font-medium ${t.amount > 0 ? "text-primary" : "text-destructive"}`}>
+                    {fmt(t.amount)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
       <div className="rounded-xl border border-border bg-gradient-card p-5">
         <div className="text-sm font-semibold mb-4">Properties snapshot</div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {properties.map((p) => (
-            <div key={p.id} className="rounded-lg border border-border p-4">
-              <div className="font-display font-semibold">{p.name}</div>
-              <div className="text-xs text-muted-foreground">{p.address}</div>
-              <div className="mt-3 text-xs">{p.occupied}/{p.units} occupied</div>
-            </div>
-          ))}
-        </div>
+        {properties.length === 0 ? (
+          <div className="text-sm text-muted-foreground">Add your first property to get started.</div>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {properties.map((p) => (
+              <div key={p.id} className="rounded-lg border border-border p-4">
+                <div className="font-display font-semibold">{p.name}</div>
+                <div className="text-xs text-muted-foreground">{p.address}</div>
+                <div className="mt-3 text-xs">{p.occupied}/{p.units} occupied</div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

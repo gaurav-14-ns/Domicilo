@@ -19,17 +19,24 @@ export default function Profile() {
   });
 
   useEffect(() => {
-    if (tenant) setForm((f) => ({ ...f, phone: tenant.phone || f.phone }));
-  }, [tenant?.id]);
+    setForm({
+      phone: tenant?.phone || data.tenantProfile.phone,
+      emergency: data.tenantProfile.emergency,
+    });
+  }, [tenant?.id, data.tenantProfile.emergency, tenant?.phone]);
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
-    await new Promise((r) => setTimeout(r, 350));
-    updateTenantProfile({ phone: form.phone, emergency: form.emergency, email: user?.email ?? "" });
-    if (tenant) updateTenant(tenant.id, { phone: form.phone });
-    setBusy(false);
-    toast.success("Profile updated");
+    try {
+      await updateTenantProfile({ phone: form.phone, emergency: form.emergency, email: user?.email ?? "" });
+      if (tenant) await updateTenant(tenant.id, { phone: form.phone });
+      toast.success("Profile updated");
+    } catch (err: any) {
+      toast.error("Update failed", { description: err.message });
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -38,7 +45,7 @@ export default function Profile() {
       <form onSubmit={save} className="rounded-xl border border-border bg-gradient-card p-6 space-y-4">
         <div className="space-y-2"><Label>Email</Label><Input value={user?.email ?? ""} disabled /></div>
         <div className="space-y-2"><Label>Name</Label><Input value={tenant?.name ?? ""} disabled /></div>
-        <div className="space-y-2"><Label>Property</Label><Input value={tenant ? `${tenant.property} · Room ${tenant.room}` : ""} disabled /></div>
+        <div className="space-y-2"><Label>Property</Label><Input value={tenant ? `${tenant.property} · Room ${tenant.room}` : "Not yet assigned"} disabled /></div>
         <div className="space-y-2"><Label>Phone</Label><Input placeholder="+91 …" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
         <div className="space-y-2"><Label>Emergency contact</Label><Input placeholder="Name & phone" value={form.emergency} onChange={(e) => setForm({ ...form, emergency: e.target.value })} /></div>
         <Button type="submit" variant="hero" disabled={busy}>

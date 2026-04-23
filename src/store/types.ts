@@ -1,10 +1,12 @@
+import type { CurrencyCode } from "@/lib/currency";
+
 export type Property = {
   id: string;
   name: string;
   address: string;
   units: number;
-  occupied: number; // derived from active tenants, kept in sync by store
-  revenue: number;  // derived from completed transactions for this property
+  occupied: number; // derived
+  revenue: number;  // derived
 };
 
 export type TenantStatus = "active" | "paused" | "deactivated" | "moved_out";
@@ -13,41 +15,35 @@ export type Tenant = {
   id: string;
   name: string;
   room: string;
-  property: string; // property name (kept for backward compat)
+  property: string;        // property name snapshot (derived from join)
   propertyId?: string;
   rent: number;
   deposit: number;
   email: string;
   phone: string;
-  startDate: string; // ISO yyyy-mm-dd
+  startDate: string;       // yyyy-mm-dd
   status: TenantStatus;
-  joined: string; // legacy alias for startDate
-  lastBilledMonth?: string; // yyyy-mm
+  joined: string;          // legacy alias for startDate
 };
 
 export type TransactionStatus = "completed" | "pending" | "paused" | "refund";
 
 export type TransactionType =
-  | "Rent"
-  | "Water"
-  | "Electricity"
-  | "Maintenance"
-  | "Penalty"
-  | "Refund"
-  | "Other";
+  | "Rent" | "Water" | "Electricity" | "Maintenance"
+  | "Penalty" | "Refund" | "Other";
 
 export type Transaction = {
   id: string;
-  date: string; // yyyy-mm-dd
-  tenant: string; // tenant name snapshot
+  date: string;            // yyyy-mm-dd
+  tenant: string;          // tenant name snapshot
   tenantId?: string;
   propertyId?: string;
   property?: string;
   type: TransactionType | string;
-  amount: number; // in INR
+  amount: number;
   status: TransactionStatus;
   note?: string;
-  auto?: boolean; // true if auto-generated rent
+  auto?: boolean;
 };
 
 export type AdminOrg = {
@@ -66,6 +62,8 @@ export type Settings = {
   emailNotifications: boolean;
   smsNotifications: boolean;
   theme: "light" | "dark" | "system";
+  currencyCode: CurrencyCode;
+  locale: string;
 };
 
 export type TenantProfile = {

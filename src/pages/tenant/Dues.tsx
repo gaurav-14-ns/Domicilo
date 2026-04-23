@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useDataStore } from "@/store/DataStore";
+import { useCurrency } from "@/hooks/useCurrency";
 import { useCurrentTenant, useTenantDues } from "@/hooks/useTenantData";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { formatINR } from "@/lib/format";
 import { Loader2 } from "lucide-react";
 
 export default function Dues() {
   const { user } = useAuth();
   const { data, updateTransaction } = useDataStore();
+  const { fmt } = useCurrency();
   const tenant = useCurrentTenant(data.tenants, user?.email);
   const outstanding = useTenantDues(data.transactions, tenant?.id);
   const pending = data.transactions.filter((t) => t.tenantId === tenant?.id && t.status === "pending");
@@ -21,10 +22,14 @@ export default function Dues() {
       return;
     }
     setBusy(true);
-    await new Promise((r) => setTimeout(r, 600));
-    pending.forEach((p) => updateTransaction(p.id, { status: "completed" }));
-    setBusy(false);
-    toast.success("Payment successful", { description: `${formatINR(outstanding)} cleared.` });
+    try {
+      await Promise.all(pending.map((p) => updateTransaction(p.id, { status: "completed" })));
+      toast.success("Payment successful", { description: `${fmt(outstanding)} cleared.` });
+    } catch (err: any) {
+      toast.error("Payment failed", { description: err.message });
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -32,7 +37,7 @@ export default function Dues() {
       <h1 className="text-2xl md:text-3xl font-display font-bold">My dues</h1>
       <div className="rounded-xl border border-border bg-gradient-card p-6">
         <div className="text-sm text-muted-foreground">Total outstanding</div>
-        <div className="text-4xl font-bold font-display mt-2">{formatINR(outstanding)}</div>
+        <div className="text-4xl font-bold font-display mt-2">{fmt(outstanding)}</div>
         <div className="text-sm text-muted-foreground mt-1">
           {pending.length ? `${pending.length} pending charge${pending.length > 1 ? "s" : ""}` : "No pending charges"}
         </div>
@@ -47,7 +52,7 @@ export default function Dues() {
             {pending.map((p) => (
               <div key={p.id} className="flex justify-between border-t border-border pt-2">
                 <span className="text-muted-foreground">{p.date} · {p.type}</span>
-                <span className="font-medium">{formatINR(p.amount)}</span>
+                <span className="font-medium">{fmt(p.amount)}</span>
               </div>
             ))}
           </div>
