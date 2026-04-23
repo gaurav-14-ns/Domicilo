@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 type Variant = "demo" | "sales" | "video";
 
@@ -36,10 +37,8 @@ const COPY: Record<Variant, { title: string; description: string; submit: string
 interface Props {
   variant: Variant;
   trigger: ReactNode;
-  context?: string; // e.g. plan name
+  context?: string;
 }
-
-const STORAGE_KEY = "domicilo:leads";
 
 export function ContactDialog({ variant, trigger, context }: Props) {
   const copy = COPY[variant];
@@ -55,20 +54,23 @@ export function ContactDialog({ variant, trigger, context }: Props) {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!name.trim() || !email.trim()) {
+      toast.error("Name and email are required");
+      return;
+    }
     setBusy(true);
-    await new Promise((r) => setTimeout(r, 600));
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      const list = raw ? JSON.parse(raw) : [];
-      list.push({
-        id: `lead_${Date.now()}`,
-        variant, context: context ?? null,
-        name, email, company, message,
-        createdAt: new Date().toISOString(),
-      });
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-    } catch { /* ignore */ }
+    const { error } = await supabase.from("leads").insert({
+      name: name.trim(),
+      email: email.trim(),
+      company: company.trim() || null,
+      message: [context ? `[${context}]` : "", message.trim()].filter(Boolean).join(" ") || null,
+      source: variant,
+    });
     setBusy(false);
+    if (error) {
+      toast.error("Couldn't send", { description: error.message });
+      return;
+    }
     toast.success(copy.success, {
       description: context ? `Plan: ${context} · ${email}` : email,
     });

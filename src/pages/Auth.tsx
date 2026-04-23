@@ -9,6 +9,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, dashboardPathFor, AppRole } from "@/hooks/useAuth";
+import { detectCurrencyFromBrowser } from "@/lib/currency";
 
 export default function Auth() {
   const nav = useNavigate();
@@ -24,7 +25,6 @@ export default function Auth() {
   // signin
   const [email, setEmail] = useState("");
   const [pwd, setPwd] = useState("");
-  const [signinRole, setSigninRole] = useState<AppRole>("owner");
 
   useEffect(() => {
     if (!loading && user && role) nav(dashboardPathFor(role), { replace: true });
@@ -34,12 +34,18 @@ export default function Auth() {
     e.preventDefault();
     setBusy(true);
     try {
+      const detected = detectCurrencyFromBrowser();
       const { error } = await supabase.auth.signUp({
         email: signupEmail,
         password: signupPwd,
         options: {
           emailRedirectTo: `${window.location.origin}/`,
-          data: { full_name: name, role: signupRole },
+          data: {
+            full_name: name,
+            role: signupRole,
+            currency_code: detected.code,
+            locale: detected.locale,
+          },
         },
       });
       if (error) throw error;
@@ -57,7 +63,7 @@ export default function Auth() {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password: pwd });
       if (error) throw error;
-      toast.success(`Welcome back`, { description: `Signed in as ${signinRole}` });
+      toast.success("Welcome back");
     } catch (err: any) {
       toast.error("Sign in failed", { description: err.message });
     } finally {
@@ -84,17 +90,6 @@ export default function Auth() {
             <TabsContent value="signin">
               <form onSubmit={handleSignin} className="space-y-4 pt-4">
                 <div className="space-y-2">
-                  <Label>I am a</Label>
-                  <RadioGroup value={signinRole} onValueChange={(v) => setSigninRole(v as AppRole)} className="grid grid-cols-3 gap-2">
-                    {(["owner", "tenant", "admin"] as AppRole[]).map((r) => (
-                      <Label key={r} htmlFor={`si-${r}`} className={`cursor-pointer rounded-lg border px-3 py-2 text-center text-sm capitalize transition-smooth ${signinRole === r ? "border-primary bg-primary/10 text-primary" : "border-border"}`}>
-                        <RadioGroupItem value={r} id={`si-${r}`} className="sr-only" />
-                        {r}
-                      </Label>
-                    ))}
-                  </RadioGroup>
-                </div>
-                <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
                 </div>
@@ -105,6 +100,9 @@ export default function Auth() {
                 <Button type="submit" variant="hero" className="w-full" disabled={busy}>
                   {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign in"}
                 </Button>
+                <p className="text-xs text-muted-foreground text-center">
+                  You'll be sent to your portal automatically based on your account type.
+                </p>
               </form>
             </TabsContent>
 
@@ -112,14 +110,25 @@ export default function Auth() {
               <form onSubmit={handleSignup} className="space-y-4 pt-4">
                 <div className="space-y-2">
                   <Label>Account type</Label>
-                  <RadioGroup value={signupRole} onValueChange={(v) => setSignupRole(v as AppRole)} className="grid grid-cols-3 gap-2">
-                    {(["owner", "tenant", "admin"] as AppRole[]).map((r) => (
-                      <Label key={r} htmlFor={`su-${r}`} className={`cursor-pointer rounded-lg border px-3 py-2 text-center text-sm capitalize transition-smooth ${signupRole === r ? "border-primary bg-primary/10 text-primary" : "border-border"}`}>
+                  <RadioGroup
+                    value={signupRole}
+                    onValueChange={(v) => setSignupRole(v as AppRole)}
+                    className="grid grid-cols-2 gap-2"
+                  >
+                    {(["owner", "tenant"] as AppRole[]).map((r) => (
+                      <Label
+                        key={r}
+                        htmlFor={`su-${r}`}
+                        className={`cursor-pointer rounded-lg border px-3 py-2 text-center text-sm capitalize transition-smooth ${
+                          signupRole === r ? "border-primary bg-primary/10 text-primary" : "border-border"
+                        }`}
+                      >
                         <RadioGroupItem value={r} id={`su-${r}`} className="sr-only" />
-                        {r}
+                        {r === "owner" ? "Property owner" : "Tenant"}
                       </Label>
                     ))}
                   </RadioGroup>
+                  <p className="text-[11px] text-muted-foreground">Admin accounts are issued by the platform.</p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="name">Full name</Label>
