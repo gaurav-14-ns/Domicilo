@@ -1,9 +1,11 @@
 import { useMemo } from "react";
 import { useDataStore } from "@/store/DataStore";
-import { formatINR, monthKey, prettyMonth } from "@/lib/format";
+import { useCurrency } from "@/hooks/useCurrency";
+import { monthKey, prettyMonth } from "@/lib/format";
 
 export default function Reports() {
   const { data } = useDataStore();
+  const { fmt } = useCurrency();
   const { properties, tenants, transactions } = data;
 
   const totalRevenue = properties.reduce((s, p) => s + p.revenue, 0);
@@ -15,7 +17,6 @@ export default function Reports() {
     .filter((t) => t.status === "pending")
     .reduce((s, t) => s + Math.max(0, t.amount), 0);
 
-  // Last 6 months trend (completed only)
   const trend = useMemo(() => {
     const now = new Date();
     const months: { key: string; label: string; total: number }[] = [];
@@ -43,11 +44,11 @@ export default function Reports() {
 
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         {[
-          { l: "Total revenue", v: formatINR(totalRevenue) },
+          { l: "Total revenue", v: fmt(totalRevenue) },
           { l: "Active tenants", v: activeTenants.toLocaleString() },
           { l: "Total units", v: totalUnits },
           { l: "Vacant units", v: vacantUnits },
-          { l: "Pending dues", v: formatINR(dues) },
+          { l: "Pending dues", v: fmt(dues) },
         ].map((k) => (
           <div key={k.l} className="rounded-xl border border-border bg-gradient-card p-5">
             <div className="text-xs uppercase text-muted-foreground">{k.l}</div>
@@ -69,7 +70,7 @@ export default function Reports() {
                   <div key={p.id}>
                     <div className="flex justify-between text-sm mb-1">
                       <span>{p.name}</span>
-                      <span className="text-muted-foreground">{formatINR(p.revenue)}</span>
+                      <span className="text-muted-foreground">{fmt(p.revenue)}</span>
                     </div>
                     <div className="h-2 rounded-full bg-muted overflow-hidden">
                       <div className="h-full bg-gradient-primary" style={{ width: `${pct}%` }} />

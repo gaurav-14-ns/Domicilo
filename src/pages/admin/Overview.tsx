@@ -1,9 +1,10 @@
 import { useDataStore } from "@/store/DataStore";
+import { useCurrency } from "@/hooks/useCurrency";
 import { Building2, Users, DollarSign, Activity } from "lucide-react";
-import { formatINR } from "@/lib/format";
 
 export default function AdminOverview() {
   const { data } = useDataStore();
+  const { fmt } = useCurrency();
   const adminOrgs = data.adminOrgs;
   const totalMrr = adminOrgs.reduce((s, o) => s + o.mrr, 0);
   const totalUsers = adminOrgs.reduce((s, o) => s + o.users, 0);
@@ -17,7 +18,7 @@ export default function AdminOverview() {
         {[
           { i: Building2, l: "Organizations", v: adminOrgs.length },
           { i: Users, l: "Total users", v: totalUsers },
-          { i: DollarSign, l: "MRR", v: formatINR(totalMrr) },
+          { i: DollarSign, l: "MRR", v: fmt(totalMrr) },
           { i: Activity, l: "System health", v: "99.98%" },
         ].map((k) => (
           <div key={k.l} className="rounded-xl border border-border bg-gradient-card p-5">
