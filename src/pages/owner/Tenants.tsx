@@ -17,7 +17,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { PauseCircle, PlayCircle, UserMinus, Trash2, Search, Plus, Pencil, LogOut } from "lucide-react";
-import { formatINR, todayISO } from "@/lib/format";
+import { todayISO } from "@/lib/format";
+import { useCurrency } from "@/hooks/useCurrency";
 import type { Tenant, TenantStatus } from "@/store/types";
 
 type FormState = {
@@ -34,6 +35,7 @@ const emptyForm: FormState = {
 export default function Tenants() {
   const { data, addTenant, updateTenant, removeTenant, setTenantStatus, moveOutTenant } = useDataStore();
   const { tenants, properties } = data;
+  const { fmt, symbol } = useCurrency();
 
   const [q, setQ] = useState("");
   const [propertyFilter, setPropertyFilter] = useState<string>("all");
@@ -151,8 +153,8 @@ export default function Tenants() {
                 <div className="space-y-2"><Label>Room / unit</Label><Input required value={form.room} onChange={(e) => setForm({ ...form, room: e.target.value })} /></div>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2"><Label>Rent (₹)</Label><Input type="number" min="0" required value={form.rent} onChange={(e) => setForm({ ...form, rent: e.target.value })} /></div>
-                <div className="space-y-2"><Label>Deposit (₹)</Label><Input type="number" min="0" value={form.deposit} onChange={(e) => setForm({ ...form, deposit: e.target.value })} /></div>
+                <div className="space-y-2"><Label>Rent ({symbol})</Label><Input type="number" min="0" required value={form.rent} onChange={(e) => setForm({ ...form, rent: e.target.value })} /></div>
+                <div className="space-y-2"><Label>Deposit ({symbol})</Label><Input type="number" min="0" value={form.deposit} onChange={(e) => setForm({ ...form, deposit: e.target.value })} /></div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2"><Label>Start date</Label><Input type="date" required value={form.startDate} onChange={(e) => setForm({ ...form, startDate: e.target.value })} /></div>
@@ -229,7 +231,7 @@ export default function Tenants() {
                       </td>
                       <td className="p-3 text-muted-foreground hidden md:table-cell">{t.property || "—"}</td>
                       <td className="p-3">{t.room}</td>
-                      <td className="p-3">{formatINR(t.rent)}</td>
+                      <td className="p-3">{fmt(t.rent)}</td>
                       <td className="p-3"><Badge className={statusColor(t.status)} variant="outline">{t.status.replace("_", " ")}</Badge></td>
                       <td className="p-3">
                         <div className="flex items-center justify-end gap-1">

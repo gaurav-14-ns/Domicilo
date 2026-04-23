@@ -12,13 +12,14 @@ import {
 } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash2, Search } from "lucide-react";
 import { toast } from "sonner";
-import { formatINR } from "@/lib/format";
+import { useCurrency } from "@/hooks/useCurrency";
 
 const PLANS = ["Starter", "Growth", "Scale"];
 
 export default function Orgs() {
   const { data, updateAdminOrgs } = useDataStore();
   const orgs = data.adminOrgs;
+  const { fmt, symbol } = useCurrency();
 
   const [q, setQ] = useState("");
   const [planFilter, setPlanFilter] = useState("all");
@@ -90,7 +91,7 @@ export default function Orgs() {
                   </Select>
                 </div>
                 <div className="space-y-2"><Label>Users</Label><Input type="number" min="0" value={form.users} onChange={(e) => setForm({ ...form, users: e.target.value })} /></div>
-                <div className="space-y-2"><Label>MRR (₹)</Label><Input type="number" min="0" value={form.mrr} onChange={(e) => setForm({ ...form, mrr: e.target.value })} /></div>
+                <div className="space-y-2"><Label>MRR ({symbol})</Label><Input type="number" min="0" value={form.mrr} onChange={(e) => setForm({ ...form, mrr: e.target.value })} /></div>
               </div>
               <DialogFooter><Button type="submit" variant="hero">{editId ? "Save" : "Create"}</Button></DialogFooter>
             </form>
@@ -138,7 +139,7 @@ export default function Orgs() {
                     <td className="p-3 text-muted-foreground">{o.owner}</td>
                     <td className="p-3"><Badge variant="outline">{o.plan}</Badge></td>
                     <td className="p-3">{o.users}</td>
-                    <td className="p-3">{formatINR(o.mrr)}</td>
+                    <td className="p-3">{fmt(o.mrr)}</td>
                     <td className="p-3">
                       <div className="flex items-center justify-end gap-1">
                         <Button size="sm" variant="ghost" onClick={() => openEdit(o.id)}><Pencil className="h-4 w-4" /></Button>
