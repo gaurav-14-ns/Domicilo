@@ -149,53 +149,66 @@ export default function Tenants() {
           <h1 className="text-2xl md:text-3xl font-display font-bold">Tenants</h1>
           <p className="text-muted-foreground">Add tenants, assign rooms, and control billing.</p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button variant="hero" onClick={openCreate}><Plus className="h-4 w-4" /> Add tenant</Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-lg">
-            <DialogHeader><DialogTitle>{editId ? "Edit tenant" : "New tenant"}</DialogTitle></DialogHeader>
-            <form onSubmit={submit} className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2"><Label>Full name</Label><Input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
-                <div className="space-y-2"><Label>Phone</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
-              </div>
-              <div className="space-y-2"><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label>Property</Label>
-                  <Select value={form.propertyId} onValueChange={(v) => setForm({ ...form, propertyId: v })}>
-                    <SelectTrigger><SelectValue placeholder="Select property" /></SelectTrigger>
-                    <SelectContent>
-                      {properties.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
+        {tenantAtLimit && !editId ? (
+          <Button variant="hero" onClick={() => setUpgradeOpen(true)} title={`${planLabel} plan limit`}>
+            <Lock className="h-4 w-4" /> Add tenant
+          </Button>
+        ) : (
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button variant="hero" onClick={openCreate}><Plus className="h-4 w-4" /> Add tenant</Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-lg">
+              <DialogHeader><DialogTitle>{editId ? "Edit tenant" : "New tenant"}</DialogTitle></DialogHeader>
+              <form onSubmit={submit} className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2"><Label>Full name</Label><Input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
+                  <div className="space-y-2"><Label>Phone</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
                 </div>
-                <div className="space-y-2"><Label>Room / unit</Label><Input required value={form.room} onChange={(e) => setForm({ ...form, room: e.target.value })} /></div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2"><Label>Rent ({symbol})</Label><Input type="number" min="0" required value={form.rent} onChange={(e) => setForm({ ...form, rent: e.target.value })} /></div>
-                <div className="space-y-2"><Label>Deposit ({symbol})</Label><Input type="number" min="0" value={form.deposit} onChange={(e) => setForm({ ...form, deposit: e.target.value })} /></div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2"><Label>Start date</Label><Input type="date" required value={form.startDate} onChange={(e) => setForm({ ...form, startDate: e.target.value })} /></div>
-                <div className="space-y-2">
-                  <Label>Status</Label>
-                  <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v as TenantStatus })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="paused">Paused</SelectItem>
-                      <SelectItem value="deactivated">Deactivated</SelectItem>
-                      <SelectItem value="moved_out">Moved out</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="space-y-2"><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label>Property</Label>
+                    <Select value={form.propertyId} onValueChange={(v) => setForm({ ...form, propertyId: v })}>
+                      <SelectTrigger><SelectValue placeholder="Select property" /></SelectTrigger>
+                      <SelectContent>
+                        {properties.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2"><Label>Room / unit</Label><Input required value={form.room} onChange={(e) => setForm({ ...form, room: e.target.value })} /></div>
                 </div>
-              </div>
-              <DialogFooter><Button type="submit" variant="hero">{editId ? "Save" : "Create"}</Button></DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2"><Label>Rent ({symbol})</Label><Input type="number" min="0" required value={form.rent} onChange={(e) => setForm({ ...form, rent: e.target.value })} /></div>
+                  <div className="space-y-2"><Label>Deposit ({symbol})</Label><Input type="number" min="0" value={form.deposit} onChange={(e) => setForm({ ...form, deposit: e.target.value })} /></div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2"><Label>Start date</Label><Input type="date" required value={form.startDate} onChange={(e) => setForm({ ...form, startDate: e.target.value })} /></div>
+                  <div className="space-y-2">
+                    <Label>Status</Label>
+                    <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v as TenantStatus })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="paused">Paused</SelectItem>
+                        <SelectItem value="deactivated">Deactivated</SelectItem>
+                        <SelectItem value="moved_out">Moved out</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <DialogFooter><Button type="submit" variant="hero">{editId ? "Save" : "Create"}</Button></DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+        )}
+        <UpgradeDialog
+          open={upgradeOpen}
+          onOpenChange={setUpgradeOpen}
+          reason={writesBlocked
+            ? "Your plan is paused. Reactivate to add more tenants."
+            : `${planLabel} includes ${limits.maxTenants === Infinity ? "unlimited" : limits.maxTenants} active tenants. You're at ${activeTenants}.`}
+        />
       </div>
 
       <div className="flex flex-wrap gap-2">
