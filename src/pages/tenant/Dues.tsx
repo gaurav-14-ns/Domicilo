@@ -4,33 +4,17 @@ import { useDataStore } from "@/store/DataStore";
 import { useCurrency } from "@/hooks/useCurrency";
 import { useCurrentTenant, useTenantDues } from "@/hooks/useTenantData";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { PaymentDialog } from "@/components/PaymentDialog";
+import { CheckCircle2 } from "lucide-react";
 
 export default function Dues() {
   const { user } = useAuth();
-  const { data, updateTransaction } = useDataStore();
+  const { data, refresh } = useDataStore();
   const { fmt } = useCurrency();
   const tenant = useCurrentTenant(data.tenants, user?.email);
   const outstanding = useTenantDues(data.transactions, tenant?.id);
   const pending = data.transactions.filter((t) => t.tenantId === tenant?.id && t.status === "pending");
-  const [busy, setBusy] = useState(false);
-
-  const payAll = async () => {
-    if (!pending.length) {
-      toast.info("Nothing to pay", { description: "You're all caught up." });
-      return;
-    }
-    setBusy(true);
-    try {
-      await Promise.all(pending.map((p) => updateTransaction(p.id, { status: "completed" })));
-      toast.success("Payment successful", { description: `${fmt(outstanding)} cleared.` });
-    } catch (err: any) {
-      toast.error("Payment failed", { description: err.message });
-    } finally {
-      setBusy(false);
-    }
-  };
+  const [open, setOpen] = useState(false);
 
   return (
     <div className="space-y-6 max-w-2xl">
@@ -39,11 +23,22 @@ export default function Dues() {
         <div className="text-sm text-muted-foreground">Total outstanding</div>
         <div className="text-4xl font-bold font-display mt-2">{fmt(outstanding)}</div>
         <div className="text-sm text-muted-foreground mt-1">
-          {pending.length ? `${pending.length} pending charge${pending.length > 1 ? "s" : ""}` : "No pending charges"}
+          {pending.length ? `${pending.length} pending charge${pending.length > 1 ? "s" : ""}` : "You're all caught up"}
         </div>
-        <Button variant="hero" className="mt-6 w-full sm:w-auto" disabled={busy || outstanding <= 0} onClick={payAll}>
-          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Pay now"}
-        </Button>
+        {pending.length === 0 ? (
+          <div className="mt-6 inline-flex items-center gap-2 text-primary text-sm font-medium">
+            <CheckCircle2 className="h-4 w-4" /> No payment needed
+          </div>
+        ) : (
+          <Button
+            variant="hero"
+            className="mt-6 w-full sm:w-auto"
+            disabled={outstanding <= 0}
+            onClick={() => setOpen(true)}
+          >
+            Pay now · {fmt(outstanding)}
+          </Button>
+        )}
       </div>
       {pending.length > 0 && (
         <div className="rounded-xl border border-border bg-gradient-card p-5">
@@ -58,6 +53,14 @@ export default function Dues() {
           </div>
         </div>
       )}
+
+      <PaymentDialog
+        open={open}
+        onOpenChange={setOpen}
+        pending={pending}
+        tenantId={tenant?.id}
+        onPaid={refresh}
+      />
     </div>
   );
 }
