@@ -1,7 +1,7 @@
 import { ArrowRight, Sparkles, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ContactDialog } from "./ContactDialog";
+import { DemoVideoDialog } from "./DemoVideoDialog";
 
 export const Hero = () => {
   const nav = useNavigate();
@@ -26,8 +26,7 @@ export const Hero = () => {
               Start 14-day trial
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
-            <ContactDialog
-              variant="video"
+            <DemoVideoDialog
               trigger={
                 <Button variant="glass" size="xl" className="w-full sm:w-auto">
                   Watch 2-min demo

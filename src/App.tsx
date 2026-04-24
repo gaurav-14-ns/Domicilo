@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
 import { DataStoreProvider } from "@/store/DataStore";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { ScrollToTop } from "@/components/ScrollToTop";
 import DashboardLayout from "@/layouts/DashboardLayout";
 
 import Index from "./pages/Index.tsx";
@@ -45,6 +46,7 @@ const App = () => (
         <BrowserRouter>
           <AuthProvider>
             <DataStoreProvider>
+              <ScrollToTop />
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
