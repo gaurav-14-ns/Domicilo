@@ -18,14 +18,23 @@ export default function Contact() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !email.trim() || !message.trim()) {
+    const n = name.trim(), em = email.trim(), msg = message.trim();
+    if (!n || !em || !msg) {
       toast.error("Please fill in all required fields");
+      return;
+    }
+    if (n.length < 2 || n.length > 100 || em.length > 255 || msg.length < 5 || msg.length > 2000) {
+      toast.error("Please check your input lengths");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) {
+      toast.error("Enter a valid email address");
       return;
     }
     setBusy(true);
     const { error } = await supabase.from("leads").insert({
-      name: name.trim(), email: email.trim(),
-      company: company.trim() || null, message: message.trim(),
+      name: n, email: em,
+      company: company.trim() || null, message: msg,
       source: "contact-page",
     });
     setBusy(false);
