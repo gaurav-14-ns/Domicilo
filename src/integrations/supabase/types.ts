@@ -89,6 +89,39 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_logs: {
+        Row: {
+          action: string
+          actor_email: string | null
+          actor_id: string | null
+          created_at: string
+          id: string
+          meta: Json | null
+          target_id: string | null
+          target_type: string | null
+        }
+        Insert: {
+          action: string
+          actor_email?: string | null
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          meta?: Json | null
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Update: {
+          action?: string
+          actor_email?: string | null
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          meta?: Json | null
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           company: string | null
@@ -125,6 +158,7 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          suspended: boolean
           updated_at: string
         }
         Insert: {
@@ -132,6 +166,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
+          suspended?: boolean
           updated_at?: string
         }
         Update: {
@@ -139,6 +174,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          suspended?: boolean
           updated_at?: string
         }
         Relationships: []
@@ -170,6 +206,81 @@ export type Database = {
           owner_id?: string
           units?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          amount: number
+          cancelled_at: string | null
+          created_at: string
+          currency_code: string
+          current_period_end: string | null
+          id: string
+          owner_id: string
+          plan: Database["public"]["Enums"]["subscription_plan"]
+          status: Database["public"]["Enums"]["subscription_status"]
+          trial_end: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          cancelled_at?: string | null
+          created_at?: string
+          currency_code?: string
+          current_period_end?: string | null
+          id?: string
+          owner_id: string
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          status?: Database["public"]["Enums"]["subscription_status"]
+          trial_end?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          cancelled_at?: string | null
+          created_at?: string
+          currency_code?: string
+          current_period_end?: string | null
+          id?: string
+          owner_id?: string
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          status?: Database["public"]["Enums"]["subscription_status"]
+          trial_end?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      support_tickets: {
+        Row: {
+          body: string
+          created_at: string
+          email: string
+          id: string
+          status: string
+          subject: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          email: string
+          id?: string
+          status?: string
+          subject: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          email?: string
+          id?: string
+          status?: string
+          subject?: string
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -263,10 +374,12 @@ export type Database = {
           created_at: string
           date: string
           id: string
+          method: string | null
           month_key: string | null
           note: string | null
           owner_id: string
           property_id: string | null
+          receipt_no: string | null
           status: string
           tenant_id: string | null
           type: string
@@ -278,10 +391,12 @@ export type Database = {
           created_at?: string
           date?: string
           id?: string
+          method?: string | null
           month_key?: string | null
           note?: string | null
           owner_id: string
           property_id?: string | null
+          receipt_no?: string | null
           status?: string
           tenant_id?: string | null
           type?: string
@@ -293,10 +408,12 @@ export type Database = {
           created_at?: string
           date?: string
           id?: string
+          method?: string | null
           month_key?: string | null
           note?: string | null
           owner_id?: string
           property_id?: string | null
+          receipt_no?: string | null
           status?: string
           tenant_id?: string | null
           type?: string
@@ -355,6 +472,13 @@ export type Database = {
     }
     Enums: {
       app_role: "owner" | "tenant" | "admin"
+      subscription_plan: "starter" | "growth" | "scale"
+      subscription_status:
+        | "trial"
+        | "active"
+        | "overdue"
+        | "cancelled"
+        | "expired"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -483,6 +607,14 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["owner", "tenant", "admin"],
+      subscription_plan: ["starter", "growth", "scale"],
+      subscription_status: [
+        "trial",
+        "active",
+        "overdue",
+        "cancelled",
+        "expired",
+      ],
     },
   },
 } as const
