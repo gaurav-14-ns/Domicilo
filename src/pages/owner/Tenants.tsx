@@ -19,9 +19,11 @@ import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
-import { PauseCircle, PlayCircle, UserMinus, Trash2, Search, Plus, Pencil, LogOut } from "lucide-react";
+import { PauseCircle, PlayCircle, UserMinus, Trash2, Search, Plus, Pencil, LogOut, Lock } from "lucide-react";
 import { todayISO } from "@/lib/format";
 import { useCurrency } from "@/hooks/useCurrency";
+import { usePlanLimits } from "@/hooks/usePlanLimits";
+import { UpgradeDialog } from "@/components/UpgradeDialog";
 import type { Tenant, TenantStatus } from "@/store/types";
 
 type FormState = {
@@ -39,12 +41,14 @@ export default function Tenants() {
   const { data, addTenant, updateTenant, removeTenant, setTenantStatus, moveOutTenant } = useDataStore();
   const { tenants, properties } = data;
   const { fmt, symbol } = useCurrency();
+  const { tenantAtLimit, limits, activeTenants, planLabel, writesBlocked } = usePlanLimits();
 
   const [q, setQ] = useState("");
   const [propertyFilter, setPropertyFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
   const [open, setOpen] = useState(false);
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
 
@@ -58,7 +62,10 @@ export default function Tenants() {
     });
   }, [tenants, q, propertyFilter, statusFilter]);
 
-  const openCreate = () => { setEditId(null); setForm(emptyForm); setOpen(true); };
+  const openCreate = () => {
+    if (tenantAtLimit) { setUpgradeOpen(true); return; }
+    setEditId(null); setForm(emptyForm); setOpen(true);
+  };
   const openEdit = (t: Tenant) => {
     setEditId(t.id);
     setForm({
@@ -142,53 +149,66 @@ export default function Tenants() {
           <h1 className="text-2xl md:text-3xl font-display font-bold">Tenants</h1>
           <p className="text-muted-foreground">Add tenants, assign rooms, and control billing.</p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button variant="hero" onClick={openCreate}><Plus className="h-4 w-4" /> Add tenant</Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-lg">
-            <DialogHeader><DialogTitle>{editId ? "Edit tenant" : "New tenant"}</DialogTitle></DialogHeader>
-            <form onSubmit={submit} className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2"><Label>Full name</Label><Input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
-                <div className="space-y-2"><Label>Phone</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
-              </div>
-              <div className="space-y-2"><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label>Property</Label>
-                  <Select value={form.propertyId} onValueChange={(v) => setForm({ ...form, propertyId: v })}>
-                    <SelectTrigger><SelectValue placeholder="Select property" /></SelectTrigger>
-                    <SelectContent>
-                      {properties.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
+        {tenantAtLimit && !editId ? (
+          <Button variant="hero" onClick={() => setUpgradeOpen(true)} title={`${planLabel} plan limit`}>
+            <Lock className="h-4 w-4" /> Add tenant
+          </Button>
+        ) : (
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button variant="hero" onClick={openCreate}><Plus className="h-4 w-4" /> Add tenant</Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-lg">
+              <DialogHeader><DialogTitle>{editId ? "Edit tenant" : "New tenant"}</DialogTitle></DialogHeader>
+              <form onSubmit={submit} className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2"><Label>Full name</Label><Input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
+                  <div className="space-y-2"><Label>Phone</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
                 </div>
-                <div className="space-y-2"><Label>Room / unit</Label><Input required value={form.room} onChange={(e) => setForm({ ...form, room: e.target.value })} /></div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2"><Label>Rent ({symbol})</Label><Input type="number" min="0" required value={form.rent} onChange={(e) => setForm({ ...form, rent: e.target.value })} /></div>
-                <div className="space-y-2"><Label>Deposit ({symbol})</Label><Input type="number" min="0" value={form.deposit} onChange={(e) => setForm({ ...form, deposit: e.target.value })} /></div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2"><Label>Start date</Label><Input type="date" required value={form.startDate} onChange={(e) => setForm({ ...form, startDate: e.target.value })} /></div>
-                <div className="space-y-2">
-                  <Label>Status</Label>
-                  <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v as TenantStatus })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="paused">Paused</SelectItem>
-                      <SelectItem value="deactivated">Deactivated</SelectItem>
-                      <SelectItem value="moved_out">Moved out</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="space-y-2"><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label>Property</Label>
+                    <Select value={form.propertyId} onValueChange={(v) => setForm({ ...form, propertyId: v })}>
+                      <SelectTrigger><SelectValue placeholder="Select property" /></SelectTrigger>
+                      <SelectContent>
+                        {properties.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2"><Label>Room / unit</Label><Input required value={form.room} onChange={(e) => setForm({ ...form, room: e.target.value })} /></div>
                 </div>
-              </div>
-              <DialogFooter><Button type="submit" variant="hero">{editId ? "Save" : "Create"}</Button></DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2"><Label>Rent ({symbol})</Label><Input type="number" min="0" required value={form.rent} onChange={(e) => setForm({ ...form, rent: e.target.value })} /></div>
+                  <div className="space-y-2"><Label>Deposit ({symbol})</Label><Input type="number" min="0" value={form.deposit} onChange={(e) => setForm({ ...form, deposit: e.target.value })} /></div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2"><Label>Start date</Label><Input type="date" required value={form.startDate} onChange={(e) => setForm({ ...form, startDate: e.target.value })} /></div>
+                  <div className="space-y-2">
+                    <Label>Status</Label>
+                    <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v as TenantStatus })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="paused">Paused</SelectItem>
+                        <SelectItem value="deactivated">Deactivated</SelectItem>
+                        <SelectItem value="moved_out">Moved out</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <DialogFooter><Button type="submit" variant="hero">{editId ? "Save" : "Create"}</Button></DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+        )}
+        <UpgradeDialog
+          open={upgradeOpen}
+          onOpenChange={setUpgradeOpen}
+          reason={writesBlocked
+            ? "Your plan is paused. Reactivate to add more tenants."
+            : `${planLabel} includes ${limits.maxTenants === Infinity ? "unlimited" : limits.maxTenants} active tenants. You're at ${activeTenants}.`}
+        />
       </div>
 
       <div className="flex flex-wrap gap-2">

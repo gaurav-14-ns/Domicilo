@@ -269,6 +269,20 @@ export function DataStoreProvider({ children }: { children: ReactNode }) {
     fetchAll();
   }, [fetchAll]);
 
+  // Realtime: refetch on any owned/assigned data change so cross-portal edits sync.
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel(`ds-${user.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "tenants" }, () => fetchAll())
+      .on("postgres_changes", { event: "*", schema: "public", table: "properties" }, () => fetchAll())
+      .on("postgres_changes", { event: "*", schema: "public", table: "transactions" }, () => fetchAll())
+      .on("postgres_changes", { event: "*", schema: "public", table: "tenant_profiles" }, () => fetchAll())
+      .on("postgres_changes", { event: "*", schema: "public", table: "subscriptions" }, () => fetchAll())
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user, fetchAll]);
+
   // Bootstrap settings: if currency is still default and never set, detect from browser
   useEffect(() => {
     if (!user) return;

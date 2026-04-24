@@ -1,11 +1,17 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useDataStore } from "@/store/DataStore";
 import { useCurrency } from "@/hooks/useCurrency";
 import { monthKey, prettyMonth } from "@/lib/format";
+import { usePlanLimits } from "@/hooks/usePlanLimits";
+import { UpgradeDialog } from "@/components/UpgradeDialog";
+import { Lock, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function Reports() {
   const { data } = useDataStore();
   const { fmt } = useCurrency();
+  const { canUseAdvancedReports, planLabel } = usePlanLimits();
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
   const { properties, tenants, transactions } = data;
 
   const totalRevenue = properties.reduce((s, p) => s + p.revenue, 0);
@@ -57,43 +63,65 @@ export default function Reports() {
         ))}
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-4">
-        <div className="rounded-xl border border-border bg-gradient-card p-5">
-          <div className="text-sm font-semibold mb-4">Revenue by property</div>
-          {properties.length === 0 ? (
-            <div className="text-sm text-muted-foreground">No properties yet.</div>
-          ) : (
-            <div className="space-y-3">
-              {properties.map((p) => {
-                const pct = totalRevenue ? (p.revenue / totalRevenue) * 100 : 0;
-                return (
-                  <div key={p.id}>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>{p.name}</span>
-                      <span className="text-muted-foreground">{fmt(p.revenue)}</span>
+      {canUseAdvancedReports ? (
+        <div className="grid lg:grid-cols-2 gap-4">
+          <div className="rounded-xl border border-border bg-gradient-card p-5">
+            <div className="text-sm font-semibold mb-4">Revenue by property</div>
+            {properties.length === 0 ? (
+              <div className="text-sm text-muted-foreground">No properties yet.</div>
+            ) : (
+              <div className="space-y-3">
+                {properties.map((p) => {
+                  const pct = totalRevenue ? (p.revenue / totalRevenue) * 100 : 0;
+                  return (
+                    <div key={p.id}>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>{p.name}</span>
+                        <span className="text-muted-foreground">{fmt(p.revenue)}</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-muted overflow-hidden">
+                        <div className="h-full bg-gradient-primary" style={{ width: `${pct}%` }} />
+                      </div>
                     </div>
-                    <div className="h-2 rounded-full bg-muted overflow-hidden">
-                      <div className="h-full bg-gradient-primary" style={{ width: `${pct}%` }} />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        <div className="rounded-xl border border-border bg-gradient-card p-5">
-          <div className="text-sm font-semibold mb-4">Monthly revenue · last 6 months</div>
-          <div className="flex items-end gap-2 h-48">
-            {trend.map((m) => (
-              <div key={m.key} className="flex-1 flex flex-col items-center gap-1">
-                <div className="w-full rounded-t-md bg-gradient-primary" style={{ height: `${(m.total / trendMax) * 100}%`, minHeight: 2 }} />
-                <div className="text-[10px] text-muted-foreground">{m.label.slice(0, 3)}</div>
+                  );
+                })}
               </div>
-            ))}
+            )}
+          </div>
+
+          <div className="rounded-xl border border-border bg-gradient-card p-5">
+            <div className="text-sm font-semibold mb-4">Monthly revenue · last 6 months</div>
+            {trend.every((m) => m.total === 0) ? (
+              <div className="h-48 grid place-items-center text-center text-sm text-muted-foreground">
+                Not enough historical data yet.<br />Charts populate as transactions are recorded.
+              </div>
+            ) : (
+              <div className="flex items-end gap-2 h-48">
+                {trend.map((m) => (
+                  <div key={m.key} className="flex-1 flex flex-col items-center gap-1">
+                    <div className="w-full rounded-t-md bg-gradient-primary" style={{ height: `${(m.total / trendMax) * 100}%`, minHeight: 2 }} />
+                    <div className="text-[10px] text-muted-foreground">{m.label.slice(0, 3)}</div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="rounded-xl border border-dashed border-primary/40 bg-primary/5 p-8 text-center space-y-3">
+          <div className="mx-auto h-10 w-10 rounded-full bg-primary/10 grid place-items-center">
+            <Lock className="h-5 w-5 text-primary" />
+          </div>
+          <div className="font-display font-semibold">Advanced reports are on Growth & Scale</div>
+          <div className="text-sm text-muted-foreground">
+            Your {planLabel} plan shows top-line metrics. Upgrade to unlock revenue charts, exports, and trend analysis.
+          </div>
+          <Button variant="hero" onClick={() => setUpgradeOpen(true)}>
+            <Sparkles className="h-4 w-4" /> Upgrade plan
+          </Button>
+        </div>
+      )}
+      <UpgradeDialog open={upgradeOpen} onOpenChange={setUpgradeOpen} reason={`Advanced reports require Growth or Scale.`} />
 
       <div className="rounded-xl border border-border bg-gradient-card p-5">
         <div className="text-sm font-semibold mb-4">Property-wise occupancy</div>
