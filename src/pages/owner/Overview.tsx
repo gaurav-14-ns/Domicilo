@@ -1,5 +1,7 @@
+import { useMemo } from "react";
 import { useDataStore } from "@/store/DataStore";
 import { useCurrency } from "@/hooks/useCurrency";
+import { monthKey, prettyMonth } from "@/lib/format";
 import { TrendingUp, Users, DollarSign, AlertCircle } from "lucide-react";
 
 const KpiCard = ({ icon: Icon, label, value, delta }: any) => (
@@ -27,6 +29,25 @@ export default function OwnerOverview() {
     .filter((t) => t.status === "pending")
     .reduce((s, t) => s + Math.max(0, t.amount), 0);
 
+  const trend = useMemo(() => {
+    const now = new Date();
+    const months: { key: string; label: string; total: number }[] = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = monthKey(d);
+      months.push({ key, label: prettyMonth(key), total: 0 });
+    }
+    for (const t of transactions) {
+      if (t.status !== "completed") continue;
+      const k = monthKey(t.date);
+      const slot = months.find((m) => m.key === k);
+      if (slot) slot.total += Math.max(0, t.amount);
+    }
+    return months;
+  }, [transactions]);
+  const trendMax = Math.max(1, ...trend.map((m) => m.total));
+  const hasTrendData = trend.some((m) => m.total > 0);
+
   return (
     <div className="space-y-6">
       <div>
@@ -42,11 +63,23 @@ export default function OwnerOverview() {
       <div className="grid lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 rounded-xl border border-border bg-gradient-card p-5">
           <div className="text-sm font-semibold mb-4">Revenue · last 6 months</div>
-          <div className="flex items-end gap-2 h-48">
-            {[40, 65, 50, 78, 72, 92].map((h, i) => (
-              <div key={i} className="flex-1 rounded-t-md bg-gradient-primary" style={{ height: `${h}%` }} />
-            ))}
-          </div>
+          {hasTrendData ? (
+            <div className="flex items-end gap-2 h-48">
+              {trend.map((m) => (
+                <div key={m.key} className="flex-1 flex flex-col items-center gap-1">
+                  <div className="w-full rounded-t-md bg-gradient-primary" style={{ height: `${(m.total / trendMax) * 100}%`, minHeight: 2 }} title={fmt(m.total)} />
+                  <div className="text-[10px] text-muted-foreground">{m.label.slice(0, 3)}</div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="h-48 grid place-items-center text-center">
+              <div>
+                <div className="font-display font-semibold">Not enough historical data yet.</div>
+                <div className="text-xs text-muted-foreground mt-1">Once tenants start paying, your trend will appear here.</div>
+              </div>
+            </div>
+          )}
         </div>
         <div className="rounded-xl border border-border bg-gradient-card p-5">
           <div className="text-sm font-semibold mb-4">Recent transactions</div>

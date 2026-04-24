@@ -110,12 +110,23 @@ export default function Tenants() {
     toast.success("Tenant activated", { description: t.name });
   };
   const moveOut = (t: Tenant) => {
+    const dues = data.transactions
+      .filter((x) => x.tenantId === t.id && x.status === "pending")
+      .reduce((s, x) => s + Math.max(0, x.amount), 0);
+    if (dues > 0) {
+      toast.error("Settle dues first", { description: `${t.name} has ${fmt(dues)} pending. Clear or waive before move-out.` });
+      return;
+    }
     moveOutTenant(t.id);
     toast.success("Tenant moved out", { description: `${t.name} · room ${t.room} freed` });
   };
   const remove = (t: Tenant) => {
+    if (t.status !== "moved_out") {
+      toast.error("Cannot delete active tenant", { description: "Deactivate and complete move-out before deleting." });
+      return;
+    }
     removeTenant(t.id);
-    toast.success("Tenant deleted", { description: t.name });
+    toast.success("Tenant archived", { description: t.name });
   };
 
   const statusColor = (s: TenantStatus) =>
@@ -250,16 +261,20 @@ export default function Tenants() {
                           <Button size="sm" variant="ghost" onClick={() => deactivate(t)} disabled={t.status === "deactivated"} title="Deactivate"><UserMinus className="h-4 w-4" /></Button>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
-                              <Button size="sm" variant="ghost" title="Delete"><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                              <Button size="sm" variant="ghost" title={t.status === "moved_out" ? "Archive" : "Move out first to archive"} disabled={t.status !== "moved_out"}>
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Delete {t.name}?</AlertDialogTitle>
-                                <AlertDialogDescription>This permanently removes the tenant. Auto-generated rent records will stop.</AlertDialogDescription>
+                                <AlertDialogTitle>Archive {t.name}?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This permanently removes the tenant record. Historical transactions are kept for audit.
+                                </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => remove(t)}>Delete</AlertDialogAction>
+                                <AlertDialogAction onClick={() => remove(t)}>Archive</AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>
                           </AlertDialog>
