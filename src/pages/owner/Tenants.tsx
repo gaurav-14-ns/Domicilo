@@ -19,9 +19,11 @@ import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
-import { PauseCircle, PlayCircle, UserMinus, Trash2, Search, Plus, Pencil, LogOut } from "lucide-react";
+import { PauseCircle, PlayCircle, UserMinus, Trash2, Search, Plus, Pencil, LogOut, Lock } from "lucide-react";
 import { todayISO } from "@/lib/format";
 import { useCurrency } from "@/hooks/useCurrency";
+import { usePlanLimits } from "@/hooks/usePlanLimits";
+import { UpgradeDialog } from "@/components/UpgradeDialog";
 import type { Tenant, TenantStatus } from "@/store/types";
 
 type FormState = {
@@ -39,12 +41,14 @@ export default function Tenants() {
   const { data, addTenant, updateTenant, removeTenant, setTenantStatus, moveOutTenant } = useDataStore();
   const { tenants, properties } = data;
   const { fmt, symbol } = useCurrency();
+  const { tenantAtLimit, limits, activeTenants, planLabel, writesBlocked } = usePlanLimits();
 
   const [q, setQ] = useState("");
   const [propertyFilter, setPropertyFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
   const [open, setOpen] = useState(false);
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
 
@@ -58,7 +62,10 @@ export default function Tenants() {
     });
   }, [tenants, q, propertyFilter, statusFilter]);
 
-  const openCreate = () => { setEditId(null); setForm(emptyForm); setOpen(true); };
+  const openCreate = () => {
+    if (tenantAtLimit) { setUpgradeOpen(true); return; }
+    setEditId(null); setForm(emptyForm); setOpen(true);
+  };
   const openEdit = (t: Tenant) => {
     setEditId(t.id);
     setForm({
