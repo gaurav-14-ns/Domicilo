@@ -8,6 +8,7 @@ import type {
 } from "./types";
 import { detectCurrencyFromBrowser, type CurrencyCode } from "@/lib/currency";
 import { monthKey, monthsBetween, todayISO } from "@/lib/format";
+import { toast } from "sonner";
 
 // ---------------------------------------------------------------------------
 // Defaults
@@ -315,28 +316,75 @@ export function DataStoreProvider({ children }: { children: ReactNode }) {
   // Mutations
   // -------------------------------------------------------------------------
   const addProperty = useCallback(async (p: AddPropertyInput) => {
-    if (!user) return;
-    await supabase.from("properties").insert({
-      owner_id: user.id, name: p.name, address: p.address, units: p.units,
-    });
-    await refresh();
-  }, [user, refresh]);
+  if (!user) {
+    toast.error("Please sign in first.");
+    return;
+  }
 
-  const updateProperty = useCallback(async (id: string, patch: Partial<Property>) => {
+  try {
+    const { error } = await supabase.from("properties").insert({
+      owner_id: user.id,
+      name: p.name,
+      address: p.address,
+      units: p.units,
+    });
+
+    if (error) throw error;
+
+    await refresh();
+    toast.success("Property added successfully.");
+  } catch (error: any) {
+    toast.error(error.message || "Failed to add property.");
+  }
+}, [user, refresh]);
+
+const updateProperty = useCallback(async (id: string, patch: Partial<Property>) => {
+  try {
     const dbPatch: any = {};
+
     if (patch.name !== undefined) dbPatch.name = patch.name;
     if (patch.address !== undefined) dbPatch.address = patch.address;
     if (patch.units !== undefined) dbPatch.units = patch.units;
-    await supabase.from("properties").update(dbPatch).eq("id", id);
-    await refresh();
-  }, [refresh]);
 
-  const removeProperty = useCallback(async (id: string) => {
-    // Detach tenants first (so the FK ON DELETE SET NULL works cleanly)
-    await supabase.from("tenants").update({ property_id: null, status: "moved_out" }).eq("property_id", id);
-    await supabase.from("properties").delete().eq("id", id);
+    const { error } = await supabase
+      .from("properties")
+      .update(dbPatch)
+      .eq("id", id);
+
+    if (error) throw error;
+
     await refresh();
-  }, [refresh]);
+    toast.success("Property updated successfully.");
+  } catch (error: any) {
+    toast.error(error.message || "Failed to update property.");
+  }
+}, [refresh]);
+
+const removeProperty = useCallback(async (id: string) => {
+  try {
+    const { error: tenantError } = await supabase
+      .from("tenants")
+      .update({
+        property_id: null,
+        status: "moved_out",
+      })
+      .eq("property_id", id);
+
+    if (tenantError) throw tenantError;
+
+    const { error } = await supabase
+      .from("properties")
+      .delete()
+      .eq("id", id);
+
+    if (error) throw error;
+
+    await refresh();
+    toast.success("Property removed successfully.");
+  } catch (error: any) {
+    toast.error(error.message || "Failed to remove property.");
+  }
+}, [refresh]);
 
   const addTenant = useCallback(async (t: AddTenantInput) => {
     if (!user) return;
