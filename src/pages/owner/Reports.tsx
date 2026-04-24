@@ -1,11 +1,17 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useDataStore } from "@/store/DataStore";
 import { useCurrency } from "@/hooks/useCurrency";
 import { monthKey, prettyMonth } from "@/lib/format";
+import { usePlanLimits } from "@/hooks/usePlanLimits";
+import { UpgradeDialog } from "@/components/UpgradeDialog";
+import { Lock, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function Reports() {
   const { data } = useDataStore();
   const { fmt } = useCurrency();
+  const { canUseAdvancedReports, planLabel } = usePlanLimits();
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
   const { properties, tenants, transactions } = data;
 
   const totalRevenue = properties.reduce((s, p) => s + p.revenue, 0);
