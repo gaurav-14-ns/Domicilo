@@ -15,6 +15,9 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { PauseCircle, PlayCircle, UserMinus, Trash2, Search, Plus, Pencil, LogOut } from "lucide-react";
 import { todayISO } from "@/lib/format";
