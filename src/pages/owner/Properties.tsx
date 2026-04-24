@@ -80,26 +80,36 @@ export default function Properties() {
           <h1 className="text-2xl md:text-3xl font-display font-bold">Properties</h1>
           <p className="text-muted-foreground">Manage every building in your portfolio.</p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button variant="hero" onClick={openCreate}>
-              {propertyAtLimit ? <Lock className="h-4 w-4" /> : <Plus className="h-4 w-4" />} Add property
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader><DialogTitle>{editId ? "Edit property" : "New property"}</DialogTitle></DialogHeader>
-            <form onSubmit={submit} className="space-y-4">
-              <div className="space-y-2"><Label>Name</Label><Input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
-              <div className="space-y-2"><Label>Address</Label><Input required value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2"><Label>Total units</Label><Input type="number" min="1" required value={form.units} onChange={(e) => setForm({ ...form, units: e.target.value })} /></div>
-                <div className="space-y-2"><Label>Occupied</Label><Input type="number" min="0" value={form.occupied} onChange={(e) => setForm({ ...form, occupied: e.target.value })} disabled={!!editId} /></div>
-              </div>
-              <DialogFooter><Button type="submit" variant="hero">{editId ? "Save" : "Create"}</Button></DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </div>
+        {propertyAtLimit ? (
+          <Button variant="hero" onClick={() => setUpgradeOpen(true)} title={`${planLabel} plan: ${limits.maxProperties === Infinity ? "∞" : limits.maxProperties} properties`}>
+            <Lock className="h-4 w-4" /> Add property
+          </Button>
+        ) : (
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button variant="hero" onClick={openCreate}><Plus className="h-4 w-4" /> Add property</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader><DialogTitle>{editId ? "Edit property" : "New property"}</DialogTitle></DialogHeader>
+              <form onSubmit={submit} className="space-y-4">
+                <div className="space-y-2"><Label>Name</Label><Input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
+                <div className="space-y-2"><Label>Address</Label><Input required value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2"><Label>Total units</Label><Input type="number" min="1" required value={form.units} onChange={(e) => setForm({ ...form, units: e.target.value })} /></div>
+                  <div className="space-y-2"><Label>Occupied</Label><Input type="number" min="0" value={form.occupied} onChange={(e) => setForm({ ...form, occupied: e.target.value })} disabled={!!editId} /></div>
+                </div>
+                <DialogFooter><Button type="submit" variant="hero">{editId ? "Save" : "Create"}</Button></DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+        )}
+        <UpgradeDialog
+          open={upgradeOpen}
+          onOpenChange={setUpgradeOpen}
+          reason={writesBlocked
+            ? "Your plan is paused. Reactivate to add more properties."
+            : `${planLabel} includes ${limits.maxProperties === Infinity ? "unlimited" : limits.maxProperties} ${limits.maxProperties === 1 ? "property" : "properties"}. You're at ${propertyCount}.`}
+        />
 
       <div className="relative max-w-sm">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
