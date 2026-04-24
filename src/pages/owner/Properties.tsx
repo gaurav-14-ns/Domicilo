@@ -3,10 +3,12 @@ import { useDataStore } from "@/store/DataStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Home, Trash2, Pencil, Search } from "lucide-react";
+import { Plus, Home, Trash2, Pencil, Search, Lock } from "lucide-react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter,
 } from "@/components/ui/dialog";
+import { usePlanLimits } from "@/hooks/usePlanLimits";
+import { UpgradeDialog } from "@/components/UpgradeDialog";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -22,9 +24,11 @@ const empty: FormState = { name: "", address: "", units: "10", occupied: "0" };
 export default function Properties() {
   const { data, addProperty, updateProperty, removeProperty } = useDataStore();
   const list = data.properties;
+  const { propertyAtLimit, limits, propertyCount, planLabel, writesBlocked } = usePlanLimits();
 
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(empty);
 
@@ -35,6 +39,7 @@ export default function Properties() {
   }, [list, q]);
 
   const openCreate = () => {
+    if (propertyAtLimit) { setUpgradeOpen(true); return; }
     setEditId(null); setForm(empty); setOpen(true);
   };
   const openEdit = (id: string) => {
@@ -77,7 +82,9 @@ export default function Properties() {
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button variant="hero" onClick={openCreate}><Plus className="h-4 w-4" /> Add property</Button>
+            <Button variant="hero" onClick={openCreate}>
+              {propertyAtLimit ? <Lock className="h-4 w-4" /> : <Plus className="h-4 w-4" />} Add property
+            </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader><DialogTitle>{editId ? "Edit property" : "New property"}</DialogTitle></DialogHeader>
