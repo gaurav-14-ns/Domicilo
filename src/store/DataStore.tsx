@@ -284,24 +284,39 @@ export function DataStoreProvider({ children }: { children: ReactNode }) {
     return () => { supabase.removeChannel(channel); };
   }, [user, fetchAll]);
 
-  // Bootstrap settings: if currency is still default and never set, detect from browser
+  // Bootstrap settings: detect currency from browser ONLY for brand-new accounts
+  // that have never explicitly saved settings. Once the user picks a currency
+  // (or any other setting is saved), `updated_at` advances past `created_at`
+  // and we never overwrite their choice on subsequent logins.
   useEffect(() => {
     if (!user) return;
-    const s = data.settings;
-    // Trigger creates a row with INR/en-IN. If browser indicates otherwise, update once.
-    const detected = detectCurrencyFromBrowser();
-    if (s.currencyCode === "INR" && s.locale === "en-IN" && detected.code !== "INR") {
-      supabase
+    let cancelled = false;
+    (async () => {
+      const { data: row } = await supabase
         .from("app_settings")
-        .update({ currency_code: detected.code, locale: detected.locale })
+        .select("currency_code, locale, created_at, updated_at")
         .eq("user_id", user.id)
-        .then(() => {
+        .maybeSingle();
+      if (cancelled || !row) return;
+      const created = new Date(row.created_at).getTime();
+      const updated = new Date(row.updated_at).getTime();
+      const neverEdited = Math.abs(updated - created) < 5000; // within 5s of signup
+      if (!neverEdited) return;
+      const detected = detectCurrencyFromBrowser();
+      if (row.currency_code === "INR" && row.locale === "en-IN" && detected.code !== "INR") {
+        await supabase
+          .from("app_settings")
+          .update({ currency_code: detected.code, locale: detected.locale })
+          .eq("user_id", user.id);
+        if (!cancelled) {
           setData((d) => ({
             ...d,
             settings: { ...d.settings, currencyCode: detected.code, locale: detected.locale },
           }));
-        });
-    }
+        }
+      }
+    })();
+    return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
