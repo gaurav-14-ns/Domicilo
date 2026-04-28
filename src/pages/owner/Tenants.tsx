@@ -233,6 +233,28 @@ export default function Tenants() {
             <SelectItem value="moved_out">Moved out</SelectItem>
           </SelectContent>
         </Select>
+        <Button
+          variant="outline"
+          className="ml-auto"
+          disabled={filtered.length === 0}
+          onClick={() => {
+            const csv = toCSV(filtered, [
+              { key: "name", header: "Name" },
+              { key: "email", header: "Email" },
+              { key: "phone", header: "Phone" },
+              { key: "property", header: "Property", map: (t) => t.property || "" },
+              { key: "room", header: "Room" },
+              { key: "rent", header: `Rent (${symbol})` },
+              { key: "deposit", header: `Deposit (${symbol})` },
+              { key: "startDate", header: "Start date" },
+              { key: "status", header: "Status", map: (t) => t.status.replace("_", " ") },
+            ]);
+            downloadCSV(`tenants-${todayISO()}.csv`, csv);
+            toast.success("Exported", { description: `${filtered.length} tenant${filtered.length === 1 ? "" : "s"} exported.` });
+          }}
+        >
+          <Download className="h-4 w-4" /> Export CSV
+        </Button>
       </div>
 
       {filtered.length === 0 ? (
