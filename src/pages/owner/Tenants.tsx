@@ -176,7 +176,21 @@ export default function Tenants() {
               <form onSubmit={submit} className="space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2"><Label>Full name</Label><Input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
-                  <div className="space-y-2"><Label>Phone</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
+                  <div className="space-y-2">
+                    <Label>Phone</Label>
+                    <Input
+                      type="tel"
+                      inputMode="numeric"
+                      autoComplete="tel"
+                      maxLength={10}
+                      placeholder="10-digit number"
+                      value={form.phone}
+                      onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })}
+                      aria-invalid={!!phoneError}
+                      className={phoneError ? "border-destructive focus-visible:ring-destructive" : ""}
+                    />
+                    {phoneError && <p className="text-xs text-destructive">{phoneError}</p>}
+                  </div>
                 </div>
                 <div className="space-y-2"><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
                 <div className="grid grid-cols-2 gap-3">
