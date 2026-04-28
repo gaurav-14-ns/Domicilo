@@ -500,18 +500,28 @@ const removeProperty = useCallback(async (id: string) => {
 
   const updateSettings = useCallback(async (patch: Partial<Settings>) => {
     if (!user) return;
-    const dbPatch: any = {};
+    const current = data.settings;
+    const next: Settings = { ...current, ...patch };
+    // Always send currency + locale so a brand-new row created by upsert
+    // never ends up with NULL/default values that would override the
+    // owner's saved choice on the next login.
+    const dbPatch: any = {
+      user_id: user.id,
+      currency_code: next.currencyCode,
+      locale: next.locale,
+    };
     if (patch.displayName !== undefined) dbPatch.display_name = patch.displayName;
     if (patch.companyName !== undefined) dbPatch.company_name = patch.companyName;
     if (patch.ownerEmail !== undefined) dbPatch.contact_email = patch.ownerEmail;
     if (patch.emailNotifications !== undefined) dbPatch.email_notifications = patch.emailNotifications;
     if (patch.smsNotifications !== undefined) dbPatch.sms_notifications = patch.smsNotifications;
     if (patch.theme !== undefined) dbPatch.theme = patch.theme;
-    if (patch.currencyCode !== undefined) dbPatch.currency_code = patch.currencyCode;
-    if (patch.locale !== undefined) dbPatch.locale = patch.locale;
-    await supabase.from("app_settings").upsert({ user_id: user.id, ...dbPatch });
-    setData((d) => ({ ...d, settings: { ...d.settings, ...patch } }));
-  }, [user]);
+    const { error } = await supabase
+      .from("app_settings")
+      .upsert(dbPatch, { onConflict: "user_id" });
+    if (error) throw error;
+    setData((d) => ({ ...d, settings: next }));
+  }, [user, data.settings]);
 
   const updateTenantProfile = useCallback(async (patch: Partial<TenantProfile>) => {
     if (!user) return;
