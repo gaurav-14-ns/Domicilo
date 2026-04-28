@@ -77,24 +77,37 @@ export default function Tenants() {
     setOpen(true);
   };
 
+  const phoneDigits = form.phone.replace(/\D/g, "");
+  const phoneError =
+    form.phone.trim() === ""
+      ? "" // optional; only validate if entered
+      : phoneDigits.length !== 10
+        ? "Phone must be exactly 10 digits"
+        : "";
+
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim() || !form.propertyId || !form.room.trim()) {
       toast.error("Missing details", { description: "Name, property and room are required." });
       return;
     }
+    if (phoneError) {
+      toast.error("Invalid phone", { description: phoneError });
+      return;
+    }
     const rent = Math.max(0, Number(form.rent) || 0);
     const deposit = Math.max(0, Number(form.deposit) || 0);
+    const phoneClean = phoneDigits; // store only digits
     if (editId) {
       updateTenant(editId, {
-        name: form.name.trim(), phone: form.phone.trim(), email: form.email.trim(),
+        name: form.name.trim(), phone: phoneClean, email: form.email.trim(),
         propertyId: form.propertyId, room: form.room.trim(),
         rent, deposit, startDate: form.startDate, status: form.status,
       });
       toast.success("Tenant updated", { description: form.name });
     } else {
       addTenant({
-        name: form.name.trim(), phone: form.phone.trim(), email: form.email.trim(),
+        name: form.name.trim(), phone: phoneClean, email: form.email.trim(),
         propertyId: form.propertyId, room: form.room.trim(),
         rent, deposit, startDate: form.startDate, status: form.status,
       } as any);
@@ -163,7 +176,21 @@ export default function Tenants() {
               <form onSubmit={submit} className="space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2"><Label>Full name</Label><Input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
-                  <div className="space-y-2"><Label>Phone</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
+                  <div className="space-y-2">
+                    <Label>Phone</Label>
+                    <Input
+                      type="tel"
+                      inputMode="numeric"
+                      autoComplete="tel"
+                      maxLength={10}
+                      placeholder="10-digit number"
+                      value={form.phone}
+                      onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })}
+                      aria-invalid={!!phoneError}
+                      className={phoneError ? "border-destructive focus-visible:ring-destructive" : ""}
+                    />
+                    {phoneError && <p className="text-xs text-destructive">{phoneError}</p>}
+                  </div>
                 </div>
                 <div className="space-y-2"><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
                 <div className="grid grid-cols-2 gap-3">
