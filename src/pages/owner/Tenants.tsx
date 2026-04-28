@@ -19,8 +19,8 @@ import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
-import { PauseCircle, PlayCircle, UserMinus, Trash2, Search, Plus, Pencil, LogOut, Lock } from "lucide-react";
-import { todayISO } from "@/lib/format";
+import { PauseCircle, PlayCircle, UserMinus, Trash2, Search, Plus, Pencil, LogOut, Lock, Download } from "lucide-react";
+import { todayISO, toCSV, downloadCSV } from "@/lib/format";
 import { useCurrency } from "@/hooks/useCurrency";
 import { usePlanLimits } from "@/hooks/usePlanLimits";
 import { UpgradeDialog } from "@/components/UpgradeDialog";
