@@ -273,12 +273,66 @@ export default function Tenants() {
                           {isInactive ? (
                             <Button size="sm" variant="ghost" onClick={() => activate(t)} title="Activate"><PlayCircle className="h-4 w-4" /></Button>
                           ) : (
-                            <Button size="sm" variant="ghost" onClick={() => togglePause(t)} title={t.status === "paused" ? "Resume billing" : "Pause billing"}>
-                              {t.status === "paused" ? <PlayCircle className="h-4 w-4" /> : <PauseCircle className="h-4 w-4" />}
-                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button size="sm" variant="ghost" title={t.status === "paused" ? "Resume billing" : "Pause billing"}>
+                                  {t.status === "paused" ? <PlayCircle className="h-4 w-4" /> : <PauseCircle className="h-4 w-4" />}
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>
+                                    {t.status === "paused" ? `Resume billing for ${t.name}?` : `Pause billing for ${t.name}?`}
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    {t.status === "paused"
+                                      ? "Monthly rent invoices will resume from the next cycle."
+                                      : "No new rent invoices will be generated until you resume. Existing dues remain."}
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => togglePause(t)}>
+                                    {t.status === "paused" ? "Resume" : "Pause"}
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
                           )}
-                          <Button size="sm" variant="ghost" onClick={() => moveOut(t)} disabled={t.status === "moved_out"} title="Move out"><LogOut className="h-4 w-4" /></Button>
-                          <Button size="sm" variant="ghost" onClick={() => deactivate(t)} disabled={t.status === "deactivated"} title="Deactivate"><UserMinus className="h-4 w-4" /></Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button size="sm" variant="ghost" disabled={t.status === "moved_out"} title="Move out"><LogOut className="h-4 w-4" /></Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Move out {t.name}?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This frees room {t.room} and marks the tenant as moved out. Pending dues must be cleared first.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => moveOut(t)}>Confirm move-out</AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button size="sm" variant="ghost" disabled={t.status === "deactivated"} title="Deactivate"><UserMinus className="h-4 w-4" /></Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Deactivate {t.name}?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  The tenant loses portal access and billing stops. You can reactivate later.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => deactivate(t)}>Deactivate</AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button size="sm" variant="ghost" title={t.status === "moved_out" ? "Archive" : "Move out first to archive"} disabled={t.status !== "moved_out"}>
