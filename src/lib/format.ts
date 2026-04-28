@@ -39,3 +39,40 @@ export const prettyMonth = (key: string) => {
   const [y, m] = key.split("-").map(Number);
   return new Date(y, m - 1, 1).toLocaleString("en-IN", { month: "short", year: "numeric" });
 };
+
+// ---------------------------------------------------------------------------
+// CSV helpers
+// ---------------------------------------------------------------------------
+const csvEscape = (val: unknown): string => {
+  if (val === null || val === undefined) return "";
+  const s = String(val);
+  return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+};
+
+export function toCSV<T extends Record<string, unknown>>(
+  rows: T[],
+  columns: { key: keyof T | string; header: string; map?: (row: T) => unknown }[],
+): string {
+  const header = columns.map((c) => csvEscape(c.header)).join(",");
+  const body = rows
+    .map((r) =>
+      columns
+        .map((c) => csvEscape(c.map ? c.map(r) : (r as any)[c.key]))
+        .join(","),
+    )
+    .join("\n");
+  // BOM so Excel detects UTF-8 correctly
+  return "\uFEFF" + header + "\n" + body;
+}
+
+export function downloadCSV(filename: string, csv: string) {
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
