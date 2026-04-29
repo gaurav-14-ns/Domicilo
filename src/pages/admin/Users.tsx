@@ -39,6 +39,11 @@ export default function AdminUsers() {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [planFilter, setPlanFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [suspendedFilter, setSuspendedFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("name_asc");
   const [busy, setBusy] = useState<string | null>(null);
 
   const load = async () => {
@@ -65,10 +70,54 @@ export default function AdminUsers() {
   useEffect(() => { load(); }, []);
 
   const filtered = useMemo(() => {
-    const s = q.trim().toLowerCase();
-    if (!s) return rows;
-    return rows.filter((r) => `${r.full_name ?? ""} ${r.email ?? ""}`.toLowerCase().includes(s));
-  }, [rows, q]);
+  const s = q.trim().toLowerCase();
+
+  let result = rows.filter((r) => {
+    const matchesSearch =
+      !s ||
+      `${r.full_name ?? ""} ${r.email ?? ""}`.toLowerCase().includes(s);
+
+    const matchesRole =
+      roleFilter === "all" || r.role === roleFilter;
+
+    const matchesPlan =
+      planFilter === "all" || r.sub?.plan === planFilter;
+
+    const matchesStatus =
+      statusFilter === "all" || r.sub?.status === statusFilter;
+
+    const matchesSuspended =
+      suspendedFilter === "all" ||
+      (suspendedFilter === "yes" && r.suspended) ||
+      (suspendedFilter === "no" && !r.suspended);
+
+    return (
+      matchesSearch &&
+      matchesRole &&
+      matchesPlan &&
+      matchesStatus &&
+      matchesSuspended
+    );
+  });
+
+result.sort((a, b) => {
+  if (sortBy === "name_asc")
+    return (a.full_name || "").localeCompare(b.full_name || "");
+
+  if (sortBy === "name_desc")
+    return (b.full_name || "").localeCompare(a.full_name || "");
+
+  if (sortBy === "role")
+    return a.role.localeCompare(b.role);
+
+  if (sortBy === "suspended")
+    return Number(b.suspended) - Number(a.suspended);
+
+  return 0;
+});
+
+return result;
+}, [rows, q, roleFilter, planFilter, statusFilter, suspendedFilter, sortBy]);
 
   const audit = async (action: string, target: string, meta: any) => {
     if (!user) return;
@@ -129,17 +178,137 @@ export default function AdminUsers() {
     } finally { setBusy(null); }
   };
 
-  return (
-    <div className="space-y-6">
+  const exportUsersCsv = () => {
+  const headers = [
+    "Name",
+    "Email",
+    "Role",
+    "Plan",
+    "Subscription Status",
+    "Suspended",
+  ];
+
+  const rowsCsv = filtered.map((u) => [
+    u.full_name || "",
+    u.email || "",
+    u.role,
+    u.sub?.plan || "",
+    u.sub?.status || "",
+    u.suspended ? "Yes" : "No",
+  ]);
+
+  const csv = [
+    headers.join(","),
+    ...rowsCsv.map((row) =>
+      row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")
+    ),
+  ].join("\n");
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "users_export.csv";
+  link.click();
+
+  URL.revokeObjectURL(url);
+};
+
+return (
+  <div className="space-y-6">
+    <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-3 flex-wrap">
-        <h1 className="text-2xl md:text-3xl font-display font-bold">Users</h1>
-        <div className="relative w-full sm:max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Search name or email…" value={q} onChange={(e) => setQ(e.target.value)} className="pl-9" />
-        </div>
+        <h1 className="text-2xl md:text-3xl font-display font-bold">
+          Users
+        </h1>
+
+<div className="flex w-full sm:w-auto gap-2">
+  <div className="relative w-full sm:w-[320px]">
+    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+    <Input
+      placeholder="Search name or email…"
+      value={q}
+      onChange={(e) => setQ(e.target.value)}
+      className="pl-9"
+    />
+  </div>
+
+  <Button
+    type="button"
+    variant="outline"
+    onClick={exportUsersCsv}
+  >
+    Export CSV
+  </Button>
+</div>
       </div>
 
-      {loading ? (
+      {/* Filters Row */}
+      <div className="flex flex-wrap gap-2">
+        <Select value={roleFilter} onValueChange={setRoleFilter}>
+          <SelectTrigger className="w-[140px]">
+            <SelectValue placeholder="Role" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Roles</SelectItem>
+            <SelectItem value="owner">Owner</SelectItem>
+            <SelectItem value="tenant">Tenant</SelectItem>
+            <SelectItem value="admin">Admin</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={planFilter} onValueChange={setPlanFilter}>
+          <SelectTrigger className="w-[140px]">
+            <SelectValue placeholder="Plan" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Plans</SelectItem>
+            <SelectItem value="starter">Starter</SelectItem>
+            <SelectItem value="growth">Growth</SelectItem>
+            <SelectItem value="scale">Scale</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-[140px]">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="trial">Trial</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="cancelled">Cancelled</SelectItem>
+            <SelectItem value="expired">Expired</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={suspendedFilter} onValueChange={setSuspendedFilter}>
+          <SelectTrigger className="w-[140px]">
+            <SelectValue placeholder="Suspended" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="yes">Suspended</SelectItem>
+            <SelectItem value="no">Active</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={sortBy} onValueChange={setSortBy}>
+          <SelectTrigger className="w-[160px]">
+            <SelectValue placeholder="Sort By" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="name_asc">Name A-Z</SelectItem>
+            <SelectItem value="name_desc">Name Z-A</SelectItem>
+            <SelectItem value="role">Role</SelectItem>
+            <SelectItem value="suspended">Suspended First</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+
+    {loading ? (
         <div className="flex items-center gap-2 text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Loading…</div>
       ) : filtered.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border p-12 text-center">
