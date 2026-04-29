@@ -159,6 +159,31 @@ export default function Settings() {
 
   return (
     <div className="space-y-6 max-w-3xl">
+      <AlertDialog open={!!pendingPlan} onOpenChange={() => setPendingPlan(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Switch subscription plan?</AlertDialogTitle>
+              <AlertDialogDescription>
+                {pendingPlan
+                ? `You are about to switch to the ${PLAN_LABEL[pendingPlan]} plan. Continue?`
+                : ""}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+
+            <AlertDialogAction
+              onClick={() => {
+                if (pendingPlan) upgrade(pendingPlan);
+                setPendingPlan(null);
+              }}
+            >
+              Yes, Continue
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      
       <div>
         <h1 className="text-2xl md:text-3xl font-display font-bold">Settings</h1>
         <p className="text-muted-foreground">Manage your account preferences and subscription.</p>
@@ -247,7 +272,7 @@ export default function Settings() {
                   <button
                     key={p}
                     type="button"
-                    onClick={() => upgrade(p)}
+                    onClick={() => setPendingPlan(p)}
                     disabled={busy}
                     className="text-left rounded-lg border p-4 transition-smooth border-border hover:border-primary/40"
                   >
@@ -257,9 +282,29 @@ export default function Settings() {
                   </button>
                 );
               }
+
+              if (p === "growth") {
+                return (
+                  <div
+                    key={p}
+                    onClick={() => setPendingPlan(p)}
+                    className="cursor-pointer"
+                  >
+                    {tile}
+                    </div>
+                );
+              }
+
               return (
-                <UpgradePlaceholderDialog key={p} plan={p} planLabel={PLAN_LABEL[p]} onActivated={refresh} trigger={tile} />
+                <UpgradePlaceholderDialog
+                key={p}
+                plan={p}
+                planLabel={PLAN_LABEL[p]}
+                onActivated={refresh}
+                trigger={tile}
+                />
               );
+          
             })}
           </div>
           <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
