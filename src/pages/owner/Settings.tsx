@@ -155,13 +155,11 @@ export default function Settings() {
           <div className="grid sm:grid-cols-3 gap-3">
             {(["starter", "growth", "scale"] as PlanId[]).map((p) => {
               const active = subscription.plan === p && subscription.status === "active";
-              return (
+              const tile = (
                 <button
-                  key={p}
                   type="button"
-                  onClick={() => p !== "scale" && upgrade(p)}
-                  disabled={busy || active || p === "scale"}
-                  className={`text-left rounded-lg border p-4 transition-smooth disabled:cursor-not-allowed ${
+                  disabled={busy || active}
+                  className={`w-full text-left rounded-lg border p-4 transition-smooth disabled:cursor-not-allowed ${
                     active ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"
                   }`}
                 >
@@ -174,6 +172,25 @@ export default function Settings() {
                     {p === "starter" ? "Up to 25 tenants · 1 property" : p === "growth" ? "Up to 250 tenants · unlimited properties" : "Custom — contact sales"}
                   </div>
                 </button>
+              );
+              if (active || p === "scale") return <div key={p}>{tile}</div>;
+              if (p === "starter") {
+                return (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => upgrade(p)}
+                    disabled={busy}
+                    className="text-left rounded-lg border p-4 transition-smooth border-border hover:border-primary/40"
+                  >
+                    <div className="font-display font-semibold">{PLAN_LABEL[p]}</div>
+                    <div className="text-2xl font-bold mt-1">{planPriceIn(p, code, locale)}<span className="text-xs font-normal text-muted-foreground">/mo</span></div>
+                    <div className="text-[11px] text-muted-foreground mt-1">Up to 25 tenants · 1 property</div>
+                  </button>
+                );
+              }
+              return (
+                <UpgradePlaceholderDialog key={p} plan={p} planLabel={PLAN_LABEL[p]} onActivated={refresh} trigger={tile} />
               );
             })}
           </div>
