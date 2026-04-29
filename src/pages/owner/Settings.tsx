@@ -32,6 +32,7 @@ export default function Settings() {
   const { fmt, code, locale } = useCurrency();
   const { subscription, changePlan, cancel, trialDaysLeft, isTrial, refresh } = useSubscription();
   const [busy, setBusy] = useState(false);
+  const [pendingPlan, setPendingPlan] = useState<PlanId | null>(null);
   const [planNotice, setPlanNotice] = useState<{
     type: "success" | "error";
     message: string;
