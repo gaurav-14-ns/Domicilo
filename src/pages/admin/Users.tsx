@@ -45,6 +45,7 @@ export default function AdminUsers() {
   const [suspendedFilter, setSuspendedFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("name_asc");
   const [busy, setBusy] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const load = async () => {
     setLoading(true);
@@ -321,6 +322,7 @@ return (
             <table className="w-full text-sm">
               <thead className="bg-muted/40 text-xs uppercase text-muted-foreground">
                 <tr>
+                  <th className="text-left p-3">Select</th>
                   <th className="text-left p-3">Name</th>
                   <th className="text-left p-3">Email</th>
                   <th className="text-left p-3">Role</th>
@@ -334,6 +336,19 @@ return (
                   const isOwner = u.role === "owner";
                   return (
                     <tr key={u.id} className={`border-t border-border ${u.suspended ? "opacity-60" : ""}`}>
+                      <td className="p-3">
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.includes(u.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedIds([...selectedIds, u.id]);
+                            } else {
+                              setSelectedIds(selectedIds.filter((id) => id !== u.id));
+                            }
+                          }}
+                          />
+                      </td>
                       <td className="p-3 font-medium">
                         {u.full_name || "—"}
                         {u.suspended && <Badge variant="destructive" className="ml-2 text-[10px]">Suspended</Badge>}
