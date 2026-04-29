@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import { Loader2, Sparkles, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { SUPPORTED_CURRENCIES, localeForCurrency, type CurrencyCode, planPriceIn } from "@/lib/currency";
 import type { PlanId } from "@/lib/currency";
+import { UpgradePlaceholderDialog } from "@/components/UpgradePlaceholderDialog";
 
 const PLAN_LABEL: Record<PlanId, string> = { starter: "Starter", growth: "Growth", scale: "Scale" };
 
