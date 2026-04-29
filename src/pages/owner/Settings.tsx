@@ -301,7 +301,11 @@ export default function Settings() {
                 plan={p}
                 planLabel={PLAN_LABEL[p]}
                 onActivated={refresh}
-                trigger={tile}
+                trigger={
+                <div className="cursor-pointer">
+                  {tile}
+                </div>
+                }
                 />
               );
           
