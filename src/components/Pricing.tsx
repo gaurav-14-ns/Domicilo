@@ -6,6 +6,7 @@ import { useCurrency } from "@/hooks/useCurrency";
 import { planPriceIn } from "@/lib/currency";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
+import { UpgradePlaceholderDialog } from "./UpgradePlaceholderDialog";
 import { toast } from "sonner";
 import type { PlanId } from "@/lib/currency";
 
