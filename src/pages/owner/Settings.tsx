@@ -266,7 +266,7 @@ export default function Settings() {
                   </div>
                 </button>
               );
-              if (active || p === "scale") return <div key={p}>{tile}</div>;
+              if (active) return <div key={p}>{tile}</div>;
               if (p === "starter") {
                 return (
                   <button
