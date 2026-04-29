@@ -56,31 +56,21 @@ export const Pricing = () => {
   const nav = useNavigate();
   const { code, locale } = useCurrency();
   const { user, role } = useAuth();
-  const { subscription, changePlan } = useSubscription();
+  const { subscription } = useSubscription();
 
-  const handleClick = async (t: Tier) => {
-    if (t.action === "contact") return; // handled by ContactDialog wrapper
-    if (!user) {
-      nav("/auth");
-      return;
-    }
-    if (role !== "owner") {
-      toast.info("Subscriptions are for property owners only.");
-      return;
-    }
-    if (t.id === "starter" && subscription?.status === "trial") {
+  const handleStarter = () => {
+    if (!user) { nav("/auth"); return; }
+    if (role !== "owner") { toast.info("Subscriptions are for property owners only."); return; }
+    if (subscription?.status === "trial") {
       toast.info("You're already on the Starter trial.");
       nav("/owner");
       return;
     }
-    try {
-      await changePlan(t.id);
-      toast.success(`${t.name} plan activated`);
-      nav("/owner");
-    } catch (err: any) {
-      toast.error("Couldn't change plan", { description: err.message });
-    }
+    nav("/owner");
   };
+
+  const isCurrent = (id: PlanId) =>
+    subscription?.plan === id && subscription.status === "active";
 
   return (
     <section id="pricing" className="py-24 md:py-32 bg-muted/30">
@@ -96,6 +86,8 @@ export const Pricing = () => {
           {tiers.map((t) => {
             const price = planPriceIn(t.id, code, locale);
             const isCustom = t.id === "scale";
+            const current = isCurrent(t.id);
+            const btnLabel = current ? "Current plan" : t.cta;
             return (
               <div
                 key={t.id}
@@ -122,11 +114,35 @@ export const Pricing = () => {
                     context={t.name}
                     trigger={<Button variant={t.variant} className="w-full mt-6">{t.cta}</Button>}
                   />
+                ) : t.action === "subscribe" ? (
+                  user && role === "owner" && !current ? (
+                    <UpgradePlaceholderDialog
+                      plan={t.id}
+                      planLabel={t.name}
+                      onActivated={() => nav("/owner")}
+                      trigger={<Button variant={t.variant} className="w-full mt-6">{btnLabel}</Button>}
+                    />
+                  ) : (
+                    <Button
+                      variant={t.variant}
+                      className="w-full mt-6"
+                      onClick={() => {
+                        if (!user) { nav("/auth"); return; }
+                        if (role !== "owner") { toast.info("Subscriptions are for property owners only."); return; }
+                      }}
+                      disabled={current}
+                    >
+                      {btnLabel}
+                    </Button>
+                  )
                 ) : (
-                  <Button variant={t.variant} className="w-full mt-6" onClick={() => handleClick(t)}>
-                    {subscription?.plan === t.id && subscription.status === "active"
-                      ? "Current plan"
-                      : t.cta}
+                  <Button
+                    variant={t.variant}
+                    className="w-full mt-6"
+                    onClick={handleStarter}
+                    disabled={current}
+                  >
+                    {btnLabel}
                   </Button>
                 )}
                 <ul className="mt-6 space-y-3">
