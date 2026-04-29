@@ -32,6 +32,11 @@ export default function Settings() {
   const { fmt, code, locale } = useCurrency();
   const { subscription, changePlan, cancel, trialDaysLeft, isTrial, refresh } = useSubscription();
   const [busy, setBusy] = useState(false);
+  const [planNotice, setPlanNotice] = useState<{
+    type: "success" | "error";
+    message: string;
+    seconds: number;
+  } | null>(null);
 
   const [form, setForm] = useState({
     displayName: data.settings.displayName,
@@ -61,6 +66,24 @@ export default function Settings() {
     themeDirty.current = false;
   }, [data.settings, user?.email]);
 
+  useEffect(() => {
+  if (!planNotice) return;
+
+  const timer = setInterval(() => {
+    setPlanNotice((prev) => {
+      if (!prev) return null;
+      if (prev.seconds <= 1) return null;
+
+      return {
+        ...prev,
+        seconds: prev.seconds - 1,
+      };
+    });
+  }, 1000);
+
+  return () => clearInterval(timer);
+}, [planNotice]);
+
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
@@ -79,23 +102,54 @@ export default function Settings() {
 
   // ----- Subscription block -----
   const upgrade = async (plan: PlanId) => {
-    setBusy(true);
-    try {
-      await changePlan(plan);
-      toast.success(`Switched to ${PLAN_LABEL[plan]}`, { description: `${planPriceIn(plan, code, locale)} / month` });
-    } catch (err: any) {
-      toast.error("Couldn't change plan", { description: err.message });
-    } finally { setBusy(false); }
+  setBusy(true);
+
+  try {
+    await changePlan(plan);
+    await refresh();
+
+    setPlanNotice({
+      type: "success",
+      message: `Your ${PLAN_LABEL[plan]} plan is now active.`,
+      seconds: 10,
+    });
+
+    toast.success(`Switched to ${PLAN_LABEL[plan]}`, {
+      description: `${planPriceIn(plan, code, locale)} / month`,
+    });
+  } catch (err: any) {
+    toast.error("Couldn't change plan", {
+      description: err.message,
+    });
+  } finally {
+    setBusy(false);
+    }
   };
+  
   const doCancel = async () => {
-    setBusy(true);
-    try {
-      await cancel();
-      toast.success("Subscription cancelled", { description: "You can re-activate anytime." });
-    } catch (err: any) {
-      toast.error("Couldn't cancel", { description: err.message });
-    } finally { setBusy(false); }
-  };
+  setBusy(true);
+
+  try {
+    await cancel();
+    await refresh();
+
+    setPlanNotice({
+      type: "error",
+      message: "Your subscription has been cancelled.",
+      seconds: 10,
+    });
+
+    toast.success("Subscription cancelled", {
+      description: "You can re-activate anytime.",
+    });
+  } catch (err: any) {
+    toast.error("Couldn't cancel", {
+      description: err.message,
+    });
+  } finally {
+    setBusy(false);
+  }
+};
 
   const statusColor = (s: string) =>
     s === "active" ? "bg-primary/15 text-primary"
@@ -108,6 +162,19 @@ export default function Settings() {
         <h1 className="text-2xl md:text-3xl font-display font-bold">Settings</h1>
         <p className="text-muted-foreground">Manage your account preferences and subscription.</p>
       </div>
+
+      {planNotice && (
+      <div
+        className={`rounded-lg border px-4 py-3 text-sm flex items-center justify-between ${
+        planNotice.type === "success"
+          ? "border-green-500/30 bg-green-500/10 text-green-400"
+          : "border-red-500/30 bg-red-500/10 text-red-400"
+        }`}
+      >
+        <span>{planNotice.message}</span>
+        <span className="font-semibold">{planNotice.seconds}s</span>
+      </div>
+      )}
 
       {subscription && (
         <div className="rounded-xl border border-border bg-gradient-card p-6 space-y-5">
