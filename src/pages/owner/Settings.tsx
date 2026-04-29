@@ -241,19 +241,25 @@ export default function Settings() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between rounded-lg border border-border p-4">
+        <div className="flex items-center justify-between rounded-lg border border-border p-4 opacity-70">
           <div>
-            <div className="font-medium text-sm">Email notifications</div>
-            <div className="text-xs text-muted-foreground">Billing & tenant updates.</div>
+            <div className="font-medium text-sm flex items-center gap-2">
+              Email notifications
+              <Badge variant="outline" className="text-[10px]">Coming soon</Badge>
+            </div>
+            <div className="text-xs text-muted-foreground">Billing & tenant updates — provider integration in progress.</div>
           </div>
-          <Switch checked={form.emailNotifications} onCheckedChange={(v) => setForm({ ...form, emailNotifications: v })} />
+          <Switch checked={false} disabled />
         </div>
-        <div className="flex items-center justify-between rounded-lg border border-border p-4">
+        <div className="flex items-center justify-between rounded-lg border border-border p-4 opacity-70">
           <div>
-            <div className="font-medium text-sm">SMS notifications</div>
-            <div className="text-xs text-muted-foreground">Critical alerts via SMS (provider integration ready).</div>
+            <div className="font-medium text-sm flex items-center gap-2">
+              SMS notifications
+              <Badge variant="outline" className="text-[10px]">Coming soon</Badge>
+            </div>
+            <div className="text-xs text-muted-foreground">Critical alerts via SMS — provider integration in progress.</div>
           </div>
-          <Switch checked={form.smsNotifications} onCheckedChange={(v) => setForm({ ...form, smsNotifications: v })} />
+          <Switch checked={false} disabled />
         </div>
         <Button type="submit" variant="hero" disabled={busy}>
           {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save changes"}
