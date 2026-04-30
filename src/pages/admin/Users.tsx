@@ -38,6 +38,8 @@ export default function AdminUsers() {
   const { user } = useAuth();
   const [rows, setRows] = useState<Row[]>([]);
   const [selectedUser, setSelectedUser] = useState<Row | null>(null);
+  const [auditLogs, setAuditLogs] = useState<any[]>([]);
+  const [logsLoading, setLogsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
@@ -71,6 +73,35 @@ export default function AdminUsers() {
 
   useEffect(() => { load(); }, []);
 
+  useEffect(() => {
+    if (!selectedUser) return;
+    
+    const loadLogs = async () => {
+      setLogsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from("audit_logs")
+          .select("action, created_at")
+          .eq("target_id", selectedUser.id)
+          .order("created_at", { ascending: false })
+          .limit(10);
+        
+        if (error) throw error;
+        
+        setAuditLogs(data ?? []);
+      } catch (err: any) {
+        toast.error("Failed to load audit logs", {
+          description: err.message,
+        });
+        setAuditLogs([]);
+      } finally {
+        setLogsLoading(false);
+      }
+    };
+    
+    loadLogs();
+  }, [selectedUser]);
+  
   const filtered = useMemo(() => {
   const s = q.trim().toLowerCase();
 
@@ -487,13 +518,6 @@ return (
                   const isOwner = u.role === "owner";
                   return (
                     <tr key={u.id} className={`border-t border-border ${u.suspended ? "opacity-60" : ""}`}>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => setSelectedUser(u)}
-                        >
-                        View
-                      </Button>
                       <td className="p-3">
                         <input
                           type="checkbox"
@@ -543,6 +567,15 @@ return (
                       </td>
                       <td className="p-3">
                         <div className="flex items-center justify-end gap-1">
+                          
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setSelectedUser(u)}
+                            >
+                            View
+                          </Button>
+                          
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button size="sm" variant="ghost" disabled={busy === u.id} title={u.suspended ? "Reactivate" : "Suspend"}>
@@ -580,6 +613,87 @@ return (
           </div>
         </div>
       )}
+    {selectedUser && (
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+      <div className="bg-background border border-border rounded-xl p-6 w-full max-w-md">
+        
+        <h2 className="text-lg font-semibold mb-4">
+          User Details
+        </h2>
+        
+        <div className="space-y-2 text-sm">
+          <div><strong>Name:</strong> {selectedUser.full_name || "—"}</div>
+          <div><strong>Email:</strong> {selectedUser.email || "—"}</div>
+          <div><strong>Role:</strong> {selectedUser.role}</div>
+          <div><strong>Status:</strong> {selectedUser.suspended ? "Suspended" : "Active"}</div>
+          <div><strong>Plan:</strong> {selectedUser.sub?.plan || "—"}</div>
+        </div>
+
+        <div className="mt-4 flex gap-2 flex-wrap">
+          <Button
+            size="sm"
+            variant={selectedUser.suspended ? "outline" : "destructive"}
+            onClick={async () => {
+              await toggleSuspend(selectedUser);
+              setSelectedUser(null);
+            }}
+            >
+            {selectedUser.suspended ? "Reactivate User" : "Suspend User"}
+          </Button>
+        </div>
+
+        {selectedUser.role === "owner" && (
+      <Select
+        value={selectedUser.sub?.plan ?? ""}
+        onValueChange={async (v) => {
+          await setPlan(selectedUser, v as Sub["plan"]);
+          setSelectedUser(null);
+        }}
+        >
+        <SelectTrigger className="h-8 w-[160px]">
+          <SelectValue placeholder="Change Plan" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="starter">Starter</SelectItem>
+          <SelectItem value="growth">Growth</SelectItem>
+          <SelectItem value="scale">Scale</SelectItem>
+        </SelectContent>
+      </Select>
+    )}
+        
+        <div className="mt-5">
+          <div className="text-sm font-medium mb-2">Recent Activity</div>
+          
+          {logsLoading ? (
+      <div className="text-xs text-muted-foreground flex items-center gap-2">
+        <Loader2 className="h-3 w-3 animate-spin" /> Loading…
+      </div>
+    ) : auditLogs.length === 0 ? (
+      <div className="text-xs text-muted-foreground">
+        No recent actions
+      </div>
+    ) : (
+      <div className="space-y-2 max-h-40 overflow-auto pr-1">
+        {auditLogs.map((log, i) => (
+        <div key={i} className="text-xs border border-border rounded p-2">
+          <div className="font-medium">{log.action}</div>
+          <div className="text-muted-foreground">
+            {new Date(log.created_at).toLocaleString()}
+          </div>
+        </div>
+      ))}
+      </div>
+    )}
+        </div>
+        
+        <div className="mt-4 flex justify-end">
+          <Button variant="outline" onClick={() => setSelectedUser(null)}>
+            Close
+          </Button>
+        </div>
+        </div>
     </div>
-  );
+  )}
+  </div>
+);
 }
