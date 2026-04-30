@@ -351,7 +351,6 @@ return (
         >
         Reactivate
       </Button>
-    </div>
     </div>  
     )}    
     <div className="flex flex-col gap-3">
