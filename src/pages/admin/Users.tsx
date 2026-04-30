@@ -487,6 +487,13 @@ return (
                   const isOwner = u.role === "owner";
                   return (
                     <tr key={u.id} className={`border-t border-border ${u.suspended ? "opacity-60" : ""}`}>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setSelectedUser(u)}
+                        >
+                        View
+                      </Button>
                       <td className="p-3">
                         <input
                           type="checkbox"
