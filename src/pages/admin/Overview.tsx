@@ -19,25 +19,33 @@ export default function AdminOverview() {
   const [recentOwners, setRecentOwners] = useState<number>(0);
   const [mrr, setMrr] = useState<number>(0);
 
-  useEffect(() => {
-    (async () => {
+useEffect(() => {
+  const loadMetrics = async () => {
+    try {
       const sevenDaysAgo = new Date(Date.now() - 7 * 86400_000).toISOString();
-      const [owners, tenants, active, trial, expired, cancelled, leads, tickets, recent] = await Promise.all([
-  supabase.from("user_roles").select("user_id", { count: "exact", head: true }).eq("role", "owner"),
-  supabase.from("user_roles").select("user_id", { count: "exact", head: true }).eq("role", "tenant"),
-  supabase.from("subscriptions").select("id", { count: "exact", head: true }).eq("status", "active"),
-  supabase.from("subscriptions").select("id", { count: "exact", head: true }).eq("status", "trial"),
-  supabase.from("subscriptions").select("id", { count: "exact", head: true }).eq("status", "expired"),
-  supabase.from("subscriptions").select("id", { count: "exact", head: true }).eq("status", "cancelled"),
-  supabase.from("leads").select("id", { count: "exact", head: true }),
-  supabase.from("support_tickets").select("id", { count: "exact", head: true }).eq("status", "open"),
-        
-        supabase
-        .from("profiles")
-        .select("id", { count: "exact", head: true })
-        .gte("created_at", sevenDaysAgo),
+
+      const [
+        owners,
+        tenants,
+        active,
+        trial,
+        expired,
+        cancelled,
+        leads,
+        tickets,
+        recent,
+      ] = await Promise.all([
+        supabase.from("user_roles").select("user_id", { count: "exact", head: true }).eq("role", "owner"),
+        supabase.from("user_roles").select("user_id", { count: "exact", head: true }).eq("role", "tenant"),
+        supabase.from("subscriptions").select("id", { count: "exact", head: true }).eq("status", "active"),
+        supabase.from("subscriptions").select("id", { count: "exact", head: true }).eq("status", "trial"),
+        supabase.from("subscriptions").select("id", { count: "exact", head: true }).eq("status", "expired"),
+        supabase.from("subscriptions").select("id", { count: "exact", head: true }).eq("status", "cancelled"),
+        supabase.from("leads").select("id", { count: "exact", head: true }),
+        supabase.from("support_tickets").select("id", { count: "exact", head: true }).eq("status", "open"),
+        supabase.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", sevenDaysAgo),
       ]);
-      
+
       setM({
         owners: owners.count ?? 0,
         tenants: tenants.count ?? 0,
@@ -48,18 +56,26 @@ export default function AdminOverview() {
         leads: leads.count ?? 0,
         openTickets: tickets.count ?? 0,
       });
+
       setRecentOwners(recent.count ?? 0);
+
       const { data: activeSubsRows } = await supabase
         .from("subscriptions")
         .select("amount")
         .eq("status", "active");
-      
+
       const totalMrr =
         (activeSubsRows ?? []).reduce((sum, s: any) => sum + (s.amount || 0), 0);
-      
+
       setMrr(totalMrr);
-    })();
-  }, []);
+
+    } catch (err) {
+      console.error("Failed to load admin metrics", err);
+    }
+  };
+
+  loadMetrics();
+}, []);
   
   const cards = m
   ? [
