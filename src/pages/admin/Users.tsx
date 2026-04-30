@@ -37,6 +37,7 @@ const STATUSES: Sub["status"][] = ["trial", "active", "cancelled", "expired"];
 export default function AdminUsers() {
   const { user } = useAuth();
   const [rows, setRows] = useState<Row[]>([]);
+  const [selectedUser, setSelectedUser] = useState<Row | null>(null);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
