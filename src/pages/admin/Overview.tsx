@@ -17,10 +17,12 @@ interface Metrics {
 export default function AdminOverview() {
   const [m, setM] = useState<Metrics | null>(null);
   const [recentOwners, setRecentOwners] = useState<number>(0);
+  const [mrr, setMrr] = useState<number>(0);
 
   useEffect(() => {
     (async () => {
-      const [owners, tenants, active, trial, expired, cancelled, leads, tickets] = await Promise.all([
+      const sevenDaysAgo = new Date(Date.now() - 7 * 86400_000).toISOString();
+      const [owners, tenants, active, trial, expired, cancelled, leads, tickets, recent] = await Promise.all([
         supabase.from("user_roles").select("user_id", { count: "exact", head: true }).eq("role", "owner"),
         supabase.from("user_roles").select("user_id", { count: "exact", head: true }).eq("role", "tenant"),
         supabase.from("subscriptions").select("id", { count: "exact", head: true }).eq("status", "active"),
@@ -30,19 +32,34 @@ export default function AdminOverview() {
         supabase.from("leads").select("id", { count: "exact", head: true }),
         supabase.from("support_tickets").select("id", { count: "exact", head: true }).eq("status", "open"),
       ]);
-      setM({
-        owners: owners.count ?? 0,
-        tenants: tenants.count ?? 0,
-        activeSubs: active.count ?? 0,
-        trialSubs: trial.count ?? 0,
-        expiredSubs: expired.count ?? 0,
-        cancelledSubs: cancelled.count ?? 0,
-        leads: leads.count ?? 0,
-        openTickets: tickets.count ?? 0,
-      });
+      
+      supabase
+        .from("profiles")
+        .select("id", { count: "exact", head: true })
+        .gte("created_at", sevenDaysAgo),
+        setM({
+          owners: owners.count ?? 0,
+          tenants: tenants.count ?? 0,
+          activeSubs: active.count ?? 0,
+          trialSubs: trial.count ?? 0,
+          expiredSubs: expired.count ?? 0,
+          cancelledSubs: cancelled.count ?? 0,
+          leads: leads.count ?? 0,
+          openTickets: tickets.count ?? 0,
+        });
+      setRecentOwners(recent.count ?? 0);
+      const { data: activeSubsRows } = await supabase
+        .from("subscriptions")
+        .select("amount")
+        .eq("status", "active");
+      
+      const totalMrr =
+        (activeSubsRows ?? []).reduce((sum, s: any) => sum + (s.amount || 0), 0);
+      
+      setMrr(totalMrr);
     })();
   }, []);
-
+  
   const cards = m
   ? [
       {
@@ -102,20 +119,48 @@ export default function AdminOverview() {
         <h1 className="text-2xl md:text-3xl font-display font-bold">Admin overview</h1>
         <p className="text-muted-foreground">Real-time platform metrics from your database.</p>
       </div>
-      {!m ? (
-        <div className="flex items-center gap-2 text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Loading metrics…</div>
-      ) : (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {cards.map((k) => (
-            <div key={k.l} className="rounded-xl border border-border bg-gradient-card p-5">
-              <k.i className="h-4 w-4 text-primary" />
-              <div className="text-xs uppercase tracking-wider text-muted-foreground mt-3">{k.l}</div>
-              <div className="text-2xl font-bold font-display mt-1">{k.v}</div>
-              <div className="text-xs text-muted-foreground mt-1">{k.d}</div>
-            </div>
-          ))}
+      {m && (
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="rounded-lg border border-border p-4">
+          <div className="text-xs text-muted-foreground">New Owners (7d)</div>
+          <div className="text-lg font-semibold">+{recentOwners}</div>
         </div>
-      )}
+        
+        <div className="rounded-lg border border-border p-4">
+          <div className="text-xs text-muted-foreground">Churn (Cancelled)</div>
+          <div className="text-lg font-semibold">{m.cancelledSubs}</div>
+        </div>
+        
+        <div className="rounded-lg border border-border p-4">
+        <div className="text-xs text-muted-foreground">Trial Users</div>
+          <div className="text-lg font-semibold">{m.trialSubs}</div>
+        </div>
+        
+        <div className="rounded-lg border border-border p-4">
+        <div className="text-xs text-muted-foreground">Open Tickets</div>
+          <div className="text-lg font-semibold">{m.openTickets}</div>
+        </div>
+      </div>
+
+      <div className="rounded-lg border border-border p-4">
+        <div className="text-xs text-muted-foreground">Estimated MRR</div>
+        <div className="text-lg font-semibold">₹{mrr.toLocaleString()}</div>
+    </div>
+    )}
+{!m ? (
+  <div className="flex items-center gap-2 text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Loading metrics…</div>
+      ) : (
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {cards.map((k) => (
+        <div key={k.l} className="rounded-xl border border-border bg-gradient-card p-5">
+          <k.i className="h-4 w-4 text-primary" />
+          <div className="text-xs uppercase tracking-wider text-muted-foreground mt-3">{k.l}</div>
+          <div className="text-2xl font-bold font-display mt-1">{k.v}</div>
+          <div className="text-xs text-muted-foreground mt-1">{k.d}</div>
+        </div>
+      ))}
+      </div>
+    )}
     </div>
   );
 }
