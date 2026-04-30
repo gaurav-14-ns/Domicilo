@@ -179,6 +179,86 @@ return result;
     } finally { setBusy(null); }
   };
 
+  const bulkSuspend = async (suspend: boolean) => {
+  if (selectedIds.length === 0) return;
+
+  setBusy("bulk");
+
+  try {
+    const { error } = await supabase
+      .from("profiles")
+      .update({ suspended: suspend })
+      .in("id", selectedIds);
+
+    if (error) throw error;
+
+    toast.success(
+      suspend ? "Users suspended" : "Users reactivated"
+    );
+
+    setSelectedIds([]);
+    await load();
+  } catch (err: any) {
+    toast.error("Bulk action failed", {
+      description: err.message,
+    });
+  } finally {
+    setBusy(null);
+  }
+  };
+
+const bulkSetPlan = async (plan: Sub["plan"]) => {
+  if (selectedIds.length === 0) return;
+
+  setBusy("bulk");
+
+  try {
+    // Only owners should get plans
+    const owners = rows.filter(
+      (r) => selectedIds.includes(r.id) && r.role === "owner"
+    );
+
+    if (owners.length === 0) {
+      toast.error("No owners selected");
+      return;
+    }
+
+    const skipped = selectedIds.length - owners.length;
+    const amount = PLAN_PRICES_INR[plan];
+
+    const updates = owners.map((r) => ({
+      owner_id: r.id,
+      plan,
+      status: "active",
+      amount,
+      currency_code: "INR",
+      current_period_end: new Date(Date.now() + 30 * 86400_000).toISOString(),
+      cancelled_at: null,
+    }));
+
+    const { error } = await supabase
+      .from("subscriptions")
+      .upsert(updates, { onConflict: "owner_id" });
+
+    if (error) throw error;
+
+    toast.success(
+      `Plan set to ${plan} for ${owners.length} owner${
+        owners.length > 1 ? "s" : ""
+      }${skipped ? ` (skipped ${skipped} non-owners)` : ""}`
+    );
+
+    setSelectedIds([]);
+    await load();
+  } catch (err: any) {
+    toast.error("Bulk plan update failed", {
+      description: err.message,
+    });
+  } finally {
+    setBusy(null);
+  }
+};
+
   const exportUsersCsv = () => {
   const headers = [
     "Name",
@@ -218,33 +298,89 @@ return result;
 
 return (
   <div className="space-y-6">
+    {selectedIds.length > 0 && (
+    <div className="flex items-center justify-between rounded-lg border border-border p-3 bg-muted/30">
+      <span className="text-sm font-medium">
+        {selectedIds.length} user{selectedIds.length > 1 ? "s" : ""} selected
+      </span>
+      
+      <div className="flex gap-2 flex-wrap">
+        <Button
+          size="sm"
+          variant="destructive"
+          onClick={() => bulkSuspend(true)}
+          disabled={busy === "bulk"}
+          >
+          Suspend
+        </Button>
+        
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => bulkSuspend(false)}
+          disabled={busy === "bulk"}
+          >
+          Reactivate
+        </Button>
+        
+        <Select onValueChange={(v) => bulkSetPlan(v as Sub["plan"])}>
+          <SelectTrigger className="h-8 w-[140px]">
+            <SelectValue placeholder="Set Plan" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="starter">Starter</SelectItem>
+            <SelectItem value="growth">Growth</SelectItem>
+            <SelectItem value="scale">Scale</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <Button
+        size="sm"
+        variant="destructive"
+        onClick={() => bulkSuspend(true)}
+        disabled={busy === "bulk"}
+        >
+        Suspend
+      </Button>
+      
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={() => bulkSuspend(false)}
+        disabled={busy === "bulk"}
+        >
+        Reactivate
+      </Button>
+    </div>
+    </div>  
+    )}    
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <h1 className="text-2xl md:text-3xl font-display font-bold">
           Users
         </h1>
-
-<div className="flex w-full sm:w-auto gap-2">
-  <div className="relative w-full sm:w-[320px]">
-    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-    <Input
-      placeholder="Search name or email…"
-      value={q}
-      onChange={(e) => setQ(e.target.value)}
-      className="pl-9"
-    />
-  </div>
-
-  <Button
-    type="button"
-    variant="outline"
-    onClick={exportUsersCsv}
-  >
-    Export CSV
-  </Button>
-</div>
+        
+        <div className="flex w-full sm:w-auto gap-2">
+          <div className="relative w-full sm:w-[320px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search name or email…"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              className="pl-9"
+              />
+          </div>
+          
+          <Button
+            type="button"
+            variant="outline"
+            onClick={exportUsersCsv}
+            >
+            Export CSV
+          </Button>
+        </div>
       </div>
-
+      
       {/* Filters Row */}
       <div className="flex flex-wrap gap-2">
         <Select value={roleFilter} onValueChange={setRoleFilter}>
@@ -322,7 +458,22 @@ return (
             <table className="w-full text-sm">
               <thead className="bg-muted/40 text-xs uppercase text-muted-foreground">
                 <tr>
-                  <th className="text-left p-3">Select</th>
+                  <th className="text-left p-3">
+                    <input
+                      type="checkbox"
+                      checked={
+                        filtered.length > 0 &&
+                        filtered.every((u) => selectedIds.includes(u.id))
+                      }
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedIds(filtered.map((u) => u.id));
+                        } else {
+                          setSelectedIds([]);
+                        }
+                      }}
+                      />
+                  </th>
                   <th className="text-left p-3">Name</th>
                   <th className="text-left p-3">Email</th>
                   <th className="text-left p-3">Role</th>
