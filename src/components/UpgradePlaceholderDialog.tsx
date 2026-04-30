@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useCurrency } from "@/hooks/useCurrency";
 import { planPriceIn, type PlanId } from "@/lib/currency";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Props {
   plan: PlanId;
@@ -21,16 +23,45 @@ export function UpgradePlaceholderDialog({ plan, planLabel, trigger, onActivated
   const [busy, setBusy] = useState(false);
   const { changePlan } = useSubscription();
   const { code, locale } = useCurrency();
+  const { user } = useAuth();
 
   const activate = async () => {
     setBusy(true);
     try {
+      // 👉 SCALE PLAN → CREATE LEAD (NO DIRECT ACTIVATION)
+      if (plan === "scale") {
+        const { error } = await supabase.from("leads").insert({
+          email: user?.email ?? null,
+          name: user?.user_metadata?.full_name ?? null,
+          type: "scale_plan_inquiry",
+          status: "new",
+        });
+
+        if (error) throw error;
+
+        toast.success("Request sent to sales", {
+          description: "Our team will contact you shortly.",
+        });
+
+        setOpen(false);
+        onActivated?.();
+        return;
+      }
+
+      // 👉 OTHER PLANS → NORMAL FLOW
       await changePlan(plan);
-      toast.success(`${planLabel} activated`, { description: "No payment required during preview." });
+
+      toast.success(`${planLabel} activated`, {
+        description: "No payment required during preview.",
+      });
+
       setOpen(false);
       onActivated?.();
+
     } catch (err: any) {
-      toast.error("Couldn't activate plan", { description: err.message });
+      toast.error("Action failed", {
+        description: err.message,
+      });
     } finally {
       setBusy(false);
     }
@@ -43,23 +74,35 @@ export function UpgradePlaceholderDialog({ plan, planLabel, trigger, onActivated
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CreditCard className="h-5 w-5 text-primary" />
-            Upgrade to {planLabel}
+            {plan === "scale" ? "Contact Sales" : `Upgrade to ${planLabel}`}
           </DialogTitle>
           <DialogDescription>
-            {planPriceIn(plan, code, locale)} / month. Payment processing is rolling out soon — meanwhile
-            you can activate the plan for testing and exploring premium features.
+            {plan === "scale"
+              ? "Custom pricing based on your needs. Our team will contact you to finalize the plan."
+              : `${planPriceIn(plan, code, locale)} / month. Payment processing is rolling out soon — meanwhile you can activate the plan for testing and exploring premium features.`}
           </DialogDescription>
         </DialogHeader>
+
         <div className="rounded-lg border border-border bg-muted/30 p-3 text-xs text-muted-foreground flex items-start gap-2">
           <ShieldCheck className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-          You will be billed only after the live payment provider is enabled. Cancel anytime from Settings.
+          {plan === "scale"
+            ? "Sales team will reach out to you for onboarding and pricing discussion."
+            : "You will be billed only after the live payment provider is enabled. Cancel anytime from Settings."}
         </div>
+
         <DialogFooter className="gap-2 sm:gap-2">
           <Button variant="outline" onClick={() => setOpen(false)} disabled={busy}>
             Maybe later
           </Button>
+
           <Button variant="hero" onClick={activate} disabled={busy}>
-            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : `Activate ${planLabel}`}
+            {busy ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : plan === "scale" ? (
+              "Contact Sales"
+            ) : (
+              `Activate ${planLabel}`
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
