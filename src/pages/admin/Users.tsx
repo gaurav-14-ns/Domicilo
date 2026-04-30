@@ -366,23 +366,7 @@ return (
           </SelectContent>
         </Select>
       </div>
-      <Button
-        size="sm"
-        variant="destructive"
-        onClick={() => bulkSuspend(true)}
-        disabled={busy === "bulk"}
-        >
-        Suspend
-      </Button>
       
-      <Button
-        size="sm"
-        variant="outline"
-        onClick={() => bulkSuspend(false)}
-        disabled={busy === "bulk"}
-        >
-        Reactivate
-      </Button>
     </div>  
     )}    
     <div className="flex flex-col gap-3">
