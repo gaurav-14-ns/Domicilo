@@ -16,6 +16,7 @@ interface Metrics {
 
 export default function AdminOverview() {
   const [m, setM] = useState<Metrics | null>(null);
+  const [recentOwners, setRecentOwners] = useState<number>(0);
 
   useEffect(() => {
     (async () => {
@@ -43,17 +44,57 @@ export default function AdminOverview() {
   }, []);
 
   const cards = m
-    ? [
-        { i: Building2, l: "Total owners", v: m.owners },
-        { i: Users, l: "Total tenants", v: m.tenants },
-        { i: DollarSign, l: "Active subscriptions", v: m.activeSubs },
-        { i: Clock, l: "Trial users", v: m.trialSubs },
-        { i: AlertCircle, l: "Expired", v: m.expiredSubs },
-        { i: Activity, l: "Cancelled", v: m.cancelledSubs },
-        { i: Inbox, l: "Leads", v: m.leads },
-        { i: LifeBuoy, l: "Open tickets", v: m.openTickets },
-      ]
-    : [];
+  ? [
+      {
+        i: Building2,
+        l: "Total Owners",
+        v: m.owners,
+        d: "Number of property owners using the platform",
+      },
+      {
+        i: Users,
+        l: "Total Tenants",
+        v: m.tenants,
+        d: "Total tenants managed across all properties",
+      },
+      {
+        i: DollarSign,
+        l: "Active Subscriptions",
+        v: m.activeSubs,
+        d: "Paying users currently on active plans",
+      },
+      {
+        i: Clock,
+        l: "Trial Users",
+        v: m.trialSubs,
+        d: "Users currently evaluating the platform",
+      },
+      {
+        i: AlertCircle,
+        l: "Expired Plans",
+        v: m.expiredSubs,
+        d: "Users whose subscriptions have ended",
+      },
+      {
+        i: Activity,
+        l: "Cancelled Plans",
+        v: m.cancelledSubs,
+        d: "Users who cancelled their subscriptions",
+      },
+      {
+        i: Inbox,
+        l: "New Leads",
+        v: m.leads,
+        d: "Potential customers awaiting follow-up",
+      },
+      {
+        i: LifeBuoy,
+        l: "Open Support Tickets",
+        v: m.openTickets,
+        d: "Unresolved issues needing attention",
+      },
+    ]
+  : [];
 
   return (
     <div className="space-y-6">
@@ -70,6 +111,7 @@ export default function AdminOverview() {
               <k.i className="h-4 w-4 text-primary" />
               <div className="text-xs uppercase tracking-wider text-muted-foreground mt-3">{k.l}</div>
               <div className="text-2xl font-bold font-display mt-1">{k.v}</div>
+              <div className="text-xs text-muted-foreground mt-1">{k.d}</div>
             </div>
           ))}
         </div>
