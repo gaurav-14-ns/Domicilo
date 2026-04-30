@@ -32,7 +32,6 @@ import Profile from "./pages/tenant/Profile";
 
 import AdminLeads from "./pages/admin/Leads";
 import AdminOverview from "./pages/admin/Overview";
-import Orgs from "./pages/admin/Orgs";
 import AdminUsers from "./pages/admin/Users";
 import System from "./pages/admin/System";
 
@@ -95,7 +94,6 @@ const App = () => (
                   }
                 >
                   <Route index element={<AdminOverview />} />
-                  <Route path="orgs" element={<Orgs />} />
                   <Route path="users" element={<AdminUsers />} />
                   <Route path="leads" element={<AdminLeads />} />
                   <Route path="system" element={<System />} />
