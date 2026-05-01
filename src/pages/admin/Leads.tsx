@@ -89,7 +89,11 @@ export default function AdminLeads() {
                 <tr key={l.id} className="border-t border-border">
                   <td className="p-3">{l.name || "—"}</td>
                   <td className="p-3 text-muted-foreground">{l.email || "—"}</td>
-                  <td className="p-3">{l.type || "—"}</td>
+                  <td className="p-3 capitalize">
+                    {l.type === "scale_plan_inquiry"
+                      ? "Scale Plan"
+                    : l.type || "—"}
+                  </td>
                   <td className="p-3">
                     <Badge variant="outline" className="capitalize">
                       {l.status}
