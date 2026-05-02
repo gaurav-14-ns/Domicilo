@@ -270,7 +270,7 @@ const bulkSetPlan = async (plan: Sub["plan"]) => {
 
     const { error } = await supabase
       .from("subscriptions")
-      .upsert(updates, { onConflict: "owner_id" });
+      .upsert(updates as any, { onConflict: "owner_id" });
 
     if (error) throw error;
 
