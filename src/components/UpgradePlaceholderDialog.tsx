@@ -35,7 +35,7 @@ export function UpgradePlaceholderDialog({ plan, planLabel, trigger, onActivated
           name: user?.user_metadata?.full_name ?? null,
           type: "scale_plan_inquiry",
           status: "new",
-        });
+        } as any);
 
         if (error) throw error;
 
