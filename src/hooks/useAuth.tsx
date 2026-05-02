@@ -27,13 +27,52 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchRole = async (uid: string) => {
-      const { data } = await supabase
+    const ensureUserRecords = async (u: User): Promise<AppRole | null> => {
+      // Check existing role
+      const { data: existing } = await supabase
         .from("user_roles")
         .select("role")
-        .eq("user_id", uid)
+        .eq("user_id", u.id)
         .maybeSingle();
-      setRole((data?.role as AppRole) ?? null);
+      if (existing?.role) return existing.role as AppRole;
+
+      // Backfill from auth metadata (covers users created before trigger or after data wipe)
+      const meta = (u.user_metadata ?? {}) as Record<string, any>;
+      const role: AppRole = (meta.role as AppRole) || "tenant";
+      const fullName: string = meta.full_name || "";
+      const currency: string = meta.currency_code || "INR";
+      const locale: string = meta.locale || "en-IN";
+
+      await supabase.from("profiles").upsert(
+        { id: u.id, full_name: fullName, email: u.email ?? "" },
+        { onConflict: "id" }
+      );
+      await supabase.from("user_roles").upsert(
+        { user_id: u.id, role },
+        { onConflict: "user_id,role" }
+      );
+      await supabase.from("app_settings").upsert(
+        {
+          user_id: u.id,
+          display_name: fullName,
+          contact_email: u.email ?? "",
+          currency_code: currency,
+          locale,
+        },
+        { onConflict: "user_id" }
+      );
+      if (role === "tenant") {
+        await supabase.from("tenant_profiles").upsert(
+          { user_id: u.id, email: u.email ?? "" },
+          { onConflict: "user_id" }
+        );
+      }
+      return role;
+    };
+
+    const fetchRole = async (u: User) => {
+      const r = await ensureUserRecords(u);
+      setRole(r);
     };
 
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
