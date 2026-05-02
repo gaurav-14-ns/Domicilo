@@ -30,7 +30,7 @@ export default function AdminLeads() {
       toast.error("Failed to load leads", { description: error.message });
       setRows([]);
     } else {
-      setRows(data ?? []);
+      setRows((data ?? []) as any);
     }
     setLoading(false);
   };
@@ -44,7 +44,7 @@ export default function AdminLeads() {
     try {
       const { error } = await supabase
         .from("leads")
-        .update({ status })
+        .update({ status } as any)
         .eq("id", id);
 
       if (error) throw error;
