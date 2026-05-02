@@ -79,7 +79,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setSession(s);
       setUser(s?.user ?? null);
       if (s?.user) {
-        setTimeout(() => fetchRole(s.user.id), 0);
+        setTimeout(() => fetchRole(s.user), 0);
       } else {
         setRole(null);
       }
@@ -88,7 +88,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       setUser(data.session?.user ?? null);
-      if (data.session?.user) fetchRole(data.session.user.id);
+      if (data.session?.user) fetchRole(data.session.user);
       setLoading(false);
     });
 
