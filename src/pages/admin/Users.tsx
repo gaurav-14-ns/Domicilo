@@ -215,6 +215,10 @@ const setStatus = async (row: Row, status: Sub["status"]) => {
 };
 
   const toggleSuspend = async (row: Row) => {
+    if (row.role === "admin") {
+      toast.error("Admin cannot be suspended");
+      return;
+    }
     setBusy(row.id);
     try {
       const next = !row.suspended;
@@ -234,15 +238,26 @@ const setStatus = async (row: Row, status: Sub["status"]) => {
   setBusy("bulk");
 
   try {
+    // exclude any admins from suspension
+    const adminIds = new Set(rows.filter((r) => r.role === "admin").map((r) => r.id));
+    const ids = selectedIds.filter((id) => !adminIds.has(id));
+    const skipped = selectedIds.length - ids.length;
+
+    if (ids.length === 0) {
+      toast.error("Admins cannot be suspended");
+      return;
+    }
+
     const { error } = await supabase
       .from("profiles")
       .update({ suspended: suspend })
-      .in("id", selectedIds);
+      .in("id", ids);
 
     if (error) throw error;
 
     toast.success(
-      suspend ? "Users suspended" : "Users reactivated"
+      suspend ? "Users suspended" : "Users reactivated",
+      skipped ? { description: `Skipped ${skipped} admin account${skipped > 1 ? "s" : ""}` } : undefined,
     );
 
     setSelectedIds([]);
@@ -354,24 +369,38 @@ return (
       </span>
       
       <div className="flex gap-2 flex-wrap">
-        <Button
-          size="sm"
-          variant="destructive"
-          onClick={() => bulkSuspend(true)}
-          disabled={busy === "bulk"}
-          >
-          Suspend
-        </Button>
-        
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => bulkSuspend(false)}
-          disabled={busy === "bulk"}
-          >
-          Reactivate
-        </Button>
-        
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button size="sm" variant="destructive" disabled={busy === "bulk"}>Suspend</Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Suspend {selectedIds.length} user{selectedIds.length > 1 ? "s" : ""}?</AlertDialogTitle>
+              <AlertDialogDescription>They will be blocked from signing in. Admin accounts are skipped.</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => bulkSuspend(true)}>Suspend</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button size="sm" variant="outline" disabled={busy === "bulk"}>Reactivate</Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Reactivate {selectedIds.length} user{selectedIds.length > 1 ? "s" : ""}?</AlertDialogTitle>
+              <AlertDialogDescription>They will regain access on next sign-in.</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => bulkSuspend(false)}>Reactivate</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
         <Select onValueChange={(v) => bulkSetPlan(v as Sub["plan"])}>
           <SelectTrigger className="h-8 w-[140px]">
             <SelectValue placeholder="Set Plan" />
@@ -577,33 +606,35 @@ return (
                             View
                           </Button>
                           
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button size="sm" variant="ghost" disabled={busy === u.id} title={u.suspended ? "Reactivate" : "Suspend"}>
-                                {u.suspended
-                                  ? <ShieldCheck className="h-4 w-4 text-primary" />
-                                  : <ShieldOff className="h-4 w-4 text-destructive" />}
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  {u.suspended ? "Reactivate this user?" : "Suspend this user?"}
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
+                          {u.role !== "admin" && (
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button size="sm" variant="ghost" disabled={busy === u.id} title={u.suspended ? "Reactivate" : "Suspend"}>
                                   {u.suspended
-                                    ? "They will regain access immediately on next sign-in."
-                                    : "They will be signed out and blocked from logging in until reactivated."}
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => toggleSuspend(u)}>
-                                  {u.suspended ? "Reactivate" : "Suspend"}
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
+                                    ? <ShieldCheck className="h-4 w-4 text-primary" />
+                                    : <ShieldOff className="h-4 w-4 text-destructive" />}
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>
+                                    {u.suspended ? "Reactivate this user?" : "Suspend this user?"}
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    {u.suspended
+                                      ? "They will regain access immediately on next sign-in."
+                                      : "They will be signed out and blocked from logging in until reactivated."}
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => toggleSuspend(u)}>
+                                    {u.suspended ? "Reactivate" : "Suspend"}
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -631,16 +662,18 @@ return (
         </div>
 
         <div className="mt-4 flex gap-2 flex-wrap">
-          <Button
-            size="sm"
-            variant={selectedUser.suspended ? "outline" : "destructive"}
-            onClick={async () => {
-              await toggleSuspend(selectedUser);
-              setSelectedUser(null);
-            }}
-            >
-            {selectedUser.suspended ? "Reactivate User" : "Suspend User"}
-          </Button>
+          {selectedUser.role !== "admin" && (
+            <Button
+              size="sm"
+              variant={selectedUser.suspended ? "outline" : "destructive"}
+              onClick={async () => {
+                await toggleSuspend(selectedUser);
+                setSelectedUser(null);
+              }}
+              >
+              {selectedUser.suspended ? "Reactivate User" : "Suspend User"}
+            </Button>
+          )}
         </div>
 
         {selectedUser.role === "owner" && (

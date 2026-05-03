@@ -4,6 +4,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 type Lead = {
   id: string;
@@ -104,22 +109,37 @@ export default function AdminLeads() {
                   </td>
                   <td className="p-3 text-right">
                     <div className="flex justify-end gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={busy === l.id}
-                        onClick={() => setStatus(l.id, "contacted")}
-                      >
-                        Contacted
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={busy === l.id}
-                        onClick={() => setStatus(l.id, "closed")}
-                      >
-                        Close
-                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button size="sm" variant="outline" disabled={busy === l.id}>Contacted</Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Mark this lead as contacted?</AlertDialogTitle>
+                            <AlertDialogDescription>{l.email || l.name || "Lead"} will move to the contacted state.</AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => setStatus(l.id, "contacted")}>Confirm</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button size="sm" variant="outline" disabled={busy === l.id}>Close</Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Close this lead?</AlertDialogTitle>
+                            <AlertDialogDescription>It will be marked as closed and removed from your active queue.</AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => setStatus(l.id, "closed")}>Close lead</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </td>
                 </tr>
