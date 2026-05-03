@@ -29,10 +29,63 @@ const map = (r: any): Subscription => ({
   cancelledAt: r.cancelled_at,
 });
 
+const now = () => Date.now();
+
+const deriveStatus = (s: Subscription): SubscriptionStatus => {
+  if (s.status === "cancelled") return "cancelled";
+  if (s.status === "overdue") return "overdue";
+  if (s.status === "expired") return "expired";
+
+  if (s.status === "trial") {
+    if (s.trialEnd && new Date(s.trialEnd).getTime() <= now()) return "expired";
+    return "trial";
+  }
+
+  if (s.status === "active") {
+    if (s.currentPeriodEnd && new Date(s.currentPeriodEnd).getTime() <= now()) return "overdue";
+    return "active";
+  }
+
+  return s.status;
+};
+
 export function useSubscription() {
   const { user, role } = useAuth();
   const [sub, setSub] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const ensureOwnerSubscription = useCallback(async () => {
+    if (!user) return null;
+
+    const { data: existing, error: fetchError } = await supabase
+      .from("subscriptions")
+      .select("*")
+      .eq("owner_id", user.id)
+      .maybeSingle();
+
+    if (fetchError) throw fetchError;
+    if (existing) return map(existing);
+
+    const payload = {
+      owner_id: user.id,
+      plan: "starter",
+      status: "trial",
+      trial_end: new Date(Date.now() + 14 * 86400_000).toISOString(),
+      amount: PLAN_PRICES_INR.starter,
+      currency_code: "INR",
+      cancelled_at: null,
+      current_period_end: null,
+    };
+
+    const { data: inserted, error: insertError } = await supabase
+      .from("subscriptions")
+      .insert(payload)
+      .select("*")
+      .single();
+
+    if (insertError) throw insertError;
+    return map(inserted);
+  }, [user]);
 
   const fetch = useCallback(async () => {
     if (!user || role !== "owner") {
@@ -40,23 +93,24 @@ export function useSubscription() {
       setLoading(false);
       return;
     }
+
     setLoading(true);
-    const { data } = await supabase
-      .from("subscriptions")
-      .select("*")
-      .eq("owner_id", user.id)
-      .maybeSingle();
-    setSub(data ? map(data) : null);
-    setLoading(false);
-  }, [user, role]);
+    try {
+      const ensured = await ensureOwnerSubscription();
+      setSub(ensured);
+    } finally {
+      setLoading(false);
+    }
+  }, [user, role, ensureOwnerSubscription]);
 
   useEffect(() => {
-    fetch();
+    void fetch();
   }, [fetch]);
 
   const changePlan = useCallback(async (plan: PlanId) => {
     if (!user) return;
     const amount = PLAN_PRICES_INR[plan];
+
     const { error } = await supabase
       .from("subscriptions")
       .update({
@@ -68,36 +122,61 @@ export function useSubscription() {
         cancelled_at: null,
       })
       .eq("owner_id", user.id);
+
     if (error) throw error;
+
     await supabase.from("audit_logs").insert({
-      actor_id: user.id, actor_email: user.email,
-      action: "subscription.change_plan", target_type: "subscription",
-      target_id: user.id, meta: { plan },
+      actor_id: user.id,
+      actor_email: user.email,
+      action: "subscription.change_plan",
+      target_type: "subscription",
+      target_id: user.id,
+      meta: { plan },
     });
+
     await fetch();
   }, [user, fetch]);
 
   const cancel = useCallback(async () => {
     if (!user) return;
+
     const { error } = await supabase
       .from("subscriptions")
       .update({ status: "cancelled", cancelled_at: new Date().toISOString() })
       .eq("owner_id", user.id);
+
     if (error) throw error;
+
     await supabase.from("audit_logs").insert({
-      actor_id: user.id, actor_email: user.email,
-      action: "subscription.cancel", target_type: "subscription", target_id: user.id,
+      actor_id: user.id,
+      actor_email: user.email,
+      action: "subscription.cancel",
+      target_type: "subscription",
+      target_id: user.id,
     });
+
     await fetch();
   }, [user, fetch]);
 
-  // Derived flags
-  const trialDaysLeft = sub?.trialEnd
-    ? Math.max(0, Math.ceil((new Date(sub.trialEnd).getTime() - Date.now()) / 86400_000))
-    : 0;
-  const isTrial = sub?.status === "trial";
-  const isExpired = sub?.status === "expired" || (isTrial && trialDaysLeft === 0);
-  const needsPaidUpgrade = isExpired || sub?.status === "cancelled";
+  const effectiveStatus = sub ? deriveStatus(sub) : null;
 
-  return { subscription: sub, loading, refresh: fetch, changePlan, cancel, trialDaysLeft, isTrial, isExpired, needsPaidUpgrade };
+  const trialDaysLeft = sub?.trialEnd
+    ? Math.max(0, Math.ceil((new Date(sub.trialEnd).getTime() - now()) / 86400_000))
+    : 0;
+
+  const isTrial = effectiveStatus === "trial";
+  const isExpired = effectiveStatus === "expired";
+  const needsPaidUpgrade = isExpired || effectiveStatus === "cancelled" || effectiveStatus === "overdue";
+
+  return {
+    subscription: sub ? { ...sub, status: effectiveStatus ?? sub.status } : null,
+    loading,
+    refresh: fetch,
+    changePlan,
+    cancel,
+    trialDaysLeft,
+    isTrial,
+    isExpired,
+    needsPaidUpgrade,
+  };
 }
