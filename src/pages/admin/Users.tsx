@@ -32,7 +32,7 @@ type Row = {
 };
 
 const PLANS: Sub["plan"][] = ["starter", "growth", "scale"];
-const STATUSES: Sub["status"][] = ["trial", "active", "cancelled", "expired"];
+const STATUSES: Sub["status"][] = ["trial", "active", "overdue", "cancelled", "expired"];
 
 export default function AdminUsers() {
   const { user } = useAuth();
