@@ -215,6 +215,10 @@ const setStatus = async (row: Row, status: Sub["status"]) => {
 };
 
   const toggleSuspend = async (row: Row) => {
+    if (row.role === "admin") {
+      toast.error("Admin cannot be suspended");
+      return;
+    }
     setBusy(row.id);
     try {
       const next = !row.suspended;
@@ -234,15 +238,26 @@ const setStatus = async (row: Row, status: Sub["status"]) => {
   setBusy("bulk");
 
   try {
+    // exclude any admins from suspension
+    const adminIds = new Set(rows.filter((r) => r.role === "admin").map((r) => r.id));
+    const ids = selectedIds.filter((id) => !adminIds.has(id));
+    const skipped = selectedIds.length - ids.length;
+
+    if (ids.length === 0) {
+      toast.error("Admins cannot be suspended");
+      return;
+    }
+
     const { error } = await supabase
       .from("profiles")
       .update({ suspended: suspend })
-      .in("id", selectedIds);
+      .in("id", ids);
 
     if (error) throw error;
 
     toast.success(
-      suspend ? "Users suspended" : "Users reactivated"
+      suspend ? "Users suspended" : "Users reactivated",
+      skipped ? { description: `Skipped ${skipped} admin account${skipped > 1 ? "s" : ""}` } : undefined,
     );
 
     setSelectedIds([]);
