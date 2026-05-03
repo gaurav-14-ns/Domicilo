@@ -182,19 +182,45 @@ return result;
   };
 
   const setStatus = async (row: Row, status: Sub["status"]) => {
-    if (!row.sub) { toast.error("No subscription record"); return; }
+  if (!row.sub) {
+    toast.error("No subscription record");
+    return;
+    }
+
     setBusy(row.id);
     try {
       const patch: any = { status };
-      if (status === "cancelled") patch.cancelled_at = new Date().toISOString();
-      const { error } = await supabase.from("subscriptions").update(patch).eq("owner_id", row.id);
+
+      if (status === "cancelled") {
+        patch.cancelled_at = new Date().toISOString();
+      }
+
+      if (status === "active") {
+        patch.cancelled_at = null;
+        patch.current_period_end = new Date(Date.now() + 30 * 86400_000).toISOString();
+      }
+
+      if (status === "trial") {
+        patch.cancelled_at = null;
+        patch.trial_end = new Date(Date.now() + 14 * 86400_000).toISOString();
+        patch.current_period_end = null;
+      }
+
+      const { error } = await supabase
+        .from("subscriptions")
+        .update(patch)
+        .eq("owner_id", row.id);
+
       if (error) throw error;
+
       await audit("admin.set_sub_status", row.id, { status });
       toast.success(`Status: ${status}`);
       await load();
-    } catch (err: any) {
-      toast.error("Failed", { description: err.message });
-    } finally { setBusy(null); }
+      } catch (err: any) {
+        toast.error("Failed", { description: err.message });
+      } finally {
+      setBusy(null);
+    }
   };
 
   const toggleSuspend = async (row: Row) => {
@@ -524,7 +550,7 @@ return (
                       <td className="p-3">
                         {isOwner ? (
                           <Select
-                            value={u.sub?.plan ?? ""}
+                            value={u.sub?.plan}
                             onValueChange={(v) => setPlan(u, v as Sub["plan"])}
                             disabled={busy === u.id}
                           >
@@ -628,7 +654,7 @@ return (
 
         {selectedUser.role === "owner" && (
       <Select
-        value={selectedUser.sub?.plan ?? ""}
+        value={selectedUser.sub?.plan}
         onValueChange={async (v) => {
           await setPlan(selectedUser, v as Sub["plan"]);
           setSelectedUser(null);
