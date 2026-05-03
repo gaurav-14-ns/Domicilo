@@ -592,33 +592,35 @@ return (
                             View
                           </Button>
                           
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button size="sm" variant="ghost" disabled={busy === u.id} title={u.suspended ? "Reactivate" : "Suspend"}>
-                                {u.suspended
-                                  ? <ShieldCheck className="h-4 w-4 text-primary" />
-                                  : <ShieldOff className="h-4 w-4 text-destructive" />}
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  {u.suspended ? "Reactivate this user?" : "Suspend this user?"}
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
+                          {u.role !== "admin" && (
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button size="sm" variant="ghost" disabled={busy === u.id} title={u.suspended ? "Reactivate" : "Suspend"}>
                                   {u.suspended
-                                    ? "They will regain access immediately on next sign-in."
-                                    : "They will be signed out and blocked from logging in until reactivated."}
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => toggleSuspend(u)}>
-                                  {u.suspended ? "Reactivate" : "Suspend"}
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
+                                    ? <ShieldCheck className="h-4 w-4 text-primary" />
+                                    : <ShieldOff className="h-4 w-4 text-destructive" />}
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>
+                                    {u.suspended ? "Reactivate this user?" : "Suspend this user?"}
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    {u.suspended
+                                      ? "They will regain access immediately on next sign-in."
+                                      : "They will be signed out and blocked from logging in until reactivated."}
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => toggleSuspend(u)}>
+                                    {u.suspended ? "Reactivate" : "Suspend"}
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -646,16 +648,18 @@ return (
         </div>
 
         <div className="mt-4 flex gap-2 flex-wrap">
-          <Button
-            size="sm"
-            variant={selectedUser.suspended ? "outline" : "destructive"}
-            onClick={async () => {
-              await toggleSuspend(selectedUser);
-              setSelectedUser(null);
-            }}
-            >
-            {selectedUser.suspended ? "Reactivate User" : "Suspend User"}
-          </Button>
+          {selectedUser.role !== "admin" && (
+            <Button
+              size="sm"
+              variant={selectedUser.suspended ? "outline" : "destructive"}
+              onClick={async () => {
+                await toggleSuspend(selectedUser);
+                setSelectedUser(null);
+              }}
+              >
+              {selectedUser.suspended ? "Reactivate User" : "Suspend User"}
+            </Button>
+          )}
         </div>
 
         {selectedUser.role === "owner" && (
