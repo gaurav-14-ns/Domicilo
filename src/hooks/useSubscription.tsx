@@ -145,7 +145,10 @@ export function useSubscription() {
 
     const { error } = await supabase
       .from("subscriptions")
-      .update({ status: "cancelled", cancelled_at: new Date().toISOString() })
+      .update({
+        status: "cancelled",
+        cancelled_at: new Date().toISOString(),
+      })
       .eq("owner_id", user.id);
 
     if (error) throw error;
