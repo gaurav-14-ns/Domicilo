@@ -369,24 +369,38 @@ return (
       </span>
       
       <div className="flex gap-2 flex-wrap">
-        <Button
-          size="sm"
-          variant="destructive"
-          onClick={() => bulkSuspend(true)}
-          disabled={busy === "bulk"}
-          >
-          Suspend
-        </Button>
-        
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => bulkSuspend(false)}
-          disabled={busy === "bulk"}
-          >
-          Reactivate
-        </Button>
-        
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button size="sm" variant="destructive" disabled={busy === "bulk"}>Suspend</Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Suspend {selectedIds.length} user{selectedIds.length > 1 ? "s" : ""}?</AlertDialogTitle>
+              <AlertDialogDescription>They will be blocked from signing in. Admin accounts are skipped.</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => bulkSuspend(true)}>Suspend</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button size="sm" variant="outline" disabled={busy === "bulk"}>Reactivate</Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Reactivate {selectedIds.length} user{selectedIds.length > 1 ? "s" : ""}?</AlertDialogTitle>
+              <AlertDialogDescription>They will regain access on next sign-in.</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => bulkSuspend(false)}>Reactivate</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
         <Select onValueChange={(v) => bulkSetPlan(v as Sub["plan"])}>
           <SelectTrigger className="h-8 w-[140px]">
             <SelectValue placeholder="Set Plan" />
