@@ -29,7 +29,7 @@ const map = (r: any): Subscription => ({
   cancelledAt: r.cancelled_at,
 });
 
-const now = () => Date.now();
+const nowMs = () => Date.now();
 
 const deriveStatus = (s: Subscription): SubscriptionStatus => {
   if (s.status === "cancelled") return "cancelled";
@@ -37,12 +37,12 @@ const deriveStatus = (s: Subscription): SubscriptionStatus => {
   if (s.status === "expired") return "expired";
 
   if (s.status === "trial") {
-    if (s.trialEnd && new Date(s.trialEnd).getTime() <= now()) return "expired";
+    if (s.trialEnd && new Date(s.trialEnd).getTime() <= nowMs()) return "expired";
     return "trial";
   }
 
   if (s.status === "active") {
-    if (s.currentPeriodEnd && new Date(s.currentPeriodEnd).getTime() <= now()) return "overdue";
+    if (s.currentPeriodEnd && new Date(s.currentPeriodEnd).getTime() <= nowMs()) return "overdue";
     return "active";
   }
 
@@ -68,8 +68,8 @@ export function useSubscription() {
 
     const payload = {
       owner_id: user.id,
-      plan: "starter",
-      status: "trial",
+      plan: "starter" as const,
+      status: "trial" as const,
       trial_end: new Date(Date.now() + 14 * 86400_000).toISOString(),
       amount: PLAN_PRICES_INR.starter,
       currency_code: "INR",
@@ -107,35 +107,38 @@ export function useSubscription() {
     void fetch();
   }, [fetch]);
 
-  const changePlan = useCallback(async (plan: PlanId) => {
-    if (!user) return;
-    const amount = PLAN_PRICES_INR[plan];
+  const changePlan = useCallback(
+    async (plan: PlanId) => {
+      if (!user) return;
+      const amount = PLAN_PRICES_INR[plan];
 
-    const { error } = await supabase
-      .from("subscriptions")
-      .update({
-        plan,
-        status: "active",
-        current_period_end: new Date(Date.now() + 30 * 86400_000).toISOString(),
-        amount,
-        currency_code: "INR",
-        cancelled_at: null,
-      })
-      .eq("owner_id", user.id);
+      const { error } = await supabase
+        .from("subscriptions")
+        .update({
+          plan,
+          status: "active",
+          current_period_end: new Date(Date.now() + 30 * 86400_000).toISOString(),
+          amount,
+          currency_code: "INR",
+          cancelled_at: null,
+        })
+        .eq("owner_id", user.id);
 
-    if (error) throw error;
+      if (error) throw error;
 
-    await supabase.from("audit_logs").insert({
-      actor_id: user.id,
-      actor_email: user.email,
-      action: "subscription.change_plan",
-      target_type: "subscription",
-      target_id: user.id,
-      meta: { plan },
-    });
+      await supabase.from("audit_logs").insert({
+        actor_id: user.id,
+        actor_email: user.email,
+        action: "subscription.change_plan",
+        target_type: "subscription",
+        target_id: user.id,
+        meta: { plan },
+      });
 
-    await fetch();
-  }, [user, fetch]);
+      await fetch();
+    },
+    [user, fetch]
+  );
 
   const cancel = useCallback(async () => {
     if (!user) return;
@@ -161,12 +164,13 @@ export function useSubscription() {
   const effectiveStatus = sub ? deriveStatus(sub) : null;
 
   const trialDaysLeft = sub?.trialEnd
-    ? Math.max(0, Math.ceil((new Date(sub.trialEnd).getTime() - now()) / 86400_000))
+    ? Math.max(0, Math.ceil((new Date(sub.trialEnd).getTime() - nowMs()) / 86400_000))
     : 0;
 
   const isTrial = effectiveStatus === "trial";
   const isExpired = effectiveStatus === "expired";
-  const needsPaidUpgrade = isExpired || effectiveStatus === "cancelled" || effectiveStatus === "overdue";
+  const needsPaidUpgrade =
+    isExpired || effectiveStatus === "cancelled" || effectiveStatus === "overdue";
 
   return {
     subscription: sub ? { ...sub, status: effectiveStatus ?? sub.status } : null,
