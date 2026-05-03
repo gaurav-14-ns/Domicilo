@@ -21,6 +21,7 @@ export default function Auth() {
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPwd, setSignupPwd] = useState("");
   const [signupRole, setSignupRole] = useState<AppRole>("owner");
+  const [adminAvailable, setAdminAvailable] = useState(false);
 
   // signin
   const [email, setEmail] = useState("");
@@ -29,6 +30,13 @@ export default function Auth() {
   useEffect(() => {
     if (!loading && user && role) nav(dashboardPathFor(role), { replace: true });
   }, [user, role, loading, nav]);
+
+  useEffect(() => {
+    (async () => {
+      const { data, error } = await supabase.rpc("admin_exists");
+      if (!error) setAdminAvailable(!data);
+    })();
+  }, []);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,9 +121,9 @@ export default function Auth() {
                   <RadioGroup
                     value={signupRole}
                     onValueChange={(v) => setSignupRole(v as AppRole)}
-                    className="grid grid-cols-2 gap-2"
+                    className={`grid gap-2 ${adminAvailable ? "grid-cols-3" : "grid-cols-2"}`}
                   >
-                    {(["owner", "tenant"] as AppRole[]).map((r) => (
+                    {((adminAvailable ? ["owner", "tenant", "admin"] : ["owner", "tenant"]) as AppRole[]).map((r) => (
                       <Label
                         key={r}
                         htmlFor={`su-${r}`}
@@ -124,11 +132,15 @@ export default function Auth() {
                         }`}
                       >
                         <RadioGroupItem value={r} id={`su-${r}`} className="sr-only" />
-                        {r === "owner" ? "Property owner" : "Tenant"}
+                        {r === "owner" ? "Owner" : r === "tenant" ? "Tenant" : "Admin"}
                       </Label>
                     ))}
                   </RadioGroup>
-                  <p className="text-[11px] text-muted-foreground">Admin accounts are issued by the platform.</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    {adminAvailable
+                      ? "Admin signup is open: the first admin signup becomes the only admin for this site."
+                      : "Admin account already exists. Only one admin is allowed."}
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="name">Full name</Label>
