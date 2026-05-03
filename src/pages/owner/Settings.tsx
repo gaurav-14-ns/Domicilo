@@ -78,7 +78,6 @@ export default function Settings() {
     locale: data.settings.locale,
   });
 
-  // Track explicit user theme changes only.
   const themeDirty = useRef(false);
 
   useEffect(() => {
@@ -97,7 +96,6 @@ export default function Settings() {
 
   useEffect(() => {
     if (!planNotice) return;
-
     const timer = setInterval(() => {
       setPlanNotice((prev) => {
         if (!prev) return null;
@@ -105,7 +103,6 @@ export default function Settings() {
         return { ...prev, seconds: prev.seconds - 1 };
       });
     }, 1000);
-
     return () => clearInterval(timer);
   }, [planNotice]);
 
@@ -131,13 +128,11 @@ export default function Settings() {
     try {
       await changePlan(plan);
       await refresh();
-
       setPlanNotice({
         type: "success",
         message: `Your ${PLAN_LABEL[plan]} plan is now active.`,
         seconds: 10,
       });
-
       toast.success(`Switched to ${PLAN_LABEL[plan]}`, {
         description: `${planPriceIn(plan, code, locale)} / month`,
       });
@@ -153,13 +148,11 @@ export default function Settings() {
     try {
       await cancel();
       await refresh();
-
       setPlanNotice({
         type: "error",
         message: "Your subscription has been cancelled.",
         seconds: 10,
       });
-
       toast.success("Subscription cancelled", {
         description: "You can re-activate anytime.",
       });
@@ -205,9 +198,7 @@ export default function Settings() {
 
       <div>
         <h1 className="text-2xl md:text-3xl font-display font-bold">Settings</h1>
-        <p className="text-muted-foreground">
-          Manage your account preferences and subscription.
-        </p>
+        <p className="text-muted-foreground">Manage your account preferences and subscription.</p>
       </div>
 
       {planNotice && (
@@ -239,30 +230,23 @@ export default function Settings() {
                   {subscription.status}
                 </Badge>
               </div>
-
               <div className="mt-2 text-2xl font-bold font-display">
                 {PLAN_LABEL[subscription.plan]} · {fmt(subscription.amount)}/mo
               </div>
-
               {isTrial && (
                 <div className="text-sm text-muted-foreground mt-1">
                   Trial ends in {trialDaysLeft} day{trialDaysLeft === 1 ? "" : "s"}
                 </div>
               )}
-
               {subscription.status === "cancelled" && (
-                <div className="text-sm text-muted-foreground mt-1">
-                  Re-activate anytime to continue.
-                </div>
+                <div className="text-sm text-muted-foreground mt-1">Re-activate anytime to continue.</div>
               )}
             </div>
 
             {subscription.status === "active" && subscription.plan !== "starter" && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    Cancel plan
-                  </Button>
+                  <Button variant="outline" size="sm">Cancel plan</Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
@@ -283,15 +267,12 @@ export default function Settings() {
           <div className="grid sm:grid-cols-3 gap-3">
             {(["starter", "growth", "scale"] as PlanId[]).map((p) => {
               const active = subscription.plan === p && subscription.status === "active";
-
               const tile = (
                 <button
                   type="button"
                   disabled={busy || active}
                   className={`w-full text-left rounded-lg border p-4 transition-smooth disabled:cursor-not-allowed ${
-                    active
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/40"
+                    active ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"
                   }`}
                 >
                   <div className="font-display font-semibold flex items-center gap-2">
@@ -300,9 +281,7 @@ export default function Settings() {
                   </div>
                   <div className="text-2xl font-bold mt-1">
                     {planPriceIn(p, code, locale)}
-                    {p !== "scale" && (
-                      <span className="text-xs font-normal text-muted-foreground">/mo</span>
-                    )}
+                    {p !== "scale" && <span className="text-xs font-normal text-muted-foreground">/mo</span>}
                   </div>
                   <div className="text-[11px] text-muted-foreground mt-1">
                     {p === "starter"
@@ -330,20 +309,14 @@ export default function Settings() {
                       {planPriceIn(p, code, locale)}
                       <span className="text-xs font-normal text-muted-foreground">/mo</span>
                     </div>
-                    <div className="text-[11px] text-muted-foreground mt-1">
-                      Up to 25 tenants · 1 property
-                    </div>
+                    <div className="text-[11px] text-muted-foreground mt-1">Up to 25 tenants · 1 property</div>
                   </button>
                 );
               }
 
               if (p === "growth") {
                 return (
-                  <div
-                    key={p}
-                    onClick={() => setPendingPlan(p)}
-                    className="cursor-pointer"
-                  >
+                  <div key={p} onClick={() => setPendingPlan(p)} className="cursor-pointer">
                     {tile}
                   </div>
                 );
@@ -368,24 +341,14 @@ export default function Settings() {
         </div>
       ) : (
         <div className="rounded-xl border border-border bg-gradient-card p-6">
-          <p className="text-sm text-muted-foreground">
-            Preparing your subscription profile...
-          </p>
-          <Button
-            variant="outline"
-            className="mt-3"
-            onClick={() => void refresh()}
-            disabled={busy}
-          >
+          <p className="text-sm text-muted-foreground">Preparing your subscription profile...</p>
+          <Button variant="outline" className="mt-3" onClick={() => void refresh()} disabled={busy}>
             Retry
           </Button>
         </div>
       )}
 
-      <form
-        onSubmit={save}
-        className="rounded-xl border border-border bg-gradient-card p-6 space-y-5"
-      >
+      <form onSubmit={save} className="rounded-xl border border-border bg-gradient-card p-6 space-y-5">
         <div className="space-y-2">
           <Label>Account email</Label>
           <Input value={user?.email ?? ""} disabled />
@@ -394,29 +357,17 @@ export default function Settings() {
         <div className="grid sm:grid-cols-2 gap-3">
           <div className="space-y-2">
             <Label>Display name</Label>
-            <Input
-              value={form.displayName}
-              onChange={(e) => setForm({ ...form, displayName: e.target.value })}
-              placeholder="Your name"
-            />
+            <Input value={form.displayName} onChange={(e) => setForm({ ...form, displayName: e.target.value })} placeholder="Your name" />
           </div>
           <div className="space-y-2">
             <Label>Company name</Label>
-            <Input
-              value={form.companyName}
-              onChange={(e) => setForm({ ...form, companyName: e.target.value })}
-              placeholder="Domicilo"
-            />
+            <Input value={form.companyName} onChange={(e) => setForm({ ...form, companyName: e.target.value })} placeholder="Domicilo" />
           </div>
         </div>
 
         <div className="space-y-2">
           <Label>Contact email</Label>
-          <Input
-            type="email"
-            value={form.ownerEmail}
-            onChange={(e) => setForm({ ...form, ownerEmail: e.target.value })}
-          />
+          <Input type="email" value={form.ownerEmail} onChange={(e) => setForm({ ...form, ownerEmail: e.target.value })} />
         </div>
 
         <div className="grid sm:grid-cols-2 gap-3">
@@ -425,27 +376,17 @@ export default function Settings() {
             <Select
               value={form.currencyCode}
               onValueChange={(v) =>
-                setForm({
-                  ...form,
-                  currencyCode: v as CurrencyCode,
-                  locale: localeForCurrency(v as CurrencyCode),
-                })
+                setForm({ ...form, currencyCode: v as CurrencyCode, locale: localeForCurrency(v as CurrencyCode) })
               }
             >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 {SUPPORTED_CURRENCIES.map((c) => (
-                  <SelectItem key={c.code} value={c.code}>
-                    {c.label}
-                  </SelectItem>
+                  <SelectItem key={c.code} value={c.code}>{c.label}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-[11px] text-muted-foreground">
-              Used everywhere amounts are shown.
-            </p>
+            <p className="text-[11px] text-muted-foreground">Used everywhere amounts are shown.</p>
           </div>
 
           <div className="space-y-2">
@@ -457,18 +398,14 @@ export default function Settings() {
                 setForm({ ...form, theme: v as any });
               }}
             >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="light">Light</SelectItem>
                 <SelectItem value="dark">Dark</SelectItem>
                 <SelectItem value="system">System</SelectItem>
               </SelectContent>
             </Select>
-            <p className="text-[11px] text-muted-foreground">
-              Use the toggle in the header for one-off switches.
-            </p>
+            <p className="text-[11px] text-muted-foreground">Use the toggle in the header for one-off switches.</p>
           </div>
         </div>
 
@@ -476,13 +413,9 @@ export default function Settings() {
           <div>
             <div className="font-medium text-sm flex items-center gap-2">
               Email notifications
-              <Badge variant="outline" className="text-[10px]">
-                Coming soon
-              </Badge>
+              <Badge variant="outline" className="text-[10px]">Coming soon</Badge>
             </div>
-            <div className="text-xs text-muted-foreground">
-              Billing & tenant updates — provider integration in progress.
-            </div>
+            <div className="text-xs text-muted-foreground">Billing & tenant updates — provider integration in progress.</div>
           </div>
           <Switch checked={false} disabled />
         </div>
@@ -491,13 +424,9 @@ export default function Settings() {
           <div>
             <div className="font-medium text-sm flex items-center gap-2">
               SMS notifications
-              <Badge variant="outline" className="text-[10px]">
-                Coming soon
-              </Badge>
+              <Badge variant="outline" className="text-[10px]">Coming soon</Badge>
             </div>
-            <div className="text-xs text-muted-foreground">
-              Critical alerts via SMS — provider integration in progress.
-            </div>
+            <div className="text-xs text-muted-foreground">Critical alerts via SMS — provider integration in progress.</div>
           </div>
           <Switch checked={false} disabled />
         </div>
