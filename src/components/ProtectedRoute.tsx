@@ -19,35 +19,58 @@ export const ProtectedRoute = ({
 
   useEffect(() => {
     let cancelled = false;
-    if (!user) { setSuspendedChecked(true); setSuspended(false); return; }
+
+    if (!user) {
+      setSuspendedChecked(true);
+      setSuspended(false);
+      return;
+    }
+
     setSuspendedChecked(false);
+
     (async () => {
       const { data } = await supabase
         .from("profiles")
         .select("suspended")
         .eq("id", user.id)
         .maybeSingle();
+
       if (cancelled) return;
+
       if (data?.suspended) {
         setSuspended(true);
         toast.error("Account suspended", { description: "Contact support to restore access." });
         await signOut();
       }
+
       setSuspendedChecked(true);
     })();
-    return () => { cancelled = true; };
+
+    return () => {
+      cancelled = true;
+    };
   }, [user, signOut]);
 
-  if (loading || (user && !suspendedChecked)) {
+  const waitingForRole = !!user && !!allow && role === null;
+  if (loading || (user && !suspendedChecked) || waitingForRole) {
     return (
       <div className="min-h-screen grid place-items-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
-  if (!user || suspended) return <Navigate to="/auth" state={{ from: loc.pathname }} replace />;
+
+  if (!user || suspended) {
+    return <Navigate to="/auth" state={{ from: loc.pathname }} replace />;
+  }
+
+  if (allow && !role) {
+    return <Navigate to="/auth" state={{ from: loc.pathname }} replace />;
+  }
+
   if (allow && role && !allow.includes(role)) {
     return <Navigate to={dashboardPathFor(role)} replace />;
   }
+
   return <>{children}</>;
 };
