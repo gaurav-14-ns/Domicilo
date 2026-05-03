@@ -1,6 +1,12 @@
 import { ReactNode, useState } from "react";
 import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Loader2, ShieldCheck, CreditCard } from "lucide-react";
@@ -60,9 +66,7 @@ export function UpgradePlaceholderDialog({ plan, planLabel, trigger, onActivated
       setOpen(false);
       onActivated?.();
     } catch (err: any) {
-      toast.error("Action failed", {
-        description: err.message,
-      });
+      toast.error("Action failed", { description: err.message });
     } finally {
       setBusy(false);
     }
