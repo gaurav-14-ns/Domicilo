@@ -315,6 +315,14 @@ export default function Settings() {
             <AlertTriangle className="h-3 w-3" /> Payment provider integration ready — plan changes are recorded instantly for demo.
           </p>
         </div>
+
+      ) : (
+      <div className="rounded-xl border border-border bg-gradient-card p-6">
+        <p className="text-sm text-muted-foreground">Preparing your subscription profile...</p>
+        <Button variant="outline" className="mt-3" onClick={refresh} disabled={busy}>
+          Retry
+        </Button>
+        </div>      
       )}
 
       <form onSubmit={save} className="rounded-xl border border-border bg-gradient-card p-6 space-y-5">
