@@ -67,6 +67,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           { onConflict: "user_id" }
         );
       }
+      if (role === "owner") {
+        const { data: existingSub } = await supabase
+          .from("subscriptions")
+          .select("id")
+          .eq("owner_id", u.id)
+          .maybeSingle();
+        if (!existingSub) {
+          await supabase.from("subscriptions").insert({
+            owner_id: u.id,
+            plan: "starter",
+            status: "trial",
+            trial_end: new Date(Date.now() + 14 * 86400_000).toISOString(),
+            amount: 999,
+            currency_code: currency,
+          });
+        }
+      }
       return role;
     };
 
