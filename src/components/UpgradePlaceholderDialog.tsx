@@ -28,14 +28,17 @@ export function UpgradePlaceholderDialog({ plan, planLabel, trigger, onActivated
   const activate = async () => {
     setBusy(true);
     try {
-      // 👉 SCALE PLAN → CREATE LEAD (NO DIRECT ACTIVATION)
       if (plan === "scale") {
+        const fullName = (user?.user_metadata as any)?.full_name ?? "";
+        const email = user?.email ?? "";
+
         const { error } = await supabase.from("leads").insert({
-          email: user?.email ?? null,
-          name: user?.user_metadata?.full_name ?? null,
-          type: "scale_plan_inquiry",
-          status: "new",
-        } as any);
+          name: fullName.trim() || "Scale plan inquiry",
+          email,
+          company: "Domicilo owner",
+          message: "Requested Scale plan upgrade from owner settings/pricing.",
+          source: "sales",
+        });
 
         if (error) throw error;
 
@@ -48,7 +51,6 @@ export function UpgradePlaceholderDialog({ plan, planLabel, trigger, onActivated
         return;
       }
 
-      // 👉 OTHER PLANS → NORMAL FLOW
       await changePlan(plan);
 
       toast.success(`${planLabel} activated`, {
@@ -57,7 +59,6 @@ export function UpgradePlaceholderDialog({ plan, planLabel, trigger, onActivated
 
       setOpen(false);
       onActivated?.();
-
     } catch (err: any) {
       toast.error("Action failed", {
         description: err.message,
