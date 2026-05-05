@@ -17,6 +17,7 @@ import {
 import { useAuth, AppRole } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const ownerItems = [
   { title: "Overview", url: "/owner", icon: LayoutDashboard, end: true },
@@ -45,6 +46,7 @@ export function AppSidebar({ role }: { role: AppRole }) {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const { signOut, user } = useAuth();
+  const { trialDaysLeft, isTrial } = useSubscription();
   const nav = useNavigate();
 
   const items = role === "owner" ? ownerItems : role === "tenant" ? tenantItems : adminItems;
@@ -91,13 +93,18 @@ export function AppSidebar({ role }: { role: AppRole }) {
       </SidebarContent>
       <SidebarFooter>
         {!collapsed && user && (
-          <div className="px-2 py-1 text-xs text-muted-foreground truncate">{user.email}</div>
+      {!collapsed && role === "owner" && isTrial && (
+        <div className="px-2 py-1 text-xs text-primary font-medium">
+          Trial: {trialDaysLeft} day{trialDaysLeft === 1 ? "" : "s"} left
+          </div>
         )}
-        <Button variant="ghost" size="sm" onClick={handleSignOut} className="justify-start">
-          <LogOut className="h-4 w-4" />
-          {!collapsed && <span>Sign out</span>}
+      <div className="px-2 py-1 text-xs text-muted-foreground truncate">{user.email}</div>
+      )}
+      <Button variant="ghost" size="sm" onClick={handleSignOut} className="justify-start">
+        <LogOut className="h-4 w-4" />
+        {!collapsed && <span>Sign out</span>}
         </Button>
       </SidebarFooter>
     </Sidebar>
-  );
-}
+    );
+  }
