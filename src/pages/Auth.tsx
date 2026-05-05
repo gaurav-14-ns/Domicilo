@@ -109,8 +109,9 @@ export default function Auth() {
                   {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign in"}
                 </Button>
                 <p className="text-xs text-muted-foreground text-center">
-                  You'll be sent to your portal automatically based on your account type.
+                  Tenants: use the credentials your owner shared. New tenant accounts can only be created by an owner or admin.
                 </p>
+
               </form>
             </TabsContent>
 
@@ -121,9 +122,11 @@ export default function Auth() {
                   <RadioGroup
                     value={signupRole}
                     onValueChange={(v) => setSignupRole(v as AppRole)}
-                    className={`grid gap-2 ${adminAvailable ? "grid-cols-3" : "grid-cols-2"}`}
+                    className={`grid gap-2 ${adminAvailable ? "grid-cols-2" : "grid-cols-1"}`}
+
                   >
-                    {((adminAvailable ? ["owner", "tenant", "admin"] : ["owner", "tenant"]) as AppRole[]).map((r) => (
+                    {((adminAvailable ? ["owner", "admin"] : ["owner"]) as AppRole[]).map((r) => (
+
                       <Label
                         key={r}
                         htmlFor={`su-${r}`}
