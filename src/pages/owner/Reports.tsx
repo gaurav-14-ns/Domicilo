@@ -1,18 +1,69 @@
-import { useMemo, useState } from "react";
-import { useDataStore } from "@/store/DataStore";
-import { useCurrency } from "@/hooks/useCurrency";
-import { monthKey, prettyMonth } from "@/lib/format";
-import { usePlanLimits } from "@/hooks/usePlanLimits";
-import { UpgradeDialog } from "@/components/UpgradeDialog";
-import { Lock, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { downloadCSV, monthKey, prettyMonth } from "@/lib/format";
 
-export default function Reports() {
+export default function Reports() {  
   const { data } = useDataStore();
   const { fmt } = useCurrency();
   const { canUseAdvancedReports, planLabel } = usePlanLimits();
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const { properties, tenants, transactions } = data;
+  const [propertyFilter, setPropertyFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [fromDate, setFromDate] = useState<string>("");
+  const [toDate, setToDate] = useState<string>("");
+
+  <div className="rounded-xl border border-border bg-gradient-card p-4 flex flex-wrap gap-3 items-end">
+  <div className="space-y-1">
+    <label className="text-xs text-muted-foreground">Property</label>
+    <Select value={propertyFilter} onValueChange={setPropertyFilter}>
+      <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+      <SelectContent>
+        <SelectItem value="all">All properties</SelectItem>
+        {properties.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+      </SelectContent>
+    </Select>
+  </div>
+  <div className="space-y-1">
+    <label className="text-xs text-muted-foreground">Status</label>
+    <Select value={statusFilter} onValueChange={setStatusFilter}>
+      <SelectTrigger className="w-36"><SelectValue /></SelectTrigger>
+      <SelectContent>
+        <SelectItem value="all">All</SelectItem>
+        <SelectItem value="completed">Completed</SelectItem>
+        <SelectItem value="pending">Pending</SelectItem>
+        <SelectItem value="failed">Failed</SelectItem>
+      </SelectContent>
+    </Select>
+  </div>
+  <div className="space-y-1">
+    <label className="text-xs text-muted-foreground">From</label>
+    <Input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="w-40" />
+  </div>
+  <div className="space-y-1">
+    <label className="text-xs text-muted-foreground">To</label>
+    <Input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="w-40" />
+  </div>
+  <Button
+    variant="outline"
+    size="sm"
+    onClick={() => downloadCSV(trend.map((m) => ({ month: m.label, revenue: m.total })), "monthly-revenue")}
+  >
+    <Download className="h-4 w-4" /> Export CSV
+  </Button>
+  </div>
+  
+  const filteredTx = useMemo(() => {
+    return transactions.filter((t) => {
+      if (propertyFilter !== "all" && t.propertyId !== propertyFilter) return false;
+      if (statusFilter !== "all" && t.status !== statusFilter) return false;
+      const ts = new Date(t.date).getTime();
+      if (fromDate && ts < new Date(fromDate).getTime()) return false;
+      if (toDate && ts > new Date(toDate).getTime() + 86_400_000) return false;
+      return true;
+    });
+  }, [transactions, propertyFilter, statusFilter, fromDate, toDate]);
 
   const totalRevenue = properties.reduce((s, p) => s + p.revenue, 0);
   const totalUnits = properties.reduce((s, p) => s + p.units, 0);
@@ -31,14 +82,15 @@ export default function Reports() {
       const key = monthKey(d);
       months.push({ key, label: prettyMonth(key), total: 0 });
     }
-    for (const t of transactions) {
+    for (const t of filteredTx) {
       if (t.status !== "completed") continue;
       const k = monthKey(t.date);
       const slot = months.find((m) => m.key === k);
       if (slot) slot.total += Math.max(0, t.amount);
     }
     return months;
-  }, [transactions]);
+  }, [filteredTx]);
+
   const trendMax = Math.max(1, ...trend.map((m) => m.total));
 
   return (
