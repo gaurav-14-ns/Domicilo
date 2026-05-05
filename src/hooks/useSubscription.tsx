@@ -31,18 +31,18 @@ const map = (r: any): Subscription => ({
 
 const nowMs = () => Date.now();
 
-const deriveStatus = (s: Subscription): SubscriptionStatus => {
+const deriveStatus = (s: Subscription, now: number = Date.now()): SubscriptionStatus => {
   if (s.status === "cancelled") return "cancelled";
   if (s.status === "overdue") return "overdue";
   if (s.status === "expired") return "expired";
 
   if (s.status === "trial") {
-    if (s.trialEnd && new Date(s.trialEnd).getTime() <= nowMs()) return "expired";
+    if (s.trialEnd && new Date(s.trialEnd).getTime() <= now) return "expired";
     return "trial";
   }
 
   if (s.status === "active") {
-    if (s.currentPeriodEnd && new Date(s.currentPeriodEnd).getTime() <= nowMs()) return "overdue";
+    if (s.currentPeriodEnd && new Date(s.currentPeriodEnd).getTime() <= now) return "overdue";
     return "active";
   }
 
@@ -53,6 +53,12 @@ export function useSubscription() {
   const { user, role } = useAuth();
   const [sub, setSub] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const [now, setNow] = useState<number>(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(id);
+  }, []);
 
   const ensureOwnerSubscription = useCallback(async () => {
     if (!user) return null;
@@ -164,10 +170,10 @@ export function useSubscription() {
     await fetch();
   }, [user, fetch]);
 
-  const effectiveStatus = sub ? deriveStatus(sub) : null;
+  const effectiveStatus = sub ? deriveStatus(sub, now) : null;
 
   const trialDaysLeft = sub?.trialEnd
-    ? Math.max(0, Math.ceil((new Date(sub.trialEnd).getTime() - nowMs()) / 86400_000))
+    ? Math.max(0, Math.ceil((new Date(sub.trialEnd).getTime() - now) / 86400_000))
     : 0;
 
   const isTrial = effectiveStatus === "trial";
