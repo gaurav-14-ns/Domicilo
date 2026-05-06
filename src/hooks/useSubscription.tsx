@@ -111,7 +111,27 @@ export function useSubscription() {
 
   useEffect(() => {
     void fetch();
-  }, [fetch]);
+    if (!user) return;
+    
+    const channel = supabase
+      .channel(`subscription-${user.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "subscriptions",
+        },
+        async () => {
+          await fetch();
+        }
+      )
+
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+    }, [fetch, user]);
 
   const changePlan = useCallback(
     async (plan: PlanId) => {
