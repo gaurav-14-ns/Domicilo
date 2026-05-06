@@ -314,19 +314,14 @@ export default function Auth() {
                     }`}
                   >
 
-                    {(
-                      adminAvailable
-                        ? ["owner", "admin"]
-                        : ["owner"]
-                    ).map((r) => (
-
-                      <Label
-                        key={r}
-                        htmlFor={`su-${r}`}
-                        className={`cursor-pointer rounded-lg border px-3 py-2 text-center text-sm capitalize transition-smooth ${
-                          signupRole === r
-                            ? "border-primary bg-primary/10 text-primary"
-                            : "border-border"
+                    {(["owner"] as AppRole[]).map((r) => (
+                    <Label
+                      key={r}
+                      htmlFor={`su-${r}`}
+                      className={`cursor-pointer rounded-lg border px-3 py-2 text-center text-sm capitalize transition-smooth ${
+                        signupRole === r
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border"
                         }`}
                       >
 
@@ -338,12 +333,13 @@ export default function Auth() {
 
                         {r === "owner"
                           ? "Property Owner"
+                          : r === "tenant"
+                          ? "Tenant"
                           : "Admin"}
-
-                      </Label>
-                    ))}
-                  </RadioGroup>
-
+                        </Label>
+                      ))}
+                    </RadioGroup>
+                  
                   <p className="text-[11px] text-muted-foreground">
                     {adminAvailable
                       ? "Only one admin account is allowed."
