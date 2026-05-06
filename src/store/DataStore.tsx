@@ -401,22 +401,51 @@ const removeProperty = useCallback(async (id: string) => {
   }
 }, [refresh]);
 
-  const addTenant = useCallback(async (t: AddTenantInput) => {
-    if (!user) return;
-    await supabase.from("tenants").insert({
-      owner_id: user.id,
-      property_id: t.propertyId || null,
-      name: t.name,
-      room: t.room,
-      rent: t.rent,
-      deposit: t.deposit,
-      email: t.email,
-      phone: t.phone,
-      start_date: t.startDate,
-      status: t.status ?? "active",
-    });
+const addTenant = useCallback(async (t: AddTenantInput) => {
+  if (!user) {
+    toast.error("You must be signed in.");
+    return;
+  }
+
+  try {
+    // duplicate tenant email check
+    const { data: existingTenant } = await supabase
+      .from("tenants")
+      .select("id")
+      .eq("email", t.email)
+      .maybeSingle();
+
+    if (existingTenant) {
+      toast.error("Tenant with this email already exists.");
+      return;
+    }
+
+    // create tenant row
+    const { error } = await supabase
+      .from("tenants")
+      .insert({
+        owner_id: user.id,
+        property_id: t.propertyId || null,
+        name: t.name,
+        room: t.room,
+        rent: t.rent,
+        deposit: t.deposit,
+        email: t.email,
+        phone: t.phone,
+        start_date: t.startDate,
+        status: t.status ?? "active",
+      });
+
+    if (error) throw error;
+
+    toast.success("Tenant created successfully.");
+
     await refresh();
-  }, [user, refresh]);
+
+  } catch (err: any) {
+    toast.error(err.message || "Failed to create tenant.");
+  }
+}, [user, refresh]);
 
   const updateTenant = useCallback(async (id: string, patch: Partial<Tenant>) => {
     const dbPatch: any = {};
