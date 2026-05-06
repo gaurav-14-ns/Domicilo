@@ -28,7 +28,7 @@ export default function Reports() {
 
   const { canUseAdvancedReports, planLabel } = usePlanLimits();
 
-  const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [upgradeOpen] = useState(false);
 
   const { properties, tenants, transactions } = data;
 
@@ -427,7 +427,7 @@ export default function Reports() {
 
           <Button
             variant="hero"
-            onClick={() => setUpgradeOpen(true)}
+            onClick={() => {}}
           >
             <Sparkles className="h-4 w-4" />
             Upgrade plan
