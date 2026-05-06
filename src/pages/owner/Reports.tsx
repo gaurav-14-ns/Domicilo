@@ -16,8 +16,6 @@ import { useDataStore } from "@/store/DataStore";
 import { useCurrency } from "@/hooks/useCurrency";
 import { usePlanLimits } from "@/hooks/usePlanLimits";
 
-import UpgradeDialog from "@/components/billing/UpgradeDialog";
-
 import {
   downloadCSV,
   monthKey,
@@ -436,12 +434,6 @@ export default function Reports() {
           </Button>
         </div>
       )}
-
-      <UpgradeDialog
-        open={upgradeOpen}
-        onOpenChange={setUpgradeOpen}
-        reason="Advanced reports require Growth or Scale."
-      />
 
       {/* OCCUPANCY */}
       <div className="rounded-xl border border-border bg-gradient-card p-5">
