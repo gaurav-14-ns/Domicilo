@@ -10,9 +10,23 @@ export interface PlanLimits {
 }
 
 const LIMITS: Record<PlanId, PlanLimits> = {
-  starter: { maxProperties: 1, maxTenants: 25, advancedReports: false },
-  growth: { maxProperties: Infinity, maxTenants: 250, advancedReports: true },
-  scale: { maxProperties: Infinity, maxTenants: Infinity, advancedReports: true },
+  starter: {
+    maxProperties: 1,
+    maxTenants: 25,
+    advancedReports: true,
+  },
+
+  growth: {
+    maxProperties: Infinity,
+    maxTenants: 250,
+    advancedReports: true,
+  },
+
+  scale: {
+    maxProperties: Infinity,
+    maxTenants: Infinity,
+    advancedReports: true,
+  },
 };
 
 const PLAN_LABEL: Record<PlanId, string> = {
