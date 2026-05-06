@@ -401,14 +401,14 @@ const removeProperty = useCallback(async (id: string) => {
   }
 }, [refresh]);
 
-const addTenant = useCallback(async (t: AddTenantInput) => {
+  const addTenant = useCallback(async (t: AddTenantInput) => {
   if (!user) {
     toast.error("You must be signed in.");
     return;
   }
 
   try {
-    // duplicate tenant email check
+    // duplicate tenant check
     const { data: existingTenant } = await supabase
       .from("tenants")
       .select("id")
@@ -420,10 +420,39 @@ const addTenant = useCallback(async (t: AddTenantInput) => {
       return;
     }
 
-    // create tenant row
+    // generate temporary password
+    const tempPassword =
+      Math.random().toString(36).slice(-10) + "A1!";
+
+    // create auth account via edge function
+    const { data: fnData, error: fnError } =
+      await supabase.functions.invoke(
+        "create-tenant-user",
+        {
+          body: {
+            email: t.email,
+            password: tempPassword,
+            name: t.name,
+            owner_id: user.id,
+          },
+        }
+      );
+
+    if (fnError) {
+      throw fnError;
+    }
+
+    if (fnData?.error) {
+      throw new Error(fnData.error);
+    }
+
+    const authUserId = fnData.user.id;
+
+    // create tenant DB row
     const { error } = await supabase
       .from("tenants")
       .insert({
+        id: authUserId,
         owner_id: user.id,
         property_id: t.propertyId || null,
         name: t.name,
@@ -436,14 +465,20 @@ const addTenant = useCallback(async (t: AddTenantInput) => {
         status: t.status ?? "active",
       });
 
-    if (error) throw error;
+    if (error) {
+      throw error;
+    }
 
-    toast.success("Tenant created successfully.");
+    toast.success(
+      `Tenant created. Temporary password: ${tempPassword}`
+    );
 
     await refresh();
 
   } catch (err: any) {
-    toast.error(err.message || "Failed to create tenant.");
+    toast.error(
+      err.message || "Failed to create tenant."
+    );
   }
 }, [user, refresh]);
 
