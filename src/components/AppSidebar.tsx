@@ -92,17 +92,24 @@ export function AppSidebar({ role }: { role: AppRole }) {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
+        {!collapsed && role === "owner" && isTrial && (
+      <div className="px-2 py-1 text-xs text-primary font-medium">
+        Trial: {trialDaysLeft} day{trialDaysLeft === 1 ? "" : "s"} left
+      </div>
+    )}
         {!collapsed && user && (
-      {!collapsed && role === "owner" && isTrial && (
-        <div className="px-2 py-1 text-xs text-primary font-medium">
-          Trial: {trialDaysLeft} day{trialDaysLeft === 1 ? "" : "s"} left
-          </div>
-        )}
-      <div className="px-2 py-1 text-xs text-muted-foreground truncate">{user.email}</div>
+      <div className="px-2 py-1 text-xs text-muted-foreground truncate">
+        {user.email}
+        </div>
       )}
-      <Button variant="ghost" size="sm" onClick={handleSignOut} className="justify-start">
-        <LogOut className="h-4 w-4" />
-        {!collapsed && <span>Sign out</span>}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleSignOut}
+          className="justify-start"
+          >
+          <LogOut className="h-4 w-4" />
+          {!collapsed && <span>Sign out</span>}
         </Button>
       </SidebarFooter>
     </Sidebar>
