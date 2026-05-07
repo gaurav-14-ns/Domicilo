@@ -113,8 +113,14 @@ export function useSubscription() {
     void fetch();
     if (!user) return;
     
+    const channelName = `subscription-${user.id}`;
+
+supabase.removeChannel(
+  supabase.channel(channelName)
+);
+
     const channel = supabase
-      .channel(`subscription-${user.id}`)
+      .channel(channelName)
       .on(
         "postgres_changes",
         {
@@ -123,11 +129,16 @@ export function useSubscription() {
           table: "subscriptions",
         },
         async () => {
-          await fetch();
+          try {
+            await fetch();
+          } catch (error) {
+            console.error("Subscription refresh failed:", error);
+            }
         }
       )
-
-      .subscribe();
+    .subscribe((status) => {
+    console.log("Realtime status:", status);
+  });
     return () => {
       supabase.removeChannel(channel);
     };
