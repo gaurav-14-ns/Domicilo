@@ -224,9 +224,9 @@ const mountedRef =
     if (!user || role !== "owner") return;
     try {
       // 1. Fetch raw data needed for maintenance
-      const { data: tenants } = await supabase.from("tenants").select("*").order("created_at", { ascending: true });
-      const { data: txs } = await supabase.from("transactions").select("*").order("date", { ascending: false });
-      const { data: properties } = await supabase.from("properties").select("*").order("created_at", { ascending: true });
+      const { data: tenants } = await supabase.from("tenants").select("*").eq("owner_id", user.id).order("created_at", { ascending: true });
+      const { data: txs } = await supabase.from("transactions").select("*").eq("owner_id", user.id).order("date", { ascending: false });
+      const { data: properties } = await supabase.from("properties").select("*").eq("owner_id", user.id).order("created_at", { ascending: true });
       if (!tenants || !txs) return;
 
       // 2. Auto-generate rent
@@ -275,7 +275,7 @@ const mountedRef =
         .filter((tx: any) => tx.status === "pending" && tx.date && new Date(tx.date) < overdueThreshold)
         .map((tx: any) => tx.id);
       if (overdueIds.length > 0) {
-        await supabase.from("transactions").update({ status: "overdue" }).in("id", overdueIds);
+        await supabase.from("transactions").update({ status: "overdue" }).eq("owner_id", user.id).in("id", overdueIds);
       }
     } catch (e) {
       console.error("Maintenance task failed:", e);
@@ -308,6 +308,258 @@ const mountedRef =
     }
 
     try {
+      const currentRole = roleRef.current;
+      const isOwner = currentRole === "owner";
+      const isAdmin = currentRole === "admin";
+
+      // Common queries for all roles
+      const commonSettings =
+        supabase
+          .from(
+            "app_settings"
+          )
+          .select("*")
+          .eq(
+            "user_id",
+            user.id
+          )
+          .maybeSingle();
+
+      const commonProfile =
+        supabase
+          .from(
+            "tenant_profiles"
+          )
+          .select("*")
+          .eq(
+            "user_id",
+            user.id
+          )
+          .maybeSingle();
+
+      let propertiesPromise,
+        tenantsPromise,
+        txsPromise,
+        orgsPromise;
+
+      if (
+        isOwner
+      ) {
+        propertiesPromise =
+          supabase
+            .from(
+              "properties"
+            )
+            .select("*")
+            .eq(
+              "owner_id",
+              user.id
+            )
+            .order(
+              "created_at",
+              {
+                ascending:
+                  true,
+              }
+            );
+
+        tenantsPromise =
+          supabase
+            .from(
+              "tenants"
+            )
+            .select("*")
+            .eq(
+              "owner_id",
+              user.id
+            )
+            .order(
+              "created_at",
+              {
+                ascending:
+                  true,
+              }
+            );
+
+        txsPromise =
+          supabase
+            .from(
+              "transactions"
+            )
+            .select("*")
+            .eq(
+              "owner_id",
+              user.id
+            )
+            .order(
+              "date",
+              {
+                ascending:
+                  false,
+              }
+            );
+
+        orgsPromise =
+          Promise.resolve(
+            {
+              data: [],
+            }
+          );
+      } else if (
+        isAdmin
+      ) {
+        propertiesPromise =
+          supabase
+            .from(
+              "properties"
+            )
+            .select("*")
+            .order(
+              "created_at",
+              {
+                ascending:
+                  true,
+              }
+            );
+
+        tenantsPromise =
+          supabase
+            .from(
+              "tenants"
+            )
+            .select("*")
+            .order(
+              "created_at",
+              {
+                ascending:
+                  true,
+              }
+            );
+
+        txsPromise =
+          supabase
+            .from(
+              "transactions"
+            )
+            .select("*")
+            .order(
+              "date",
+              {
+                ascending:
+                  false,
+              }
+            );
+
+        orgsPromise =
+          supabase
+            .from(
+              "admin_orgs"
+            )
+            .select("*")
+            .order(
+              "created_at",
+              {
+                ascending:
+                  true,
+              }
+            );
+      } else if (
+        currentRole ===
+        "tenant"
+      ) {
+        const {
+          data: myTenantRows,
+        } = await supabase
+          .from("tenants")
+          .select("*")
+          .eq(
+            "email",
+            user.email
+          );
+
+        const myTenant =
+          (myTenantRows ??
+            [])[0];
+
+        propertiesPromise =
+          Promise.resolve(
+            {
+              data: [],
+            }
+          );
+
+        tenantsPromise =
+          Promise.resolve(
+            {
+              data:
+                myTenant
+                  ? [
+                      myTenant,
+                    ]
+                  : [],
+            }
+          );
+
+        txsPromise =
+          myTenant
+            ? supabase
+                .from(
+                  "transactions"
+                )
+                .select("*")
+                .eq(
+                  "tenant_id",
+                  myTenant.id
+                )
+                .order(
+                  "date",
+                  {
+                    ascending:
+                      false,
+                  }
+                )
+            : Promise.resolve(
+                {
+                  data: [],
+                }
+              );
+
+        orgsPromise =
+          Promise.resolve(
+            {
+              data: [],
+            }
+          );
+      } else {
+        propertiesPromise =
+          Promise.resolve(
+            {
+              data: [],
+            }
+          );
+
+        tenantsPromise =
+          Promise.resolve(
+            {
+              data: [],
+            }
+          );
+
+        txsPromise =
+          Promise.resolve(
+            {
+              data: [],
+            }
+          );
+
+        orgsPromise =
+          Promise.resolve(
+            {
+              data: [],
+            }
+          );
+      }
+
       const [
         {
           data: properties,
@@ -329,87 +581,12 @@ const mountedRef =
         },
       ] =
         await Promise.all([
-          supabase
-            .from(
-              "properties"
-            )
-            .select("*")
-            .order(
-              "created_at",
-              {
-                ascending:
-                  true,
-              }
-            ),
-
-          supabase
-            .from(
-              "tenants"
-            )
-            .select("*")
-            .order(
-              "created_at",
-              {
-                ascending:
-                  true,
-              }
-            ),
-
-          supabase
-            .from(
-              "transactions"
-            )
-            .select("*")
-            .order(
-              "date",
-              {
-                ascending:
-                  false,
-              }
-            ),
-
-          supabase
-            .from(
-              "app_settings"
-            )
-            .select("*")
-            .eq(
-              "user_id",
-              user.id
-            )
-            .maybeSingle(),
-
-          supabase
-            .from(
-              "tenant_profiles"
-            )
-            .select("*")
-            .eq(
-              "user_id",
-              user.id
-            )
-            .maybeSingle(),
-
-          roleRef.current ===
-          "admin"
-            ? supabase
-                .from(
-                  "admin_orgs"
-                )
-                .select("*")
-                .order(
-                  "created_at",
-                  {
-                    ascending:
-                      true,
-                  }
-                )
-            : Promise.resolve(
-                {
-                  data:
-                    [],
-                }
-              ),
+          propertiesPromise,
+          tenantsPromise,
+          txsPromise,
+          commonSettings,
+          commonProfile,
+          orgsPromise,
         ]);
 
       let txRows =
@@ -786,7 +963,8 @@ const updateProperty = useCallback(async (id: string, patch: Partial<Property>) 
     const { error } = await supabase
       .from("properties")
       .update(dbPatch)
-      .eq("id", id);
+      .eq("id", id)
+      .eq("owner_id", user?.id);
 
     if (error) throw error;
 
@@ -794,7 +972,7 @@ const updateProperty = useCallback(async (id: string, patch: Partial<Property>) 
   } catch (error: any) {
     toast.error(error.message || "Failed to update property.");
   }
-}, [refresh]);
+}, [user, refresh]);
 
 const removeProperty = useCallback(async (id: string) => {
   try {
@@ -804,14 +982,16 @@ const removeProperty = useCallback(async (id: string) => {
         property_id: null,
         status: "moved_out",
       })
-      .eq("property_id", id);
+      .eq("property_id", id)
+      .eq("owner_id", user?.id);
 
     if (tenantError) throw tenantError;
 
     const { error } = await supabase
       .from("properties")
       .delete()
-      .eq("id", id);
+      .eq("id", id)
+      .eq("owner_id", user?.id);
 
     if (error) throw error;
 
@@ -819,7 +999,7 @@ const removeProperty = useCallback(async (id: string) => {
   } catch (error: any) {
     toast.error(error.message || "Failed to remove property.");
   }
-}, [refresh]);
+}, [user, refresh]);
 
   const addTenant = useCallback(async (t: AddTenantInput) => {
   if (!user) {
@@ -833,6 +1013,7 @@ const removeProperty = useCallback(async (id: string) => {
       .from("tenants")
       .select("id")
       .eq("email", t.email)
+      .eq("owner_id", user?.id)
       .maybeSingle();
 
     if (existingTenant) {
@@ -1017,6 +1198,10 @@ const removeProperty = useCallback(async (id: string) => {
             .eq(
               "id",
               id
+            )
+            .eq(
+              "owner_id",
+              user?.id
             );
 
         if (
@@ -1037,7 +1222,7 @@ const removeProperty = useCallback(async (id: string) => {
         throw error;
       }
     },
-    [refresh]
+    [user, refresh]
   );
 
   const setTenantStatus =
@@ -1060,6 +1245,10 @@ const removeProperty = useCallback(async (id: string) => {
             .eq(
               "id",
               id
+            )
+            .eq(
+              "owner_id",
+              user?.id
             );
 
         if (
@@ -1080,7 +1269,7 @@ const removeProperty = useCallback(async (id: string) => {
         throw error;
       }
     },
-    [refresh]
+    [user, refresh]
   );
 
   const moveOutTenant =
@@ -1103,6 +1292,10 @@ const removeProperty = useCallback(async (id: string) => {
             .eq(
               "id",
               id
+            )
+            .eq(
+              "owner_id",
+              user?.id
             );
 
         if (
@@ -1123,7 +1316,7 @@ const removeProperty = useCallback(async (id: string) => {
         throw error;
       }
     },
-    [refresh]
+    [user, refresh]
   );
 
   const removeTenant =
@@ -1143,6 +1336,10 @@ const removeProperty = useCallback(async (id: string) => {
             .eq(
               "id",
               id
+            )
+            .eq(
+              "owner_id",
+              user?.id
             );
 
         if (
@@ -1163,7 +1360,7 @@ const removeProperty = useCallback(async (id: string) => {
         throw error;
       }
     },
-    [refresh]
+    [user, refresh]
   );
 
   const addTransaction = useCallback(async (t: AddTransactionInput) => {
@@ -1195,6 +1392,10 @@ const removeProperty = useCallback(async (id: string) => {
       .eq(
         "id",
         t.tenantId
+      )
+      .eq(
+        "owner_id",
+        user?.id
       )
       .maybeSingle();
 
@@ -1287,6 +1488,7 @@ const removeProperty = useCallback(async (id: string) => {
           receipt_no
         `)
         .eq("id", id)
+        .eq("owner_id", user?.id)
         .maybeSingle();
 
       if (fetchError) {
@@ -1400,7 +1602,8 @@ const removeProperty = useCallback(async (id: string) => {
       } = await supabase
         .from("transactions")
         .update(dbPatch)
-        .eq("id", id);
+        .eq("id", id)
+        .eq("owner_id", user?.id);
 
       if (error) {
         throw error;
@@ -1409,7 +1612,7 @@ const removeProperty = useCallback(async (id: string) => {
       await refresh();
 
     },
-    [refresh]
+    [user, refresh]
   );
 
   const removeTransaction =
@@ -1434,6 +1637,7 @@ const removeProperty = useCallback(async (id: string) => {
           receipt_no
         `)
         .eq("id", id)
+        .eq("owner_id", user?.id)
         .maybeSingle();
 
       if (fetchError) {
@@ -1467,7 +1671,8 @@ const removeProperty = useCallback(async (id: string) => {
       } = await supabase
         .from("transactions")
         .delete()
-        .eq("id", id);
+        .eq("id", id)
+        .eq("owner_id", user?.id);
 
       if (error) {
         throw error;
@@ -1476,7 +1681,7 @@ const removeProperty = useCallback(async (id: string) => {
       await refresh();
 
     },
-    [refresh]
+    [user, refresh]
   );
 
   const updateAdminOrgs = useCallback(async (updater: Updater<AdminOrg[]>) => {
