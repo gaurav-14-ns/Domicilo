@@ -21,9 +21,13 @@ import { SafeSection } from "@/components/SafeSection";
 
 import { AppRole } from "@/hooks/useAuth";
 
+import { useDataStore } from "@/store/DataStore";
+
 import { Crown } from "lucide-react";
 
 import { TrialBanner } from "@/components/TrialBanner";
+
+import { LoadingState } from "@/components/states/LoadingState";
 
 function DashboardContent({
   role,
@@ -37,6 +41,10 @@ function DashboardContent({
     setOpenMobile,
   } = useSidebar();
 
+  const {
+    loading,
+  } = useDataStore();
+
   useEffect(() => {
     setOpenMobile(
       false
@@ -45,6 +53,16 @@ function DashboardContent({
     location.pathname,
     setOpenMobile,
   ]);
+
+  if (
+    loading
+  ) {
+    return (
+      <div className="min-h-screen w-full bg-background grid place-items-center">
+        <LoadingState title="Loading your dashboard..." />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-full bg-background">
