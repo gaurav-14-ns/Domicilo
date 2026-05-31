@@ -119,6 +119,9 @@ export default function Properties() {
       null
     );
 
+  const [saving, setSaving] =
+    useState(false);
+
   const [form, setForm] =
     useState<FormState>(
       empty
@@ -265,6 +268,8 @@ export default function Properties() {
     }
 
     try {
+      setSaving(true);
+
       if (editId) {
         updateProperty(
           editId,
@@ -317,6 +322,8 @@ export default function Properties() {
             error?.message,
         }
       );
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -530,10 +537,11 @@ export default function Properties() {
                   <Button
                     type="submit"
                     variant="hero"
+                    disabled={saving}
                   >
-                    {editId
+                    {saving ? "Saving..." : (editId
                       ? "Save"
-                      : "Create"}
+                      : "Create")}
                   </Button>
                 </DialogFooter>
               </form>

@@ -191,88 +191,71 @@ const mountedRef =
   >(null);
 
   // -------------------------------------------------------------------------
-  // Auto-generate monthly Rent rows for active tenants (server-side dedup
-  // via UNIQUE(tenant_id, type, month_key)).
+  // Periodic maintenance: auto-generate rent + overdue escalation.
+  // Runs every 30 minutes and on mount, but NOT on every data fetch.
   // -------------------------------------------------------------------------
-  const autoGenerateRent = useCallback(async (
-    tenants: any[],
-    txs: any[],
-    properties: any[],
-    ownerId: string,
-  ) => {
-    const current = monthKey(new Date());
-    const existingKeys = new Set(
-      txs
-        .filter((t) => t.type === "Rent" && t.tenant_id && t.month_key)
-        .map((t) => `${t.tenant_id}|${t.month_key}`)
-    );
-    const propsById = new Map(properties.map((p) => [p.id, p]));
+  const runMaintenance =
+  useCallback(async () => {
+    if (!user || role !== "owner") return;
+    try {
+      // 1. Fetch raw data needed for maintenance
+      const { data: tenants } = await supabase.from("tenants").select("*").order("created_at", { ascending: true });
+      const { data: txs } = await supabase.from("transactions").select("*").order("date", { ascending: false });
+      const { data: properties } = await supabase.from("properties").select("*").order("created_at", { ascending: true });
+      if (!tenants || !txs) return;
 
-    const additions: any[] = [];
-    for (const t of tenants) {
-      if (t.status === "deactivated" || t.status === "moved_out") continue;
-      if (!t.start_date) continue;
-      const start = monthKey(t.start_date);
-      if (start > current) continue;
-      const months = monthsBetween(start, current);
-      for (const m of months) {
-        const key = `${t.id}|${m}`;
-        if (existingKeys.has(key)) continue;
-        if (t.status === "paused" && m === current) continue;
-        additions.push({
-
-  owner_id:
-    ownerId,
-
-  tenant_id:
-    t.id,
-
-  property_id:
-    t.property_id,
-
-  date:
-    `${m}-01`,
-
-  type:
-    "Rent",
-
-  amount:
-    t.rent,
-
-  currency_code:
-    t.currency_code ??
-    "INR",
-
-  locale:
-    t.locale ??
-    "en-IN",
-
-  status:
-    m === current
-      ? "pending"
-      : "completed",
-
-  auto:
-    true,
-
-  month_key:
-    m,
-});
-        existingKeys.add(key);
+      // 2. Auto-generate rent
+      const current = monthKey(new Date());
+      const existingKeys = new Set(
+        txs
+          .filter((t: any) => t.type === "Rent" && t.tenant_id && t.month_key)
+          .map((t: any) => `${t.tenant_id}|${t.month_key}`)
+      );
+      const additions: any[] = [];
+      for (const t of tenants) {
+        if (t.status === "deactivated" || t.status === "moved_out") continue;
+        if (!t.start_date) continue;
+        const start = monthKey(t.start_date);
+        if (start > current) continue;
+        const months = monthsBetween(start, current);
+        for (const m of months) {
+          const key = `${t.id}|${m}`;
+          if (existingKeys.has(key)) continue;
+          if (t.status === "paused" && m === current) continue;
+          additions.push({
+            owner_id: user.id,
+            tenant_id: t.id,
+            property_id: t.property_id,
+            date: `${m}-01`,
+            type: "Rent",
+            amount: t.rent,
+            currency_code: t.currency_code ?? "INR",
+            locale: t.locale ?? "en-IN",
+            status: m === current ? "pending" : "completed",
+            auto: true,
+            month_key: m,
+          });
+          existingKeys.add(key);
+        }
       }
+      if (additions.length) {
+        const { error: rentErr } = await supabase.from("transactions").insert(additions);
+        if (rentErr && rentErr.code !== "23505") console.warn("auto-rent insert", rentErr);
+      }
+
+      // 3. Overdue escalation
+      const overdueThreshold = new Date();
+      overdueThreshold.setDate(overdueThreshold.getDate() - 7);
+      const overdueIds = (txs ?? [])
+        .filter((tx: any) => tx.status === "pending" && tx.date && new Date(tx.date) < overdueThreshold)
+        .map((tx: any) => tx.id);
+      if (overdueIds.length > 0) {
+        await supabase.from("transactions").update({ status: "overdue" }).in("id", overdueIds);
+      }
+    } catch (e) {
+      console.error("Maintenance task failed:", e);
     }
-    if (!additions.length) return [];
-    const { data: inserted, error } = await supabase
-      .from("transactions")
-      .insert(additions)
-      .select("*");
-    if (error) {
-      // race-condition: unique violations are fine to ignore
-      if (error.code !== "23505") console.warn("auto-rent insert", error);
-      return [];
-    }
-    return inserted ?? [];
-  }, []);
+  }, [user, role]);
 
   // -------------------------------------------------------------------------
   // Fetch everything (scoped by RLS automatically).
@@ -407,134 +390,6 @@ const mountedRef =
       let txRows =
         txs ?? [];
 
-      if (
-        role ===
-          "owner" &&
-        (tenants?.length ??
-          0) > 0
-      ) {
-        const added =
-          await autoGenerateRent(
-            tenants ??
-              [],
-            txRows,
-            properties ??
-              [],
-            user.id
-          );
-
-        if (
-          added.length
-        ) {
-          txRows = [
-            ...added,
-            ...txRows,
-          ];
-        }
-      }
-
-      /*
-  Automatically escalate
-  stale pending charges
-  into overdue.
-*/
-try {
-
-  const overdueThreshold =
-    new Date();
-
-  overdueThreshold.setDate(
-    overdueThreshold.getDate() - 7
-  );
-
-  const overdueIds =
-    (txRows ?? [])
-      .filter((tx: any) => {
-
-        if (
-          tx.status !== "pending"
-        ) {
-          return false;
-        }
-
-        if (!tx.date) {
-          return false;
-        }
-
-        const txDate =
-          new Date(tx.date);
-
-        return (
-          txDate <
-          overdueThreshold
-        );
-
-      })
-      .map(
-        (tx: any) => tx.id
-      );
-
-  if (
-    overdueIds.length > 0
-  ) {
-
-    const {
-      error:
-        overdueError,
-    } = await supabase
-      .from("transactions")
-      .update({
-        status:
-          "overdue",
-      })
-      .in(
-        "id",
-        overdueIds
-      );
-
-    if (
-      overdueError
-    ) {
-      throw overdueError;
-    }
-
-    /*
-      Reflect locally too.
-    */
-    txRows =
-      txRows.map(
-        (tx: any) => {
-
-          if (
-            overdueIds.includes(
-              tx.id
-            )
-          ) {
-
-            return {
-              ...tx,
-              status:
-                "overdue",
-            };
-          }
-
-          return tx;
-
-        }
-      );
-  }
-
-} catch (
-  escalationError
-) {
-
-  console.error(
-    "Overdue escalation failed:",
-    escalationError
-  );
-
-}
-
       const propertiesById =
         new Map(
           (
@@ -657,13 +512,21 @@ try {
   }, [
     user,
     role,
-    autoGenerateRent,
   ]);
 
   // First load + auth changes
   useEffect(() => {
     fetchAll();
   }, [fetchAll]);
+
+  // Periodic maintenance: auto-rent + overdue escalation every 30 min.
+  // Runs once on mount and then every 30 minutes thereafter.
+  useEffect(() => {
+    if (!user || role !== "owner") return;
+    runMaintenance();
+    const interval = setInterval(runMaintenance, 30 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [user, role, runMaintenance]);
 
   // Realtime: refetch on any owned/assigned data change so cross-portal edits sync.
   useEffect(() => {
