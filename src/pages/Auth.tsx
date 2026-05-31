@@ -7,6 +7,7 @@ import {
 
 import {
   Loader2,
+  Crown,
 } from "lucide-react";
 
 import {
@@ -491,7 +492,7 @@ useEffect(() => {
     };
 
   return (
-    <div className="min-h-screen grid place-items-center bg-hero p-4">
+    <div className="min-h-screen grid place-items-center bg-sunset bg-skyline p-4">
 
       <div className="w-full max-w-md">
 
@@ -528,7 +529,7 @@ useEffect(() => {
 
 )}
 
-        <div className="rounded-2xl border border-border bg-background/80 backdrop-blur-xl p-6 shadow-elegant">
+        <div className="rounded-2xl border border-border/60 bg-gradient-card p-6 shadow-elegant backdrop-blur-xl">
 
           {recoveryMode ? (
   <form

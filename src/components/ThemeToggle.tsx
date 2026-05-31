@@ -1,4 +1,4 @@
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, Crown } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
@@ -12,7 +12,7 @@ export const ThemeToggle = () => {
     <Button
       variant="ghost"
       size="icon"
-      className="rounded-full"
+      className="rounded-full relative"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       aria-label="Toggle theme"
     >

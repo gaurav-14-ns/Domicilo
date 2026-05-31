@@ -1,4 +1,4 @@
-import { Building2 } from "lucide-react";
+import { Crown } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const sections = [
@@ -40,30 +40,37 @@ export const Footer = () => {
   };
 
   return (
-    <footer className="border-t border-border py-12">
+    <footer className="border-t border-border/60 pt-16 pb-8 relative">
+      <div className="absolute top-0 left-0 right-0 divider-royal" aria-hidden />
       <div className="container">
-        <div className="grid md:grid-cols-[1.4fr_1fr_1fr_1fr] gap-10 mb-10 items-start">
-         <div className="flex flex-col items-start max-w-xs">
-          <img
-            src="/favicon.png"
-            alt="Domicilo"
-            className="h-20 w-20 rounded-[1.75rem] object-cover shadow-glow mb-4"
-          />
-
-          <p className="text-muted-foreground text-base leading-relaxed">
-            The premium operating system for modern property managers.
-          </p>
-        </div>
+        <div className="grid md:grid-cols-[1.4fr_1fr_1fr_1fr] gap-10 mb-12 items-start">
+          <div className="flex flex-col items-start max-w-xs">
+            <div className="flex items-center gap-3 mb-4">
+              <img
+                src="/favicon.png"
+                alt="Domicilo"
+                className="h-12 w-12 rounded-xl object-cover shadow-glow"
+              />
+              <span className="font-display text-xl font-bold tracking-wide">Domicilo</span>
+            </div>
+            <p className="text-muted-foreground text-sm leading-relaxed font-alt">
+              The premium royal operating system for modern Indian property managers.
+            </p>
+            <div className="flex items-center gap-1.5 mt-4 text-xs text-muted-foreground">
+              <Crown className="h-3 w-3 text-primary" />
+              Crafted with care for property operators
+            </div>
+          </div>
           {sections.map((c) => (
             <div key={c.h}>
-              <div className="font-display font-semibold text-sm mb-3">{c.h}</div>
-              <ul className="space-y-2">
+              <div className="font-display font-semibold text-sm mb-3 tracking-wide">{c.h}</div>
+              <ul className="space-y-2.5">
                 {c.l.map((i) => (
                   <li key={i.label}>
                     <Link
                       to={i.href}
                       onClick={(e) => onHashClick(e, i.href)}
-                      className="text-sm text-muted-foreground hover:text-foreground transition-smooth"
+                      className="text-sm text-muted-foreground hover:text-foreground transition-smooth font-alt"
                     >
                       {i.label}
                     </Link>
@@ -73,9 +80,9 @@ export const Footer = () => {
             </div>
           ))}
         </div>
-        <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-muted-foreground">© 2026 Domicilo Labs Inc. All rights reserved.</p>
-          <p className="text-xs text-muted-foreground">Crafted with care for property operators worldwide.</p>
+        <div className="pt-8 border-t border-border/40 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-muted-foreground">&copy; 2026 Domicilo Labs. All rights reserved.</p>
+          <p className="text-xs text-muted-foreground font-alt">Built with pride for Indian property operators.</p>
         </div>
       </div>
     </footer>

@@ -1,4 +1,4 @@
-import { LayoutDashboard, Home, Users, Receipt, BarChart3, Settings, LogOut, ShieldCheck, Wallet, UserCircle } from "lucide-react";
+import { LayoutDashboard, Home, Users, Receipt, BarChart3, Settings, LogOut, ShieldCheck, Wallet, UserCircle, Crown } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useNavigate } from "react-router-dom";
 import {
@@ -66,18 +66,21 @@ export function AppSidebar({ role }: { role: AppRole }) {
             collapsed ? "justify-center" : "gap-3"
           }`}
         >
-          <img
-            src="/favicon.png"
-            alt="Domicilo"
-            className={`shrink-0 object-contain transition-all duration-200 ${
-              collapsed
-                ? "h-5 w-5 rounded-md"
-                : "h-12 w-12 rounded-2xl shadow-glow"
-            }`}
-          />
+          <div className="relative">
+            <img
+              src="/favicon.png"
+              alt="Domicilo"
+              className={`shrink-0 object-contain transition-all duration-200 ${
+                collapsed
+                  ? "h-5 w-5 rounded-md"
+                  : "h-11 w-11 rounded-xl shadow-glow"
+              }`}
+            />
+            <Crown className={`absolute -top-1 -right-1 h-3 w-3 text-primary ${collapsed ? "hidden" : "block"}`} />
+          </div>
 
           {!collapsed && (
-            <span className="font-display text-xl font-bold">
+            <span className="font-display text-lg font-bold tracking-wide">
               Domicilo
             </span>
           )}
@@ -85,7 +88,7 @@ export function AppSidebar({ role }: { role: AppRole }) {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="capitalize">{role}</SidebarGroupLabel>
+          <SidebarGroupLabel className="capitalize font-display tracking-wide">{role} panel</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
@@ -94,7 +97,7 @@ export function AppSidebar({ role }: { role: AppRole }) {
                     <NavLink
                       to={item.url}
                       end={item.end}
-                      className="hover:bg-muted/50"
+                      className="hover:bg-muted/50 transition-smooth"
                       activeClassName="bg-primary/10 text-primary font-medium"
                     >
                       <item.icon className="h-4 w-4" />
@@ -109,12 +112,12 @@ export function AppSidebar({ role }: { role: AppRole }) {
       </SidebarContent>
       <SidebarFooter>
         {!collapsed && role === "owner" && isTrial && (
-      <div className="px-2 py-1 text-xs text-primary font-medium">
+      <div className="px-2 py-1 text-xs text-primary font-medium font-alt">
         Trial: {trialDaysLeft} day{trialDaysLeft === 1 ? "" : "s"} left
       </div>
     )}
         {!collapsed && user && (
-      <div className="px-2 py-1 text-xs text-muted-foreground truncate">
+      <div className="px-2 py-1 text-xs text-muted-foreground truncate font-alt">
         {user.email}
         </div>
       )}

@@ -9,6 +9,7 @@ import type {
 import { detectCurrencyFromBrowser, type CurrencyCode } from "@/lib/currency";
 import { monthKey, monthsBetween, todayISO } from "@/lib/format";
 import { toast } from "sonner";
+import { uuid } from "@/lib/utils";
 
 // ---------------------------------------------------------------------------
 // Defaults
@@ -947,7 +948,7 @@ const removeProperty = useCallback(async (id: string) => {
     const { error } = await supabase
       .from("tenants")
       .insert({
-        id: crypto.randomUUID(),
+        id: uuid(),
 
         owner_id:
           user.id,

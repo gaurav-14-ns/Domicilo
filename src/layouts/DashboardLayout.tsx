@@ -21,6 +21,8 @@ import { TrialBanner } from "@/components/TrialBanner";
 
 import { AppRole } from "@/hooks/useAuth";
 
+import { Crown } from "lucide-react";
+
 function DashboardContent({
   role,
 }: {
@@ -47,13 +49,16 @@ function DashboardContent({
       <AppSidebar role={role} />
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <header className="h-14 flex items-center justify-between border-b border-border px-3 md:px-6 bg-background/80 backdrop-blur-xl sticky top-0 z-30 shrink-0">
+        <header className="h-14 flex items-center justify-between border-b border-border/40 px-3 md:px-6 bg-background/80 backdrop-blur-xl sticky top-0 z-30 shrink-0">
           <div className="flex items-center gap-2 min-w-0">
             <SidebarTrigger />
 
-            <span className="font-display font-semibold capitalize truncate">
-              {role} dashboard
-            </span>
+            <div className="flex items-center gap-2">
+              <Crown className="h-4 w-4 text-primary hidden sm:block" />
+              <span className="font-display font-semibold capitalize truncate tracking-wide">
+                {role} dashboard
+              </span>
+            </div>
           </div>
 
           <ThemeToggle />

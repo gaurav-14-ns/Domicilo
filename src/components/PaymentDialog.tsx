@@ -30,6 +30,8 @@ import {
   formatMoney,
 } from "@/lib/currency";
 
+import { uuid } from "@/lib/utils";
+
 import { useCurrency } from "@/hooks/useCurrency";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -198,8 +200,7 @@ export function PaymentDialog({
             .slice(0, 10)
             .replace(/-/g, "")
         }-${
-          crypto
-            .randomUUID()
+          uuid()
             .slice(0, 6)
             .toUpperCase()
         }`;

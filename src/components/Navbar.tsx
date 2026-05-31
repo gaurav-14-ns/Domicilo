@@ -80,23 +80,31 @@ export const Navbar = () => {
     }
   };
 
+  const isActive = (href: string) => {
+    if (href.startsWith("/#")) return false;
+    return loc.pathname === href;
+  };
+
   return (
-    <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-xl bg-background/70 border-b border-border/60">
+    <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-xl bg-background/80 border-b border-border/40">
       <div className="container flex h-16 items-center justify-between">
         <Link
-  to="/"
-  className="flex items-center gap-3 shrink-0"
->
-  <img
-    src="/favicon.png"
-    alt="Domicilo"
-    className="h-12 w-12 rounded-2xl object-cover shadow-glow"
-  />
+          to="/"
+          className="flex items-center gap-3 shrink-0 group"
+        >
+          <div className="relative">
+            <img
+              src="/favicon.png"
+              alt="Domicilo"
+              className="h-11 w-11 rounded-xl object-cover transition-smooth group-hover:shadow-glow"
+            />
+            <div className="absolute -inset-1 rounded-xl bg-primary/10 opacity-0 group-hover:opacity-100 transition-smooth -z-10" />
+          </div>
 
-  <span className="text-2xl font-black tracking-tight">
-    Domicilo
-  </span>
-</Link>
+          <span className="font-display text-xl font-bold tracking-wide">
+            Domicilo
+          </span>
+        </Link>
 
         <nav className="hidden md:flex items-center gap-8">
           {links.map((l) => (
@@ -104,28 +112,31 @@ export const Navbar = () => {
               key={l.href}
               to={l.href}
               onClick={(e) =>
-                handleClick(
-                  e,
-                  l.href
-                )
+                handleClick(e, l.href)
               }
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-smooth"
+              className={`relative text-sm font-medium transition-smooth ${
+                isActive(l.href)
+                  ? "text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
             >
               {l.label}
+              {isActive(l.href) && (
+                <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary rounded-full" />
+              )}
             </Link>
           ))}
         </nav>
 
-        <div className="hidden md:flex items-center gap-2">
+        <div className="hidden md:flex items-center gap-3">
           <ThemeToggle />
 
           {user ? (
             <Button
               variant="hero"
               size="sm"
-              onClick={
-                goDashboard
-              }
+              onClick={goDashboard}
+              className="shadow-glow"
             >
               Open dashboard
             </Button>
@@ -134,9 +145,7 @@ export const Navbar = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={
-                  goAuth
-                }
+                onClick={goAuth}
               >
                 Sign in
               </Button>
@@ -144,9 +153,8 @@ export const Navbar = () => {
               <Button
                 variant="hero"
                 size="sm"
-                onClick={
-                  goAuth
-                }
+                onClick={goAuth}
+                className="shadow-glow"
               >
                 Start free
               </Button>
@@ -175,7 +183,7 @@ export const Navbar = () => {
       </div>
 
       {open && (
-        <div className="md:hidden border-t border-border bg-background/95 backdrop-blur-xl">
+        <div className="md:hidden border-t border-border/40 bg-background/95 backdrop-blur-xl">
           <div className="container py-4 flex flex-col gap-3">
             {links.map((l) => (
               <Link
@@ -183,27 +191,26 @@ export const Navbar = () => {
                 to={l.href}
                 onClick={(e) => {
                   setOpen(false);
-
-                  handleClick(
-                    e,
-                    l.href
-                  );
+                  handleClick(e, l.href);
                 }}
-                className="text-sm font-medium py-2"
+                className={`text-sm font-medium py-2 transition-smooth ${
+                  isActive(l.href)
+                    ? "text-foreground"
+                    : "text-muted-foreground"
+                }`}
               >
                 {l.label}
               </Link>
             ))}
 
-            <div className="flex gap-2 pt-2">
+            <div className="flex gap-2 pt-2 border-t border-border/40">
               {user ? (
                 <Button
                   variant="hero"
                   size="sm"
-                  className="flex-1"
+                  className="flex-1 shadow-glow"
                   onClick={() => {
                     setOpen(false);
-
                     goDashboard();
                   }}
                 >
@@ -217,7 +224,6 @@ export const Navbar = () => {
                     className="flex-1"
                     onClick={() => {
                       setOpen(false);
-
                       goAuth();
                     }}
                   >
@@ -227,10 +233,9 @@ export const Navbar = () => {
                   <Button
                     variant="hero"
                     size="sm"
-                    className="flex-1"
+                    className="flex-1 shadow-glow"
                     onClick={() => {
                       setOpen(false);
-
                       goAuth();
                     }}
                   >
