@@ -28,8 +28,6 @@ export default function Reports() {
 
   const { canUseAdvancedReports, planLabel } = usePlanLimits();
 
-  const [upgradeOpen] = useState(false);
-
   const { properties, tenants, transactions } = data;
 
   const [propertyFilter, setPropertyFilter] = useState("all");

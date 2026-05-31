@@ -23,6 +23,8 @@ import { AppRole } from "@/hooks/useAuth";
 
 import { Crown } from "lucide-react";
 
+import { TrialBanner } from "@/components/TrialBanner";
+
 function DashboardContent({
   role,
 }: {

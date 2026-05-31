@@ -65,6 +65,8 @@ export type Transaction = {
   status: TransactionStatus;
   note?: string;
   auto?: boolean;
+  method?: string;
+  receipt_no?: string;
 };
 
 export type AdminOrg = {
