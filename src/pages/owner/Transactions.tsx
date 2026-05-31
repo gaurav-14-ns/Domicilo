@@ -293,6 +293,12 @@ export default function Transactions() {
                             </AlertDialogFooter>
                           </AlertDialogContent>
                         </AlertDialog>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
           {totalPages > 1 && (
             <div className="flex items-center justify-between p-3 border-t border-border">
@@ -305,13 +311,6 @@ export default function Transactions() {
               </div>
             </div>
           )}
-        </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
         </div>
       )}
     </div>
