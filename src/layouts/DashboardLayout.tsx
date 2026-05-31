@@ -17,6 +17,8 @@ import { AppSidebar } from "@/components/AppSidebar";
 
 import { ThemeToggle } from "@/components/ThemeToggle";
 
+import { SafeSection } from "@/components/SafeSection";
+
 import { AppRole } from "@/hooks/useAuth";
 
 import { Crown } from "lucide-react";
@@ -44,7 +46,9 @@ function DashboardContent({
 
   return (
     <div className="min-h-screen w-full bg-background">
-      <AppSidebar role={role} />
+      <SafeSection name="AppSidebar" fallback={null}>
+        <AppSidebar role={role} />
+      </SafeSection>
       <div className="flex flex-col min-h-screen flex-1 min-w-0">
         <header className="h-14 flex items-center justify-between border-b border-border/40 px-3 md:px-6 bg-background/80 backdrop-blur-xl sticky top-0 z-30 shrink-0">
           <div className="flex items-center gap-2 min-w-0">
@@ -65,11 +69,15 @@ function DashboardContent({
           {role ===
             "owner" && (
             <div className="mb-4">
-              <TrialBanner />
+              <SafeSection name="TrialBanner" fallback={null}>
+                <TrialBanner />
+              </SafeSection>
             </div>
           )}
 
-          <Outlet />
+          <SafeSection name="PageContent">
+            <Outlet />
+          </SafeSection>
         </main>
       </div>
     </div>
