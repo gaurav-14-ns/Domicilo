@@ -51,6 +51,16 @@ const mapProperty = (r: any, tenants: any[], txs: any[]): Property => {
     units: Number(r.units) || 0,
     occupied: Math.min(occupied, Number(r.units) || 0),
     revenue,
+    city: r.city ?? "",
+    state: r.state ?? "",
+    priceMonthly: Number(r.price_monthly) || 0,
+    amenities: r.amenities ?? [],
+    description: r.description ?? "",
+    images: r.images ?? [],
+    available: r.available ?? true,
+    bedrooms: Number(r.bedrooms) || 1,
+    bathrooms: Number(r.bathrooms) || 1,
+    propertyType: r.property_type ?? "Apartment",
   };
 };
 
@@ -130,7 +140,12 @@ const mapAdminOrg = (r: any): AdminOrg => ({
 // ---------------------------------------------------------------------------
 type Updater<T> = (prev: T) => T;
 
-type AddPropertyInput = { name: string; address: string; units: number; occupied?: number };
+type AddPropertyInput = {
+  name: string; address: string; units: number;
+  city?: string; state?: string; priceMonthly?: number;
+  amenities?: string[]; description?: string; images?: string[];
+  available?: boolean; bedrooms?: number; bathrooms?: number; propertyType?: string;
+};
 type AddTenantInput = Omit<Tenant, "id" | "joined" | "property"> & { joined?: string; property?: string };
 type AddTransactionInput = Omit<Transaction, "id">;
 
@@ -711,6 +726,16 @@ const mountedRef =
       name: p.name,
       address: p.address,
       units: p.units,
+      city: p.city ?? "",
+      state: p.state ?? "",
+      price_monthly: p.priceMonthly ?? 0,
+      amenities: p.amenities ?? [],
+      description: p.description ?? "",
+      images: p.images ?? [],
+      available: p.available ?? true,
+      bedrooms: p.bedrooms ?? 1,
+      bathrooms: p.bathrooms ?? 1,
+      property_type: p.propertyType ?? "Apartment",
     });
 
     if (error) throw error;
@@ -728,6 +753,16 @@ const updateProperty = useCallback(async (id: string, patch: Partial<Property>) 
     if (patch.name !== undefined) dbPatch.name = patch.name;
     if (patch.address !== undefined) dbPatch.address = patch.address;
     if (patch.units !== undefined) dbPatch.units = patch.units;
+    if (patch.city !== undefined) dbPatch.city = patch.city;
+    if (patch.state !== undefined) dbPatch.state = patch.state;
+    if (patch.priceMonthly !== undefined) dbPatch.price_monthly = patch.priceMonthly;
+    if (patch.amenities !== undefined) dbPatch.amenities = patch.amenities;
+    if (patch.description !== undefined) dbPatch.description = patch.description;
+    if (patch.images !== undefined) dbPatch.images = patch.images;
+    if (patch.available !== undefined) dbPatch.available = patch.available;
+    if (patch.bedrooms !== undefined) dbPatch.bedrooms = patch.bedrooms;
+    if (patch.bathrooms !== undefined) dbPatch.bathrooms = patch.bathrooms;
+    if (patch.propertyType !== undefined) dbPatch.property_type = patch.propertyType;
 
     const { error } = await supabase
       .from("properties")

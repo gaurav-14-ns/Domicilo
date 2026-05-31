@@ -63,22 +63,34 @@ import {
 
 interface FormState {
   name: string;
-
   address: string;
-
   units: string;
-
   occupied: string;
+  city: string;
+  state: string;
+  priceMonthly: string;
+  amenities: string;
+  description: string;
+  bedrooms: string;
+  bathrooms: string;
+  propertyType: string;
+  available: boolean;
 }
 
 const empty: FormState = {
   name: "",
-
   address: "",
-
   units: "10",
-
   occupied: "0",
+  city: "",
+  state: "",
+  priceMonthly: "",
+  amenities: "",
+  description: "",
+  bedrooms: "1",
+  bathrooms: "1",
+  propertyType: "Apartment",
+  available: true,
 };
 
 export default function Properties() {
@@ -186,25 +198,19 @@ export default function Properties() {
     setEditId(id);
 
     setForm({
-      name:
-        p?.name ?? "",
-
-      address:
-        p?.address ??
-        "",
-
-      units: String(
-        Number(
-          p?.units ?? 0
-        )
-      ),
-
-      occupied: String(
-        Number(
-          p?.occupied ??
-            0
-        )
-      ),
+      name: p?.name ?? "",
+      address: p?.address ?? "",
+      units: String(Number(p?.units ?? 0)),
+      occupied: String(Number(p?.occupied ?? 0)),
+      city: p?.city ?? "",
+      state: p?.state ?? "",
+      priceMonthly: String(Number(p?.priceMonthly ?? 0)),
+      amenities: (p?.amenities ?? []).join(", "),
+      description: p?.description ?? "",
+      bedrooms: String(Number(p?.bedrooms ?? 1)),
+      bathrooms: String(Number(p?.bathrooms ?? 1)),
+      propertyType: p?.propertyType ?? "Apartment",
+      available: p?.available ?? true,
     });
 
     setOpen(true);
@@ -239,6 +245,16 @@ export default function Properties() {
           ) || 0
         )
       );
+
+    const city = form.city.trim();
+    const state = form.state.trim();
+    const priceMonthly = Number(form.priceMonthly) || 0;
+    const amenities = form.amenities.split(",").map((a) => a.trim()).filter(Boolean);
+    const description = form.description.trim();
+    const bedrooms = Math.max(1, Number(form.bedrooms) || 1);
+    const bathrooms = Math.max(1, Number(form.bathrooms) || 1);
+    const propertyType = form.propertyType;
+    const available = form.available;
 
     if (
       !name ||
@@ -277,6 +293,15 @@ export default function Properties() {
             name,
             address,
             units,
+            city,
+            state,
+            priceMonthly,
+            amenities,
+            description,
+            bedrooms,
+            bathrooms,
+            propertyType,
+            available,
           }
         );
 
@@ -292,7 +317,15 @@ export default function Properties() {
           name,
           address,
           units,
-          occupied,
+          city,
+          state,
+          priceMonthly,
+          amenities,
+          description,
+          bedrooms,
+          bathrooms,
+          propertyType,
+          available,
         });
 
         toast.success(
@@ -530,6 +563,50 @@ export default function Properties() {
                         !!editId
                       }
                     />
+                  </div>
+                </div>
+
+                <div className="border-t border-border/40 pt-4">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3 font-display">Listing Details</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label>City</Label>
+                      <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>State</Label>
+                      <Input value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Monthly Rent (₹)</Label>
+                      <Input type="number" min="0" value={form.priceMonthly} onChange={(e) => setForm({ ...form, priceMonthly: e.target.value })} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Property Type</Label>
+                      <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" value={form.propertyType} onChange={(e) => setForm({ ...form, propertyType: e.target.value })}>
+                        {["Apartment", "House", "Villa", "Studio", "Penthouse", "Duplex", "PG"].map((t) => <option key={t} value={t}>{t}</option>)}
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Bedrooms</Label>
+                      <Input type="number" min="1" value={form.bedrooms} onChange={(e) => setForm({ ...form, bedrooms: e.target.value })} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Bathrooms</Label>
+                      <Input type="number" min="1" value={form.bathrooms} onChange={(e) => setForm({ ...form, bathrooms: e.target.value })} />
+                    </div>
+                  </div>
+                  <div className="space-y-2 mt-3">
+                    <Label>Amenities (comma-separated)</Label>
+                    <Input value={form.amenities} onChange={(e) => setForm({ ...form, amenities: e.target.value })} placeholder="WiFi, Parking, AC, Gym" />
+                  </div>
+                  <div className="space-y-2 mt-3">
+                    <Label>Description</Label>
+                    <textarea className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Describe this property..." />
+                  </div>
+                  <div className="flex items-center gap-2 mt-3">
+                    <input type="checkbox" id="available" checked={form.available} onChange={(e) => setForm({ ...form, available: e.target.checked })} className="rounded border-border" />
+                    <Label htmlFor="available">Available for public listing</Label>
                   </div>
                 </div>
 

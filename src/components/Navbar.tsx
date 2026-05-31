@@ -6,6 +6,7 @@ import { ThemeToggle } from "./ThemeToggle";
 import { useAuth, dashboardPathFor } from "@/hooks/useAuth";
 
 const links = [
+  { label: "Browse Properties", href: "/properties" },
   { label: "Features", href: "/#features" },
   { label: "Pricing", href: "/#pricing" },
   { label: "FAQ", href: "/#faq" },

@@ -8,6 +8,8 @@ import {
 import {
   Loader2,
   Crown,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 
 import {
@@ -131,6 +133,29 @@ export default function Auth() {
     forgotEmail,
     setForgotEmail,
   ] = useState("");
+
+  const [showPwd, setShowPwd] =
+    useState(false);
+
+  const [
+    showSignupPwd,
+    setShowSignupPwd,
+  ] = useState(false);
+
+  const [
+    showConfirmSignupPwd,
+    setShowConfirmSignupPwd,
+  ] = useState(false);
+
+  const [
+    showRecoveryPwd,
+    setShowRecoveryPwd,
+  ] = useState(false);
+
+  const [
+    showConfirmRecoveryPwd,
+    setShowConfirmRecoveryPwd,
+  ] = useState(false);
 
 useEffect(() => {
 
@@ -604,18 +629,29 @@ useEffect(() => {
         New password
       </Label>
 
-      <Input
-        type="password"
-        required
-        value={
-          recoveryPassword
-        }
-        onChange={(e) =>
-          setRecoveryPassword(
-            e.target.value
-          )
-        }
-      />
+      <div className="relative">
+        <Input
+          type={showRecoveryPwd ? "text" : "password"}
+          required
+          value={
+            recoveryPassword
+          }
+          onChange={(e) =>
+            setRecoveryPassword(
+              e.target.value
+            )
+          }
+          className="pr-10"
+        />
+        <button
+          type="button"
+          onClick={() => setShowRecoveryPwd(!showRecoveryPwd)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+          tabIndex={-1}
+        >
+          {showRecoveryPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+        </button>
+      </div>
     </div>
 
     <div className="space-y-2">
@@ -623,18 +659,29 @@ useEffect(() => {
         Confirm new password
       </Label>
 
-      <Input
-        type="password"
-        required
-        value={
-          confirmRecoveryPassword
-        }
-        onChange={(e) =>
-          setConfirmRecoveryPassword(
-            e.target.value
-          )
-        }
-      />
+      <div className="relative">
+        <Input
+          type={showConfirmRecoveryPwd ? "text" : "password"}
+          required
+          value={
+            confirmRecoveryPassword
+          }
+          onChange={(e) =>
+            setConfirmRecoveryPassword(
+              e.target.value
+            )
+          }
+          className="pr-10"
+        />
+        <button
+          type="button"
+          onClick={() => setShowConfirmRecoveryPwd(!showConfirmRecoveryPwd)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+          tabIndex={-1}
+        >
+          {showConfirmRecoveryPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+        </button>
+      </div>
     </div>
 
     <Button
@@ -763,19 +810,30 @@ useEffect(() => {
                       Password
                     </Label>
 
-                    <Input
-                      id="pwd"
-                      type="password"
-                      required
-                      value={pwd}
-                      onChange={(
-                        e
-                      ) =>
-                        setPwd(
-                          e.target.value
-                        )
-                      }
-                    />
+                    <div className="relative">
+                      <Input
+                        id="pwd"
+                        type={showPwd ? "text" : "password"}
+                        required
+                        value={pwd}
+                        onChange={(
+                          e
+                        ) =>
+                          setPwd(
+                            e.target.value
+                          )
+                        }
+                        className="pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPwd(!showPwd)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                        tabIndex={-1}
+                      >
+                        {showPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
                   </div>
 
                   <div className="flex justify-end">
@@ -953,17 +1011,28 @@ useEffect(() => {
     Password
   </Label>
 
-  <Input
-    id="signupPwd"
-    type="password"
-    required
-    value={signupPwd}
-    onChange={(e) =>
-      setSignupPwd(
-        e.target.value
-      )
-    }
-  />
+  <div className="relative">
+    <Input
+      id="signupPwd"
+      type={showSignupPwd ? "text" : "password"}
+      required
+      value={signupPwd}
+      onChange={(e) =>
+        setSignupPwd(
+          e.target.value
+        )
+      }
+      className="pr-10"
+    />
+    <button
+      type="button"
+      onClick={() => setShowSignupPwd(!showSignupPwd)}
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+      tabIndex={-1}
+    >
+      {showSignupPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+    </button>
+  </div>
 </div>
 
 <div className="space-y-2">
@@ -971,17 +1040,28 @@ useEffect(() => {
     Confirm Password
   </Label>
 
-  <Input
-    id="confirmSignupPwd"
-    type="password"
-    required
-    value={confirmSignupPwd}
-    onChange={(e) =>
-      setConfirmSignupPwd(
-        e.target.value
-      )
-    }
-  />
+  <div className="relative">
+    <Input
+      id="confirmSignupPwd"
+      type={showConfirmSignupPwd ? "text" : "password"}
+      required
+      value={confirmSignupPwd}
+      onChange={(e) =>
+        setConfirmSignupPwd(
+          e.target.value
+        )
+      }
+      className="pr-10"
+    />
+    <button
+      type="button"
+      onClick={() => setShowConfirmSignupPwd(!showConfirmSignupPwd)}
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+      tabIndex={-1}
+    >
+      {showConfirmSignupPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+    </button>
+  </div>
 </div>
 
                   <Button

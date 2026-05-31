@@ -12,6 +12,7 @@ import { PageTransition } from "@/components/PageTransition";
 import DashboardLayout from "@/layouts/DashboardLayout";
 
 import Index from "./pages/Index.tsx";
+import BrowseProperties from "./pages/BrowseProperties.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/auth/ResetPassword";
@@ -56,6 +57,7 @@ const App = () => (
               <PageTransition>
                 <Routes>
                   <Route path="/" element={<Index />} />
+                  <Route path="/properties" element={<BrowseProperties />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/auth/reset-password" element={<ResetPassword />}/>
                   <Route path="/about" element={<About />} />

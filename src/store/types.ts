@@ -7,6 +7,17 @@ export type Property = {
   units: number;
   occupied: number; // derived
   revenue: number;  // derived
+  // public listing fields
+  city: string;
+  state: string;
+  priceMonthly: number;
+  amenities: string[];
+  description: string;
+  images: string[];
+  available: boolean;
+  bedrooms: number;
+  bathrooms: number;
+  propertyType: string;
 };
 
 export type TenantStatus = "active" | "paused" | "deactivated" | "moved_out";

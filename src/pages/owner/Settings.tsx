@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Sparkles, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Loader2, Sparkles, AlertTriangle, CheckCircle2, Eye, EyeOff } from "lucide-react";
 import {
   SUPPORTED_CURRENCIES,
   localeForCurrency,
@@ -69,6 +69,10 @@ export default function Settings() {
       newPassword: "",
       confirmPassword: "",
     });
+  const [showNewPwd, setShowNewPwd] =
+    useState(false);
+  const [showConfirmPwd, setShowConfirmPwd] =
+    useState(false);
   const [pendingPlan, setPendingPlan] = useState<PlanId | null>(null);
   const [planNotice, setPlanNotice] = useState<{
     type: "success" | "error";
@@ -531,20 +535,31 @@ export default function Settings() {
         New password
       </Label>
 
-      <Input
-        type="password"
-        value={
-          passwordForm.newPassword
-        }
-        onChange={(e) =>
-          setPasswordForm({
-            ...passwordForm,
-            newPassword:
-              e.target.value,
-          })
-        }
-        placeholder="Enter new password"
-      />
+      <div className="relative">
+        <Input
+          type={showNewPwd ? "text" : "password"}
+          value={
+            passwordForm.newPassword
+          }
+          onChange={(e) =>
+            setPasswordForm({
+              ...passwordForm,
+              newPassword:
+                e.target.value,
+            })
+          }
+          placeholder="Enter new password"
+          className="pr-10"
+        />
+        <button
+          type="button"
+          onClick={() => setShowNewPwd(!showNewPwd)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+          tabIndex={-1}
+        >
+          {showNewPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+        </button>
+      </div>
     </div>
 
     <div className="space-y-2">
@@ -552,20 +567,31 @@ export default function Settings() {
         Confirm password
       </Label>
 
-      <Input
-        type="password"
-        value={
-          passwordForm.confirmPassword
-        }
-        onChange={(e) =>
-          setPasswordForm({
-            ...passwordForm,
-            confirmPassword:
-              e.target.value,
-          })
-        }
-        placeholder="Confirm new password"
-      />
+      <div className="relative">
+        <Input
+          type={showConfirmPwd ? "text" : "password"}
+          value={
+            passwordForm.confirmPassword
+          }
+          onChange={(e) =>
+            setPasswordForm({
+              ...passwordForm,
+              confirmPassword:
+                e.target.value,
+            })
+          }
+          placeholder="Confirm new password"
+          className="pr-10"
+        />
+        <button
+          type="button"
+          onClick={() => setShowConfirmPwd(!showConfirmPwd)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+          tabIndex={-1}
+        >
+          {showConfirmPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+        </button>
+      </div>
     </div>
 
   </div>

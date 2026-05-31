@@ -23,6 +23,11 @@ import { Button }
 from "@/components/ui/button";
 
 import {
+  Eye,
+  EyeOff,
+} from "lucide-react";
+
+import {
   toast,
 } from "sonner";
 
@@ -49,6 +54,16 @@ export default function ResetPassword() {
   const [
     validSession,
     setValidSession,
+  ] = useState(false);
+
+  const [
+    showPwd,
+    setShowPwd,
+  ] = useState(false);
+
+  const [
+    showConfirmPwd,
+    setShowConfirmPwd,
   ] = useState(false);
 
   useEffect(() => {
@@ -223,16 +238,27 @@ export default function ResetPassword() {
               New password
             </label>
 
-            <Input
-              type="password"
-              placeholder="Enter new password"
-              value={password}
-              onChange={(e) =>
-                setPassword(
-                  e.target.value
-                )
-              }
-            />
+            <div className="relative">
+              <Input
+                type={showPwd ? "text" : "password"}
+                placeholder="Enter new password"
+                value={password}
+                onChange={(e) =>
+                  setPassword(
+                    e.target.value
+                  )
+                }
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPwd(!showPwd)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                tabIndex={-1}
+              >
+                {showPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
 
           </div>
 
@@ -251,16 +277,27 @@ export default function ResetPassword() {
               Confirm password
             </label>
 
-            <Input
-              type="password"
-              placeholder="Confirm new password"
-              value={confirmPassword}
-              onChange={(e) =>
-                setConfirmPassword(
-                  e.target.value
-                )
-              }
-            />
+            <div className="relative">
+              <Input
+                type={showConfirmPwd ? "text" : "password"}
+                placeholder="Confirm new password"
+                value={confirmPassword}
+                onChange={(e) =>
+                  setConfirmPassword(
+                    e.target.value
+                  )
+                }
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPwd(!showConfirmPwd)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                tabIndex={-1}
+              >
+                {showConfirmPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
 
           </div>
 

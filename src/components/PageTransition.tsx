@@ -25,10 +25,9 @@ export function PageTransition({ children }: Props) {
 
   return (
     <div
-      className="transition-all duration-500 ease-out"
+      className="transition-opacity duration-500 ease-out"
       style={{
         opacity: stage === "done" ? 1 : 0,
-        transform: stage === "done" ? "translateY(0)" : "translateY(12px)",
       }}
     >
       {display}

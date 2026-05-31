@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 
 import { Label } from "@/components/ui/label";
 
-import { Loader2 } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 
 export default function System() {
 
@@ -26,6 +26,11 @@ export default function System() {
     newPassword: "",
     confirmPassword: "",
   });
+
+  const [showNewPwd, setShowNewPwd] =
+    useState(false);
+  const [showConfirmPwd, setShowConfirmPwd] =
+    useState(false);
 
   const updatePassword =
     async (
@@ -183,20 +188,31 @@ export default function System() {
               New password
             </Label>
 
-            <Input
-              type="password"
-              placeholder="Enter new password"
-              value={
-                passwordForm.newPassword
-              }
-              onChange={(e) =>
-                setPasswordForm({
-                  ...passwordForm,
-                  newPassword:
-                    e.target.value,
-                })
-              }
-            />
+            <div className="relative">
+              <Input
+                type={showNewPwd ? "text" : "password"}
+                placeholder="Enter new password"
+                value={
+                  passwordForm.newPassword
+                }
+                onChange={(e) =>
+                  setPasswordForm({
+                    ...passwordForm,
+                    newPassword:
+                      e.target.value,
+                  })
+                }
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowNewPwd(!showNewPwd)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                tabIndex={-1}
+              >
+                {showNewPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
 
           </div>
 
@@ -206,20 +222,31 @@ export default function System() {
               Confirm password
             </Label>
 
-            <Input
-              type="password"
-              placeholder="Confirm new password"
-              value={
-                passwordForm.confirmPassword
-              }
-              onChange={(e) =>
-                setPasswordForm({
-                  ...passwordForm,
-                  confirmPassword:
-                    e.target.value,
-                })
-              }
-            />
+            <div className="relative">
+              <Input
+                type={showConfirmPwd ? "text" : "password"}
+                placeholder="Confirm new password"
+                value={
+                  passwordForm.confirmPassword
+                }
+                onChange={(e) =>
+                  setPasswordForm({
+                    ...passwordForm,
+                    confirmPassword:
+                      e.target.value,
+                  })
+                }
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPwd(!showConfirmPwd)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                tabIndex={-1}
+              >
+                {showConfirmPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
 
           </div>
 
