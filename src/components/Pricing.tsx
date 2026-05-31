@@ -7,6 +7,7 @@ import { planPriceIn } from "@/lib/currency";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { UpgradePlaceholderDialog } from "./UpgradePlaceholderDialog";
+import { AnimatedSection, AnimatedStagger } from "./AnimatedSection";
 import { toast } from "sonner";
 import type { PlanId } from "@/lib/currency";
 
@@ -76,7 +77,7 @@ export const Pricing = () => {
     <section id="pricing" className="py-24 md:py-32 relative bg-sunset bg-skyline">
       <div className="absolute top-0 left-0 right-0 divider-royal" aria-hidden />
       <div className="container relative">
-        <div className="max-w-2xl mx-auto text-center mb-16">
+        <AnimatedSection className="max-w-2xl mx-auto text-center mb-16">
           <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-primary mb-3 font-display">
             <Crown className="h-3.5 w-3.5" />
             Pricing
@@ -85,8 +86,12 @@ export const Pricing = () => {
           <p className="mt-4 text-muted-foreground text-lg font-alt">
             Start your 14-day royal trial. Upgrade when your portfolio demands it. Prices localised to your region.
           </p>
-        </div>
-        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        </AnimatedSection>
+        <AnimatedStagger
+          className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto"
+          baseDelay={150}
+          staggerMs={120}
+        >
           {tiers.map((t) => {
             const price = planPriceIn(t.id, code, locale);
             const isCustom = t.id === "scale";
@@ -164,7 +169,7 @@ export const Pricing = () => {
               </div>
             );
           })}
-        </div>
+        </AnimatedStagger>
       </div>
     </section>
   );

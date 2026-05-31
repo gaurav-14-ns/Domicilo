@@ -8,6 +8,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { DataStoreProvider } from "@/store/DataStore";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { PageTransition } from "@/components/PageTransition";
 import DashboardLayout from "@/layouts/DashboardLayout";
 
 import Index from "./pages/Index.tsx";
@@ -52,62 +53,64 @@ const App = () => (
           <AuthProvider>
             <DataStoreProvider>
               <ScrollToTop />
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/auth/reset-password" element={<ResetPassword />}/>
-                <Route path="/about" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="/terms" element={<Terms />} />
+              <PageTransition>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/auth/reset-password" element={<ResetPassword />}/>
+                  <Route path="/about" element={<About />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/privacy" element={<Privacy />} />
+                  <Route path="/terms" element={<Terms />} />
 
-                <Route
-                  path="/owner"
-                  element={
-                    <ProtectedRoute allow={["owner"]}>
-                      <DashboardLayout role="owner" />
-                    </ProtectedRoute>
-                  }
-                >
-                  <Route index element={<OwnerOverview />} />
-                  <Route path="properties" element={<Properties />} />
-                  <Route path="tenants" element={<OwnerTenants />} />
-                  <Route path="transactions" element={<OwnerTransactions />} />
-                  <Route path="reports" element={<Reports />} />
-                  <Route path="settings" element={<OwnerSettings />} />
-                </Route>
+                  <Route
+                    path="/owner"
+                    element={
+                      <ProtectedRoute allow={["owner"]}>
+                        <DashboardLayout role="owner" />
+                      </ProtectedRoute>
+                    }
+                  >
+                    <Route index element={<OwnerOverview />} />
+                    <Route path="properties" element={<Properties />} />
+                    <Route path="tenants" element={<OwnerTenants />} />
+                    <Route path="transactions" element={<OwnerTransactions />} />
+                    <Route path="reports" element={<Reports />} />
+                    <Route path="settings" element={<OwnerSettings />} />
+                  </Route>
 
-                <Route
-                  path="/tenant"
-                  element={
-                    <ProtectedRoute allow={["tenant"]}>
-                      <DashboardLayout role="tenant" />
-                    </ProtectedRoute>
-                  }
-                >
-                  <Route index element={<TenantOverview />} />
-                  <Route path="dues" element={<Dues />} />
-                  <Route path="transactions" element={<TenantTransactions />} />
-                  <Route path="profile" element={<Profile />} />
-                </Route>
+                  <Route
+                    path="/tenant"
+                    element={
+                      <ProtectedRoute allow={["tenant"]}>
+                        <DashboardLayout role="tenant" />
+                      </ProtectedRoute>
+                    }
+                  >
+                    <Route index element={<TenantOverview />} />
+                    <Route path="dues" element={<Dues />} />
+                    <Route path="transactions" element={<TenantTransactions />} />
+                    <Route path="profile" element={<Profile />} />
+                  </Route>
 
-                <Route
-                  path="/admin"
-                  element={
-                    <ProtectedRoute allow={["admin"]}>
-                      <DashboardLayout role="admin" />
-                    </ProtectedRoute>
-                  }
-                >
-                  <Route index element={<AdminOverview />} />
-                  <Route path="users" element={<AdminUsers />} />
-                  <Route path="leads" element={<AdminLeads />} />
-                  <Route path="system" element={<System />} />
-                </Route>
+                  <Route
+                    path="/admin"
+                    element={
+                      <ProtectedRoute allow={["admin"]}>
+                        <DashboardLayout role="admin" />
+                      </ProtectedRoute>
+                    }
+                  >
+                    <Route index element={<AdminOverview />} />
+                    <Route path="users" element={<AdminUsers />} />
+                    <Route path="leads" element={<AdminLeads />} />
+                    <Route path="system" element={<System />} />
+                  </Route>
 
-                <Route path="/dashboard" element={<Navigate to="/auth" replace />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+                  <Route path="/dashboard" element={<Navigate to="/auth" replace />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </PageTransition>
             </DataStoreProvider>
           </AuthProvider>
         </BrowserRouter>

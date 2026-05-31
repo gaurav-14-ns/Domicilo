@@ -1,5 +1,6 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Crown } from "lucide-react";
+import { AnimatedSection, AnimatedStagger } from "./AnimatedSection";
 
 const faqs = [
   { q: "Can I separate owner and tenant access?", a: "Absolutely. Domicilo ships with two distinct portals, role-aware routing, and row-level security so tenants only ever see what concerns them." },
@@ -13,22 +14,24 @@ export const FAQ = () => (
   <section id="faq" className="py-24 md:py-32 relative pattern-jaali">
     <div className="absolute top-0 left-0 right-0 divider-royal" aria-hidden />
     <div className="container max-w-3xl">
-      <div className="text-center mb-12">
+      <AnimatedSection className="text-center mb-12">
         <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-primary mb-3 font-display">
           <Crown className="h-3.5 w-3.5" />
           FAQ
         </div>
         <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight">Questions, answered royally.</h2>
         <p className="mt-3 text-muted-foreground font-alt">Everything you need to know about Domicilo.</p>
-      </div>
-      <Accordion type="single" collapsible className="w-full">
-        {faqs.map((f, i) => (
-          <AccordionItem key={i} value={`item-${i}`} className="border-border/60">
-            <AccordionTrigger className="text-left font-display font-semibold hover:no-underline hover:text-primary transition-smooth">{f.q}</AccordionTrigger>
-            <AccordionContent className="text-muted-foreground leading-relaxed font-alt">{f.a}</AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
+      </AnimatedSection>
+      <AnimatedSection animation="fade-in" delay={200}>
+        <Accordion type="single" collapsible className="w-full">
+          {faqs.map((f, i) => (
+            <AccordionItem key={i} value={`item-${i}`} className="border-border/60">
+              <AccordionTrigger className="text-left font-display font-semibold hover:no-underline hover:text-primary transition-smooth">{f.q}</AccordionTrigger>
+              <AccordionContent className="text-muted-foreground leading-relaxed font-alt">{f.a}</AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </AnimatedSection>
     </div>
   </section>
 );

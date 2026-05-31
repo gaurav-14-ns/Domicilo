@@ -2,6 +2,7 @@ import { ArrowRight, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ContactDialog } from "./ContactDialog";
+import { AnimatedSection } from "./AnimatedSection";
 
 export const CTA = () => {
   const nav = useNavigate();
@@ -9,7 +10,7 @@ export const CTA = () => {
     <section className="py-24 relative">
       <div className="absolute top-0 left-0 right-0 divider-royal" aria-hidden />
       <div className="container">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-primary p-10 md:p-16 text-center shadow-elegant">
+        <AnimatedSection className="relative overflow-hidden rounded-3xl bg-gradient-primary p-10 md:p-16 text-center shadow-elegant">
           <div className="absolute inset-0 pattern-jaali opacity-10" aria-hidden />
           <div className="absolute -top-20 -right-20 h-64 w-64 blur-3xl rounded-full bg-primary-foreground/20" aria-hidden />
           <div className="absolute -bottom-20 -left-20 h-64 w-64 blur-3xl rounded-full bg-primary-foreground/10" aria-hidden />
@@ -38,7 +39,7 @@ export const CTA = () => {
               />
             </div>
           </div>
-        </div>
+        </AnimatedSection>
       </div>
     </section>
   );

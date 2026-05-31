@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useDataStore } from "@/store/DataStore";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -46,6 +46,8 @@ const emptyForm: FormState = {
   amount: "", status: "completed", note: "",
 };
 
+const PAGE_SIZE = 25;
+
 export default function Transactions() {
   const { data, addTransaction, updateTransaction, removeTransaction } = useDataStore();
   const { transactions, tenants, properties } = data;
@@ -59,10 +61,14 @@ export default function Transactions() {
   const [maxAmount, setMaxAmount] = useState("");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
+  const [page, setPage] = useState(0);
 
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
+
+  const resetPage = () => setPage(0);
+  useEffect(() => { resetPage(); }, [q, propertyFilter, statusFilter, typeFilter, minAmount, maxAmount, from, to]);
 
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
@@ -79,6 +85,10 @@ export default function Transactions() {
       return true;
     });
   }, [transactions, q, propertyFilter, statusFilter, typeFilter, minAmount, maxAmount, from, to]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages - 1);
+  const paginated = filtered.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
 
   const openCreate = () => { setEditId(null); setForm(emptyForm); setOpen(true); };
   const openEdit = (t: Transaction) => {
@@ -247,7 +257,7 @@ export default function Transactions() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((t) => (
+                {paginated.map((t) => (
                   <tr key={t.id} className="border-t border-border">
                     <td className="p-3 text-muted-foreground">{t.date}</td>
                     <td className="p-3 font-medium">{t.tenant || "—"}</td>
@@ -283,7 +293,19 @@ export default function Transactions() {
                             </AlertDialogFooter>
                           </AlertDialogContent>
                         </AlertDialog>
-                      </div>
+          </div>
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between p-3 border-t border-border">
+              <span className="text-xs text-muted-foreground">
+                {safePage * PAGE_SIZE + 1}–{Math.min((safePage + 1) * PAGE_SIZE, filtered.length)} of {filtered.length}
+              </span>
+              <div className="flex gap-1">
+                <Button size="sm" variant="outline" disabled={safePage <= 0} onClick={() => setPage(safePage - 1)}>Prev</Button>
+                <Button size="sm" variant="outline" disabled={safePage >= totalPages - 1} onClick={() => setPage(safePage + 1)}>Next</Button>
+              </div>
+            </div>
+          )}
+        </div>
                     </td>
                   </tr>
                 ))}

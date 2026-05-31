@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import {
   useMemo,
   useState,
+  useEffect,
 } from "react";
 
 import {
@@ -211,6 +212,9 @@ const [
   setCreatingTenantAuth,
 ] = useState(false);
 
+  const [page, setPage] = useState(0);
+  const PAGE_SIZE = 20;
+
   const filtered =
     useMemo(() => {
       const s =
@@ -267,6 +271,12 @@ const [
       propertyFilter,
       statusFilter,
     ]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages - 1);
+  const paginated = filtered.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
+  const resetPage = () => setPage(0);
+  useEffect(() => { resetPage(); }, [q, propertyFilter, statusFilter]);
 
   const openCreate =
     () => {
@@ -1314,8 +1324,8 @@ URL.revokeObjectURL(url);
                 </tr>
               </thead>
 
-              <tbody>
-                {filtered.map(
+              <tbody className="stagger-children">
+                {paginated.map(
                   (t) => {
                     const isInactive =
                       t.status ===
@@ -1496,6 +1506,17 @@ URL.revokeObjectURL(url);
               </tbody>
             </table>
           </div>
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between p-3 border-t border-border">
+              <span className="text-xs text-muted-foreground">
+                {safePage * PAGE_SIZE + 1}–{Math.min((safePage + 1) * PAGE_SIZE, filtered.length)} of {filtered.length}
+              </span>
+              <div className="flex gap-1">
+                <Button size="sm" variant="outline" disabled={safePage <= 0} onClick={() => setPage(safePage - 1)}>Prev</Button>
+                <Button size="sm" variant="outline" disabled={safePage >= totalPages - 1} onClick={() => setPage(safePage + 1)}>Next</Button>
+              </div>
+            </div>
+          )}
         </div>
       )}
       <Dialog
