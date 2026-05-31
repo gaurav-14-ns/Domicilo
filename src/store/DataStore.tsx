@@ -188,7 +188,7 @@ const DataStoreContext = createContext<DataStoreContextValue | null>(null);
 export function DataStoreProvider({ children }: { children: ReactNode }) {
   const { user, role } = useAuth();
   const [data, setData] = useState<AppData>(initialData);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] =
   useState<string | null>(
     null
@@ -302,8 +302,6 @@ const mountedRef =
     if (
       mountedRef.current
     ) {
-      setLoading(true);
-
       setError(null);
     }
 
@@ -589,7 +587,7 @@ const mountedRef =
           orgsPromise,
         ]);
 
-      let txRows =
+      const txRows =
         txs ?? [];
 
       const propertiesById =
@@ -719,11 +717,16 @@ const mountedRef =
   useEffect(() => {
     if (!user) {
       fetchedRef.current = false;
+      setLoading(false);
       return;
     }
-    if (!role) return;
+    if (!role) {
+      setLoading(true);
+      return;
+    }
     if (fetchedRef.current) return;
     fetchedRef.current = true;
+    setLoading(true);
     fetchAll();
   }, [user, role, fetchAll]);
 

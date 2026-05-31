@@ -389,11 +389,11 @@ export default function Properties() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
-          <h1 className="text-2xl md:text-3xl font-display font-bold">
+          <h1 className="text-2xl md:text-3xl font-display font-bold text-gradient">
             Properties
           </h1>
 
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground font-alt tracking-wide">
             Manage every building in your portfolio.
           </p>
         </div>

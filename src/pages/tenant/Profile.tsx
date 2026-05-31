@@ -101,7 +101,7 @@ export default function Profile() {
 
   return (
     <div className="space-y-6 max-w-2xl">
-      <h1 className="text-2xl md:text-3xl font-display font-bold">Profile</h1>
+      <h1 className="text-2xl md:text-3xl font-display font-bold text-gradient">Profile</h1>
       <form onSubmit={save} className="rounded-xl border border-border bg-gradient-card p-6 space-y-4">
         <div className="space-y-2"><Label>Email</Label><Input value={user?.email ?? ""} disabled /></div>
         <div className="space-y-2"><Label>Name</Label><Input value={tenant?.name ?? ""} disabled /></div>

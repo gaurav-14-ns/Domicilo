@@ -277,8 +277,8 @@ export default function Settings() {
       </AlertDialog>
 
       <div>
-        <h1 className="text-2xl md:text-3xl font-display font-bold">Settings</h1>
-        <p className="text-muted-foreground">Manage your account preferences and subscription.</p>
+        <h1 className="text-2xl md:text-3xl font-display font-bold text-gradient">Settings</h1>
+        <p className="text-muted-foreground font-alt tracking-wide">Manage your account preferences and subscription.</p>
       </div>
 
       {planNotice && (

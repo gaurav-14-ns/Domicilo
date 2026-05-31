@@ -406,11 +406,11 @@ export default function AdminLeads() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
-          <h1 className="text-2xl md:text-3xl font-display font-bold">
+          <h1 className="text-2xl md:text-3xl font-display font-bold text-gradient">
             Leads
           </h1>
 
-          <p className="text-muted-foreground mt-1">
+          <p className="text-muted-foreground mt-1 font-alt tracking-wide">
             Manage incoming sales
             and support leads.
           </p>

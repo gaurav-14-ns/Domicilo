@@ -151,8 +151,8 @@ export default function Transactions() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
-          <h1 className="text-2xl md:text-3xl font-display font-bold">Transactions</h1>
-          <p className="text-muted-foreground">Auto rent + manual entries for utilities, maintenance, refunds.</p>
+          <h1 className="text-2xl md:text-3xl font-display font-bold text-gradient">Transactions</h1>
+          <p className="text-muted-foreground font-alt tracking-wide">Auto rent + manual entries for utilities, maintenance, refunds.</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={exportCsv}><Download className="h-4 w-4" /> Export CSV</Button>

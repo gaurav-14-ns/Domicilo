@@ -441,11 +441,11 @@ export default function AdminOverview() {
   return (
     <div className="space-y-6 w-full overflow-hidden">
       <div className="space-y-1">
-        <h1 className="text-2xl md:text-3xl font-display font-bold tracking-tight">
+        <h1 className="text-2xl md:text-3xl font-display font-bold tracking-tight text-gradient">
           Admin Overview
         </h1>
 
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground font-alt tracking-wide">
           Real-time platform intelligence and operational insights.
         </p>
       </div>
@@ -519,11 +519,11 @@ export default function AdminOverview() {
                 <card.icon className="h-5 w-5 text-primary" />
               </div>
 
-              <div className="mt-5 text-xs uppercase tracking-[0.18em] text-muted-foreground">
+              <div className="mt-5 text-xs uppercase tracking-[0.18em] text-muted-foreground font-display">
                 {card.label}
               </div>
 
-              <div className="mt-3 text-3xl md:text-4xl font-bold tracking-tight break-words">
+              <div className="mt-3 text-3xl md:text-4xl font-bold tracking-tight break-words text-gold">
                 {card.value}
               </div>
 

@@ -31,11 +31,11 @@ const KpiCard = ({
       <Icon className="h-4 w-4 text-primary" />
     </div>
 
-    <div className="mt-2 text-2xl md:text-3xl font-bold font-display">
+    <div className="mt-2 text-2xl md:text-3xl font-bold font-display text-gold">
       {value}
     </div>
 
-    <div className="text-xs text-primary mt-1">
+    <div className="text-xs text-primary mt-1 font-alt">
       {delta}
     </div>
   </div>
@@ -260,11 +260,11 @@ const overdueDues =
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl md:text-3xl font-display font-bold">
+        <h1 className="text-2xl md:text-3xl font-display font-bold text-gradient">
           Welcome back
         </h1>
 
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground font-alt tracking-wide">
           Here's what's happening across your portfolio.
         </p>
       </div>
@@ -320,7 +320,7 @@ const overdueDues =
 
       <div className="grid lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 rounded-xl border border-border bg-gradient-card p-5">
-          <div className="text-sm font-semibold mb-4">
+          <div className="text-sm font-semibold mb-4 text-gradient">
             Revenue · last 6 months
           </div>
 
@@ -377,7 +377,7 @@ const overdueDues =
         </div>
 
         <div className="rounded-xl border border-border bg-gradient-card p-5">
-          <div className="text-sm font-semibold mb-4">
+          <div className="text-sm font-semibold mb-4 text-gradient">
             Recent transactions
           </div>
 
@@ -428,7 +428,7 @@ const overdueDues =
       </div>
 
       <div className="rounded-xl border border-border bg-gradient-card p-5">
-        <div className="text-sm font-semibold mb-4">
+        <div className="text-sm font-semibold mb-4 text-gradient">
           Properties snapshot
         </div>
 

@@ -174,11 +174,11 @@ export default function TenantTransactions() {
 
       <div>
 
-        <h1 className="text-2xl md:text-3xl font-display font-bold">
+        <h1 className="text-2xl md:text-3xl font-display font-bold text-gradient">
           Transaction history
         </h1>
 
-        <p className="text-muted-foreground mt-1">
+        <p className="text-muted-foreground mt-1 font-alt tracking-wide">
           Complete history of charges, payments, refunds, and account activity.
         </p>
 

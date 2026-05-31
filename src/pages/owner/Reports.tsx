@@ -162,11 +162,11 @@ export default function Reports() {
 
       {/* HEADER */}
       <div>
-        <h1 className="text-2xl md:text-3xl font-display font-bold">
+        <h1 className="text-2xl md:text-3xl font-display font-bold text-gradient">
           Reports
         </h1>
 
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground font-alt tracking-wide">
           Live performance across your portfolio.
         </p>
       </div>

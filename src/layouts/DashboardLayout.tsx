@@ -77,7 +77,7 @@ function DashboardContent({
           <div className="flex items-center gap-2">
             <Crown className="h-4 w-4 text-amber-500 hidden sm:block animate-glow-pulse" />
             <span className="font-display font-semibold capitalize truncate tracking-wide">
-              {role === "owner" ? <span className="text-gold-shimmer">Owner Dashboard</span> : `${role} dashboard`}
+              {role === "owner" ? <span className="text-gold-shimmer">Owner Dashboard</span> : <span className="text-gradient">{role} dashboard</span>}
             </span>
           </div>
           </div>

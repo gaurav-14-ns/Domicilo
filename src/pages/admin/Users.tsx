@@ -453,11 +453,11 @@ export default function Users() {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
 
         <div>
-          <h1 className="text-3xl font-bold">
+          <h1 className="text-3xl font-bold text-gradient">
             Users
           </h1>
 
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground font-alt tracking-wide">
             Manage all platform users.
           </p>
         </div>

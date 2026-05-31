@@ -22,10 +22,10 @@ export default function TenantOverview() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl md:text-3xl font-display font-bold">
+        <h1 className="text-2xl md:text-3xl font-display font-bold text-gradient">
           Welcome, {tenant?.name ?? user?.email?.split("@")[0]}
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground font-alt tracking-wide">
           {tenant ? `${tenant.property} · Room ${tenant.room}` : "Your home, your dues, your schedule."}
         </p>
       </div>
