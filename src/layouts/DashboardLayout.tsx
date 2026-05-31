@@ -75,7 +75,7 @@ function DashboardContent({
             <SidebarTrigger />
 
           <div className="flex items-center gap-2">
-            <Crown className="h-4 w-4 text-amber-500 hidden sm:block" />
+            <Crown className="h-4 w-4 text-amber-500 hidden sm:block animate-glow-pulse" />
             <span className="font-display font-semibold capitalize truncate tracking-wide">
               {role === "owner" ? <span className="text-gold-shimmer">Owner Dashboard</span> : `${role} dashboard`}
             </span>
@@ -85,7 +85,7 @@ function DashboardContent({
           <ThemeToggle />
         </header>
 
-        <main className="flex-1 overflow-auto p-4 md:p-6">
+        <main className="flex-1 overflow-auto p-4 md:p-6 animate-page-enter">
           {role ===
             "owner" && (
             <div className="mb-4">
