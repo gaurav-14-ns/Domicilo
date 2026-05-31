@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { AppErrorBoundary } from "@/components/AppErrorBoundary";
 import { ThemeProvider } from "next-themes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -10,33 +11,40 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { PageTransition } from "@/components/PageTransition";
 import DashboardLayout from "@/layouts/DashboardLayout";
+import { LoadingState } from "@/components/states/LoadingState";
 
-import Index from "./pages/Index.tsx";
-import BrowseProperties from "./pages/BrowseProperties.tsx";
-import NotFound from "./pages/NotFound.tsx";
-import Auth from "./pages/Auth";
-import ResetPassword from "./pages/auth/ResetPassword";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import Privacy from "./pages/Privacy";
-import Terms from "./pages/Terms";
+const Index = lazy(() => import("./pages/Index.tsx"));
+const BrowseProperties = lazy(() => import("./pages/BrowseProperties.tsx"));
+const NotFound = lazy(() => import("./pages/NotFound.tsx"));
+const Auth = lazy(() => import("./pages/Auth"));
+const ResetPassword = lazy(() => import("./pages/auth/ResetPassword"));
+const About = lazy(() => import("./pages/About"));
+const Contact = lazy(() => import("./pages/Contact"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const Terms = lazy(() => import("./pages/Terms"));
 
-import OwnerOverview from "./pages/owner/Overview";
-import Properties from "./pages/owner/Properties";
-import OwnerTenants from "./pages/owner/Tenants";
-import OwnerTransactions from "./pages/owner/Transactions";
-import Reports from "./pages/owner/Reports";
-import OwnerSettings from "./pages/owner/Settings";
+const OwnerOverview = lazy(() => import("./pages/owner/Overview"));
+const Properties = lazy(() => import("./pages/owner/Properties"));
+const OwnerTenants = lazy(() => import("./pages/owner/Tenants"));
+const OwnerTransactions = lazy(() => import("./pages/owner/Transactions"));
+const Reports = lazy(() => import("./pages/owner/Reports"));
+const OwnerSettings = lazy(() => import("./pages/owner/Settings"));
 
-import TenantOverview from "./pages/tenant/Overview";
-import Dues from "./pages/tenant/Dues";
-import TenantTransactions from "./pages/tenant/Transactions";
-import Profile from "./pages/tenant/Profile";
+const TenantOverview = lazy(() => import("./pages/tenant/Overview"));
+const Dues = lazy(() => import("./pages/tenant/Dues"));
+const TenantTransactions = lazy(() => import("./pages/tenant/Transactions"));
+const Profile = lazy(() => import("./pages/tenant/Profile"));
 
-import AdminLeads from "./pages/admin/Leads";
-import AdminOverview from "./pages/admin/Overview";
-import AdminUsers from "./pages/admin/Users";
-import System from "./pages/admin/System";
+const AdminLeads = lazy(() => import("./pages/admin/Leads"));
+const AdminOverview = lazy(() => import("./pages/admin/Overview"));
+const AdminUsers = lazy(() => import("./pages/admin/Users"));
+const System = lazy(() => import("./pages/admin/System"));
+
+const LoadingFallback = () => (
+  <div className="p-6">
+    <LoadingState title="Loading..." />
+  </div>
+);
 
 const queryClient = new QueryClient();
 
@@ -55,6 +63,7 @@ const App = () => (
             <DataStoreProvider>
               <ScrollToTop />
               <PageTransition>
+                <Suspense fallback={<LoadingFallback />}>
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/properties" element={<BrowseProperties />} />
@@ -112,6 +121,7 @@ const App = () => (
                   <Route path="/dashboard" element={<Navigate to="/auth" replace />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
+                </Suspense>
               </PageTransition>
             </DataStoreProvider>
           </AuthProvider>

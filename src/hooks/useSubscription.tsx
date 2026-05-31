@@ -181,7 +181,7 @@ export function useSubscription() {
 
     void initialize();
 
-    if (!user?.id) {
+    if (!user?.id || role !== "owner") {
       return () => {
         isMounted = false;
       };
@@ -266,7 +266,7 @@ export function useSubscription() {
         );
       }
     };
-  }, [fetchSubscription, user]);
+  }, [fetchSubscription, user, role]);
 
   const changePlan = useCallback(
     async (plan: PlanId) => {

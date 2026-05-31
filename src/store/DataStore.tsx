@@ -200,6 +200,13 @@ export function DataStoreProvider({ children }: { children: ReactNode }) {
 
 const mountedRef =
   useRef(true);
+
+  const roleRef =
+  useRef(role);
+  roleRef.current = role;
+
+  const fetchedRef =
+  useRef(false);
   
   const realtimeRefreshTimeout =
   useRef<
@@ -383,7 +390,7 @@ const mountedRef =
             )
             .maybeSingle(),
 
-          role ===
+          roleRef.current ===
           "admin"
             ? supabase
                 .from(
@@ -529,13 +536,19 @@ const mountedRef =
     }
   }, [
     user,
-    role,
   ]);
 
-  // First load + auth changes
+  // First load: wait for both user and role, then fetch ONCE
   useEffect(() => {
+    if (!user) {
+      fetchedRef.current = false;
+      return;
+    }
+    if (!role) return;
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
     fetchAll();
-  }, [fetchAll]);
+  }, [user, role, fetchAll]);
 
   // Periodic maintenance: auto-rent + overdue escalation every 30 min.
   // Runs once on mount and then every 30 minutes thereafter.
@@ -690,6 +703,7 @@ const mountedRef =
   const refresh =
   useCallback(
     async () => {
+      fetchedRef.current = false;
       if (
         reconcileRef.current
       ) {

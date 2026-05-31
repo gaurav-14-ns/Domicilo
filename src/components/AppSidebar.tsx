@@ -46,7 +46,9 @@ export function AppSidebar({ role }: { role: AppRole }) {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const { signOut, user } = useAuth();
-  const { trialDaysLeft, isTrial } = useSubscription();
+  const sub = useSubscription();
+  const trialDaysLeft = sub?.trialDaysLeft ?? null;
+  const isTrial = sub?.isTrial ?? false;
   const nav = useNavigate();
 
   const items = role === "owner" ? ownerItems : role === "tenant" ? tenantItems : adminItems;

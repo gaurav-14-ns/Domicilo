@@ -175,7 +175,7 @@ const locale =
                 },
                 {
                   onConflict:
-                    "user_id,role",
+                    "user_id",
                 }
               )
           );
@@ -404,15 +404,13 @@ if (
             data.session
               ?.user
           ) {
-            setTimeout(() => {
-              fetchRole(
-                data
-                  .session!
-                  .user
-              ).catch(
-                console.error
-              );
-            }, 0);
+            fetchRole(
+              data
+                .session
+                .user
+            ).catch(
+              console.error
+            );
           } else {
             safeSetRole(
               null
