@@ -68,6 +68,7 @@ interface FormState {
   occupied: string;
   city: string;
   state: string;
+  pincode: string;
   priceMonthly: string;
   amenities: string;
   description: string;
@@ -84,6 +85,7 @@ const empty: FormState = {
   occupied: "0",
   city: "",
   state: "",
+  pincode: "",
   priceMonthly: "",
   amenities: "",
   description: "",
@@ -204,6 +206,7 @@ export default function Properties() {
       occupied: String(Number(p?.occupied ?? 0)),
       city: p?.city ?? "",
       state: p?.state ?? "",
+      pincode: p?.pincode ?? "",
       priceMonthly: String(Number(p?.priceMonthly ?? 0)),
       amenities: (p?.amenities ?? []).join(", "),
       description: p?.description ?? "",
@@ -237,6 +240,7 @@ export default function Properties() {
 
     const city = form.city.trim();
     const state = form.state.trim();
+    const pincode = form.pincode.trim();
     const priceMonthly = Number(form.priceMonthly) || 0;
     const amenities = form.amenities.split(",").map((a) => a.trim()).filter(Boolean);
     const description = form.description.trim();
@@ -284,6 +288,7 @@ export default function Properties() {
             units,
             city,
             state,
+            pincode,
             priceMonthly,
             amenities,
             description,
@@ -308,6 +313,7 @@ export default function Properties() {
           units,
           city,
           state,
+          pincode,
           priceMonthly,
           amenities,
           description,
@@ -560,15 +566,19 @@ export default function Properties() {
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-2">
                       <Label>City</Label>
-                      <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
+                      <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} placeholder="e.g. Mumbai" />
                     </div>
                     <div className="space-y-2">
                       <Label>State</Label>
-                      <Input value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })} />
+                      <Input value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })} placeholder="e.g. Maharashtra" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Pincode</Label>
+                      <Input value={form.pincode} onChange={(e) => setForm({ ...form, pincode: e.target.value })} placeholder="e.g. 400001" maxLength={6} />
                     </div>
                     <div className="space-y-2">
                       <Label>Monthly Rent (₹)</Label>
-                      <Input type="number" min="0" value={form.priceMonthly} onChange={(e) => setForm({ ...form, priceMonthly: e.target.value })} />
+                      <Input type="number" min="0" value={form.priceMonthly} onChange={(e) => setForm({ ...form, priceMonthly: e.target.value })} placeholder="e.g. 25000" />
                     </div>
                     <div className="space-y-2">
                       <Label>Property Type</Label>

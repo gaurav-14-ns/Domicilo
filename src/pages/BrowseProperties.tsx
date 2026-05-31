@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,7 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Search, MapPin, Bed, Bath, Home, ChevronDown, SlidersHorizontal, X } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Search, MapPin, Bed, Bath, Home, SlidersHorizontal, X, IndianRupee, Building2, CheckCircle2, Phone, Mail } from "lucide-react";
 import { AnimatedSection, AnimatedStagger } from "@/components/AnimatedSection";
 
 const AMENITIES = ["WiFi", "Parking", "AC", "Gym", "Pool", "Power Backup", "Security", "Lift"];
@@ -22,7 +22,7 @@ const INDIAN_STATES = [
 ];
 
 type Listing = {
-  id: string; name: string; address: string; city: string; state: string;
+  id: string; name: string; address: string; city: string; state: string; pincode: string;
   priceMonthly: number; amenities: string[]; description: string; images: string[];
   bedrooms: number; bathrooms: number; propertyType: string; units: number; available: boolean;
 };
@@ -43,8 +43,7 @@ export default function BrowseProperties() {
 
   const [cities, setCities] = useState<string[]>([]);
   const [loadingCities, setLoadingCities] = useState(false);
-
-  const navigate = useNavigate();
+  const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
 
   // Fetch distinct cities when state changes
   useEffect(() => {
@@ -83,7 +82,7 @@ export default function BrowseProperties() {
     query.order("created_at", { ascending: false }).then(({ data, error }) => {
       if (!error && data) {
         let results = data.map((r: any) => ({
-          id: r.id, name: r.name, address: r.address ?? "", city: r.city ?? "", state: r.state ?? "",
+          id: r.id, name: r.name, address: r.address ?? "", city: r.city ?? "", state: r.state ?? "", pincode: r.pincode ?? "",
           priceMonthly: Number(r.price_monthly) || 0, amenities: r.amenities ?? [],
           description: r.description ?? "", images: r.images ?? [],
           bedrooms: Number(r.bedrooms) || 1, bathrooms: Number(r.bathrooms) || 1,
@@ -100,8 +99,8 @@ export default function BrowseProperties() {
           const s = q.trim().toLowerCase();
           results = results.filter((l) =>
             l.name.toLowerCase().includes(s) || l.city.toLowerCase().includes(s) ||
-            l.state.toLowerCase().includes(s) || l.address.toLowerCase().includes(s) ||
-            l.description.toLowerCase().includes(s)
+            l.state.toLowerCase().includes(s) || l.pincode.toLowerCase().includes(s) ||
+            l.address.toLowerCase().includes(s) || l.description.toLowerCase().includes(s)
           );
         }
 
@@ -289,32 +288,41 @@ export default function BrowseProperties() {
           </div>
         ) : (
           <>
-            <p className="text-sm text-muted-foreground mb-4 font-num">
-              Found {listings.length} property{listings.length !== 1 ? "ies" : "y"}
-            </p>
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm text-muted-foreground font-num">
+                Found <span className="font-semibold text-foreground">{listings.length}</span> property{listings.length !== 1 ? "ies" : "y"}
+              </p>
+              <Badge variant="outline" className="text-[10px] font-normal">
+                {listings.filter(l => l.available).length} available
+              </Badge>
+            </div>
             <AnimatedStagger className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6" baseDelay={50} staggerMs={60}>
               {listings.map((l) => (
                 <div
                   key={l.id}
-                  className="group rounded-xl border border-border/60 bg-gradient-card overflow-hidden hover-lift-premium"
+                  className="group rounded-xl border border-border/60 bg-gradient-card overflow-hidden hover-lift-premium cursor-pointer"
+                  onClick={() => setSelectedListing(l)}
                 >
-                  {/* Image placeholder */}
-                  <div className="h-48 bg-gradient-primary/20 relative overflow-hidden">
+                  {/* Header image area */}
+                  <div className="h-44 bg-gradient-primary/20 relative overflow-hidden">
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <Home className="h-12 w-12 text-primary/20" />
+                      <Building2 className="h-14 w-14 text-primary/15" />
                     </div>
-                    <Badge className="absolute top-3 left-3" variant="secondary">
+                    {/* Type badge */}
+                    <Badge className="absolute top-3 left-3 font-alt font-normal tracking-wide" variant="secondary">
                       {l.propertyType}
                     </Badge>
+                    {/* Availability */}
                     <div className="absolute top-3 right-3">
-                      <Badge variant={l.available ? "default" : "secondary"} className="text-[10px]">
+                      <Badge variant={l.available ? "default" : "secondary"} className="text-[10px] font-normal">
                         {l.available ? "Available" : "Occupied"}
                       </Badge>
                     </div>
                     {/* Price badge */}
                     <div className="absolute bottom-3 left-3">
-                      <span className="text-sm font-bold text-primary-foreground bg-primary/90 px-3 py-1 rounded-lg font-num">
-                        ₹{l.priceMonthly.toLocaleString("en-IN")}/mo
+                      <span className="text-sm font-bold text-primary-foreground bg-primary/90 px-3 py-1.5 rounded-lg font-num shadow-glow flex items-center gap-1">
+                        <IndianRupee className="h-3 w-3" />
+                        {l.priceMonthly.toLocaleString("en-IN")}/mo
                       </span>
                     </div>
                   </div>
@@ -325,19 +333,21 @@ export default function BrowseProperties() {
                     </h3>
 
                     <div className="flex items-start gap-1.5 text-sm text-muted-foreground">
-                      <MapPin className="h-3.5 w-3.5 mt-0.5 shrink-0" />
-                      <span className="font-alt">{l.address}, {l.city}, {l.state}</span>
+                      <MapPin className="h-3.5 w-3.5 mt-0.5 shrink-0 text-primary/60" />
+                      <span className="font-alt">
+                        {l.address}, {l.city}, {l.state}{l.pincode ? ` — ${l.pincode}` : ""}
+                      </span>
                     </div>
 
                     <div className="flex items-center gap-4 text-sm text-muted-foreground font-num">
-                      <span className="flex items-center gap-1"><Bed className="h-3.5 w-3.5" /> {l.bedrooms} BHK</span>
-                      <span className="flex items-center gap-1"><Bath className="h-3.5 w-3.5" /> {l.bathrooms}</span>
+                      <span className="flex items-center gap-1.5"><Bed className="h-3.5 w-3.5 text-primary/60" /> {l.bedrooms} BHK</span>
+                      <span className="flex items-center gap-1.5"><Bath className="h-3.5 w-3.5 text-primary/60" /> {l.bathrooms}</span>
                     </div>
 
                     {l.amenities.length > 0 && (
                       <div className="flex flex-wrap gap-1.5">
                         {l.amenities.slice(0, 4).map((a) => (
-                          <Badge key={a} variant="outline" className="text-[10px] font-normal">{a}</Badge>
+                          <Badge key={a} variant="outline" className="text-[10px] font-normal border-primary/20">{a}</Badge>
                         ))}
                         {l.amenities.length > 4 && (
                           <Badge variant="outline" className="text-[10px] font-normal">+{l.amenities.length - 4}</Badge>
@@ -346,7 +356,7 @@ export default function BrowseProperties() {
                     )}
 
                     {l.description && (
-                      <p className="text-sm text-muted-foreground line-clamp-2 font-alt">
+                      <p className="text-sm text-muted-foreground line-clamp-2 font-alt leading-relaxed">
                         {l.description}
                       </p>
                     )}
@@ -356,6 +366,87 @@ export default function BrowseProperties() {
             </AnimatedStagger>
           </>
         )}
+
+        {/* Detail Dialog */}
+        <Dialog open={!!selectedListing} onOpenChange={(open) => { if (!open) setSelectedListing(null); }}>
+          <DialogContent className="sm:max-w-xl">
+            <DialogHeader>
+              <DialogTitle className="font-display text-xl">{selectedListing?.name}</DialogTitle>
+            </DialogHeader>
+            {selectedListing && (
+              <div className="space-y-4">
+                {/* Quick stats */}
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="rounded-lg bg-primary/5 border border-primary/10 p-3 text-center">
+                    <IndianRupee className="h-4 w-4 mx-auto text-primary mb-1" />
+                    <div className="text-lg font-bold font-num text-primary">₹{selectedListing.priceMonthly.toLocaleString("en-IN")}</div>
+                    <div className="text-[10px] text-muted-foreground">per month</div>
+                  </div>
+                  <div className="rounded-lg bg-primary/5 border border-primary/10 p-3 text-center">
+                    <Bed className="h-4 w-4 mx-auto text-primary mb-1" />
+                    <div className="text-lg font-bold font-num text-primary">{selectedListing.bedrooms}</div>
+                    <div className="text-[10px] text-muted-foreground">Bedrooms</div>
+                  </div>
+                  <div className="rounded-lg bg-primary/5 border border-primary/10 p-3 text-center">
+                    <Bath className="h-4 w-4 mx-auto text-primary mb-1" />
+                    <div className="text-lg font-bold font-num text-primary">{selectedListing.bathrooms}</div>
+                    <div className="text-[10px] text-muted-foreground">Bathrooms</div>
+                  </div>
+                </div>
+
+                {/* Details */}
+                <div className="rounded-lg border border-border/60 p-4 space-y-2">
+                  <div className="flex items-start gap-2 text-sm">
+                    <MapPin className="h-4 w-4 mt-0.5 text-primary/60 shrink-0" />
+                    <span className="font-alt">{selectedListing.address}, {selectedListing.city}, {selectedListing.state}{selectedListing.pincode ? ` — ${selectedListing.pincode}` : ""}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Building2 className="h-4 w-4 text-primary/60 shrink-0" />
+                    <span className="font-alt">{selectedListing.propertyType} · {selectedListing.units} unit{selectedListing.units !== 1 ? "s" : ""}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className={`h-4 w-4 shrink-0 ${selectedListing.available ? "text-green-600" : "text-muted-foreground"}`} />
+                    <span className="font-alt">{selectedListing.available ? "Available for rent" : "Currently occupied"}</span>
+                  </div>
+                </div>
+
+                {/* Amenities */}
+                {selectedListing.amenities.length > 0 && (
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2 font-display">Amenities</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {selectedListing.amenities.map((a) => (
+                        <Badge key={a} variant="outline" className="font-normal border-primary/20">{a}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Description */}
+                {selectedListing.description && (
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1 font-display">Description</p>
+                    <p className="text-sm text-muted-foreground font-alt leading-relaxed">{selectedListing.description}</p>
+                  </div>
+                )}
+
+                {/* Contact CTA */}
+                <div className="rounded-lg bg-gradient-primary p-4 text-center">
+                  <p className="text-primary-foreground font-display font-semibold text-sm">Interested in this property?</p>
+                  <p className="text-primary-foreground/70 text-xs mt-1 font-alt">Contact the owner to schedule a visit.</p>
+                  <div className="flex items-center justify-center gap-4 mt-3">
+                    <span className="flex items-center gap-1.5 text-primary-foreground/80 text-xs">
+                      <Phone className="h-3 w-3" /> Enquire
+                    </span>
+                    <span className="flex items-center gap-1.5 text-primary-foreground/80 text-xs">
+                      <Mail className="h-3 w-3" /> Send message
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

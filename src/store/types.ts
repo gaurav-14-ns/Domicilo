@@ -11,6 +11,7 @@ export type Property = {
   city: string;
   state: string;
   priceMonthly: number;
+  pincode: string;
   amenities: string[];
   description: string;
   images: string[];

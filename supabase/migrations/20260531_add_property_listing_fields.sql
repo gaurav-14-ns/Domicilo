@@ -3,6 +3,7 @@ alter table public.properties
   add column if not exists city text not null default '',
   add column if not exists state text not null default '',
   add column if not exists price_monthly numeric not null default 0 check (price_monthly >= 0),
+  add column if not exists pincode text not null default '',
   add column if not exists amenities text[] not null default '{}',
   add column if not exists description text not null default '',
   add column if not exists images text[] not null default '{}',

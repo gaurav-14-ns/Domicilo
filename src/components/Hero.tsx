@@ -1,4 +1,4 @@
-import { ArrowRight, Sparkles, ShieldCheck, IndianRupee } from "lucide-react";
+import { ArrowRight, Sparkles, ShieldCheck, IndianRupee, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -38,7 +38,11 @@ export const Hero = () => {
               Start 14-day royal trial
               <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
             </Button>
-            <Button variant="outline" size="xl" className="w-full sm:w-auto text-base" onClick={() => nav("/#features")}>
+            <Button variant="outline" size="xl" className="w-full sm:w-auto text-base" onClick={() => nav("/properties")}>
+              <Home className="h-4 w-4 mr-1" />
+              Browse Properties
+            </Button>
+            <Button variant="outline" size="xl" className="w-full sm:w-auto text-base hidden sm:inline-flex" onClick={() => nav("/#pricing")}>
               <IndianRupee className="h-4 w-4 mr-1" />
               See pricing
             </Button>

@@ -53,6 +53,7 @@ const mapProperty = (r: any, tenants: any[], txs: any[]): Property => {
     revenue,
     city: r.city ?? "",
     state: r.state ?? "",
+    pincode: r.pincode ?? "",
     priceMonthly: Number(r.price_monthly) || 0,
     amenities: r.amenities ?? [],
     description: r.description ?? "",
@@ -142,7 +143,7 @@ type Updater<T> = (prev: T) => T;
 
 type AddPropertyInput = {
   name: string; address: string; units: number;
-  city?: string; state?: string; priceMonthly?: number;
+  city?: string; state?: string; pincode?: string; priceMonthly?: number;
   amenities?: string[]; description?: string; images?: string[];
   available?: boolean; bedrooms?: number; bathrooms?: number; propertyType?: string;
 };
@@ -728,6 +729,7 @@ const mountedRef =
       units: p.units,
       city: p.city ?? "",
       state: p.state ?? "",
+      pincode: p.pincode ?? "",
       price_monthly: p.priceMonthly ?? 0,
       amenities: p.amenities ?? [],
       description: p.description ?? "",
@@ -755,6 +757,7 @@ const updateProperty = useCallback(async (id: string, patch: Partial<Property>) 
     if (patch.units !== undefined) dbPatch.units = patch.units;
     if (patch.city !== undefined) dbPatch.city = patch.city;
     if (patch.state !== undefined) dbPatch.state = patch.state;
+    if (patch.pincode !== undefined) dbPatch.pincode = patch.pincode;
     if (patch.priceMonthly !== undefined) dbPatch.price_monthly = patch.priceMonthly;
     if (patch.amenities !== undefined) dbPatch.amenities = patch.amenities;
     if (patch.description !== undefined) dbPatch.description = patch.description;
