@@ -116,11 +116,11 @@ export default function ResetPassword() {
       }
 
       if (
-        password.length < 8
+        password.length < 6
       ) {
 
         toast.error(
-          "Password must be at least 8 characters."
+          "Password must be at least 6 characters."
         );
 
         return;

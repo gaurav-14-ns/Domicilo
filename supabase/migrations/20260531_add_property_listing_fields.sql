@@ -13,6 +13,7 @@ alter table public.properties
 
 -- Allow public (anon) read access to non-owner_id fields for listings
 -- Only shows properties that are marked available
+drop policy if exists "Anyone can view available properties" on public.properties;
 create policy "Anyone can view available properties"
   on public.properties
   for select

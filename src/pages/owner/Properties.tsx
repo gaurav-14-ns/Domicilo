@@ -235,17 +235,6 @@ export default function Properties() {
         ) || 0
       );
 
-    const occupied =
-      Math.min(
-        units,
-        Math.max(
-          0,
-          Number(
-            form.occupied
-          ) || 0
-        )
-      );
-
     const city = form.city.trim();
     const state = form.state.trim();
     const priceMonthly = Number(form.priceMonthly) || 0;
