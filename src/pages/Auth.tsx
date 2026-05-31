@@ -527,20 +527,26 @@ useEffect(() => {
     };
 
   return (
-    <div className="min-h-screen grid place-items-center bg-sunset bg-skyline p-4">
+    <div className="min-h-screen grid place-items-center bg-sunset bg-skyline p-4 relative overflow-hidden">
+      <div className="absolute inset-0 pattern-jaali opacity-30" aria-hidden />
+      <div className="absolute top-1/4 left-1/4 h-72 w-72 bg-primary/10 blur-[150px] rounded-full animate-pulse-glow" aria-hidden />
+      <div className="absolute bottom-1/4 right-1/4 h-48 w-48 bg-amber-500/10 blur-[120px] rounded-full animate-pulse-glow" aria-hidden style={{ animationDelay: "1s" }} />
 
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md relative">
 
         {recoveryMode ? (
 
   <div className="flex flex-col items-center justify-center mb-8">
-    <img
-      src="/favicon.png"
-      alt="Domicilo"
-      className="h-24 w-24 rounded-[2rem] object-cover shadow-glow mx-auto"
-    />
+    <div className="relative">
+      <div className="absolute -inset-4 rounded-full bg-primary/20 blur-2xl animate-pulse-glow" />
+      <img
+        src="/favicon.png"
+        alt="Domicilo"
+        className="h-24 w-24 rounded-[2rem] object-cover shadow-glow mx-auto relative"
+      />
+    </div>
 
-    <p className="text-lg font-display font-bold mt-2">
+    <p className="text-lg font-display font-bold mt-3 tracking-wide">
       Domicilo
     </p>
   </div>
@@ -551,13 +557,16 @@ useEffect(() => {
     to="/"
     className="flex flex-col items-center justify-center font-display font-bold text-lg mb-8"
   >
-    <img
-      src="/favicon.png"
-      alt="Domicilo"
-      className="h-24 w-24 rounded-[2rem] object-cover shadow-glow mx-auto"
-    />
+    <div className="relative">
+      <div className="absolute -inset-4 rounded-full bg-primary/20 blur-2xl animate-pulse-glow" />
+      <img
+        src="/favicon.png"
+        alt="Domicilo"
+        className="h-24 w-24 rounded-[2rem] object-cover shadow-glow mx-auto relative"
+      />
+    </div>
 
-    <p className="mt-2">
+    <p className="mt-3 tracking-wide text-gold-shimmer">
       Domicilo
     </p>
   </Link>

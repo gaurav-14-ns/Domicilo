@@ -140,14 +140,16 @@ export default function BrowseProperties() {
       {/* Header */}
       <div className="bg-gradient-primary py-16 md:py-24 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 25% 25%, white 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
+        <div className="absolute top-1/3 left-1/4 h-48 w-48 bg-amber-500/20 blur-[120px] rounded-full animate-pulse-glow" aria-hidden />
+        <div className="absolute bottom-0 right-1/4 h-32 w-32 bg-primary/20 blur-[100px] rounded-full animate-pulse-glow" aria-hidden style={{ animationDelay: "1s" }} />
         <div className="container relative">
           <AnimatedSection className="text-center">
             <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-primary-foreground/80 mb-3 font-display">
-              <Home className="h-3.5 w-3.5" />
+              <Crown className="h-3.5 w-3.5 text-amber-400" />
               Find Your Home
             </div>
-            <h1 className="font-display text-4xl md:text-6xl font-bold text-primary-foreground text-balance">
-              Browse Properties
+            <h1 className="font-display text-4xl md:text-6xl font-bold text-balance">
+              Browse <span className="text-gold-shimmer">Properties</span>
             </h1>
             <p className="mt-4 text-primary-foreground/80 text-lg max-w-2xl mx-auto font-alt">
               Discover premium rental properties across India. Your next home awaits.
@@ -314,7 +316,7 @@ export default function BrowseProperties() {
               {listings.map((l) => (
                 <div
                   key={l.id}
-                  className="group rounded-xl border border-border/60 bg-gradient-card overflow-hidden hover-lift-premium cursor-pointer"
+                  className="group rounded-xl border border-border/60 bg-gradient-card overflow-hidden hover-lift-premium cursor-pointer transition-all duration-300 hover:border-primary/30"
                   onClick={() => setSelectedListing(l)}
                 >
                   {/* Header image area */}

@@ -2,6 +2,55 @@ import { ArrowRight, Sparkles, ShieldCheck, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
+const statCards = [
+  { l: "Active tenants", v: "1,284", d: "+12.4%" },
+  { l: "Monthly revenue", v: "₹18.4L", d: "+8.1%" },
+  { l: "Occupancy", v: "94.2%", d: "+2.3%" },
+  { l: "Pending dues", v: "₹3.2L", d: "−18%" },
+];
+
+const DashboardMock = () => (
+  <div className="grid grid-cols-12 gap-4 p-4 md:p-6">
+    <aside className="hidden md:flex col-span-2 flex-col gap-1.5">
+      {["Overview", "Properties", "Tenants", "Rooms", "Billing", "Reports", "Settings"].map((i, idx) => (
+        <div key={i} className={`px-3 py-2 rounded-lg text-xs font-medium font-alt tracking-wide ${idx === 0 ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground transition-smooth"}`}>{i}</div>
+      ))}
+    </aside>
+    <div className="col-span-12 md:col-span-10 space-y-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {statCards.map((k) => (
+          <div key={k.l} className="rounded-xl border border-border/40 bg-background/30 p-3 transition-smooth hover:bg-background/50">
+            <div className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">{k.l}</div>
+            <div className="mt-1 text-xl md:text-2xl font-bold font-display">{k.v}</div>
+            <div className={`text-[10px] font-medium mt-1 ${k.d.startsWith("+") ? "text-primary" : "text-destructive"}`}>{k.d}</div>
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="md:col-span-2 rounded-xl border border-border/40 bg-background/30 p-4 h-48">
+          <div className="text-xs font-medium font-display mb-3 tracking-wide">Revenue · last 6 months</div>
+          <div className="flex items-end gap-2 h-32">
+            {[40, 65, 50, 78, 72, 92].map((h, i) => (
+              <div key={i} className="flex-1 rounded-t-md bg-gradient-primary opacity-70 hover:opacity-100 transition-smooth cursor-pointer" style={{ height: `${h}%` }} />
+            ))}
+          </div>
+        </div>
+        <div className="rounded-xl border border-border/40 bg-background/30 p-4 h-48">
+          <div className="text-xs font-medium font-display mb-3 tracking-wide">Recent transactions</div>
+          <div className="space-y-2">
+            {[["Sara M.", "+₹1,200"], ["Apt 4B", "+₹950"], ["John D.", "−₹50"], ["Tower A", "+₹2,100"]].map(([n, a]) => (
+              <div key={n} className="flex items-center justify-between text-xs py-0.5">
+                <span className="text-muted-foreground font-alt">{n}</span>
+                <span className={`font-medium ${a.startsWith("+") ? "text-green-600 dark:text-green-400" : "text-destructive"}`}>{a}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
 export const Hero = () => {
   const nav = useNavigate();
   return (
@@ -9,6 +58,7 @@ export const Hero = () => {
       <div className="absolute inset-0 pattern-jaali opacity-40" aria-hidden />
       <div className="absolute top-1/4 left-1/3 h-96 w-96 bg-primary/20 blur-[150px] rounded-full animate-pulse-glow" aria-hidden />
       <div className="absolute bottom-0 right-1/4 h-64 w-64 bg-primary/10 blur-[100px] rounded-full" aria-hidden />
+      <div className="absolute top-1/3 right-1/4 h-48 w-48 bg-amber-500/10 blur-[120px] rounded-full animate-pulse-glow" aria-hidden style={{ animationDelay: "1s" }} />
       <div className="container relative">
         <div className="mx-auto max-w-4xl text-center animate-fade-up">
           <div className="mb-8 flex items-center justify-center gap-3">
@@ -27,7 +77,7 @@ export const Hero = () => {
           </div>
           <h1 className="font-display text-4xl sm:text-5xl md:text-7xl font-bold leading-[1.08] tracking-tight">
             Manage every property with{" "}
-            <span className="text-gold-shimmer">royal command.</span>
+            <span className="text-gold-shimmer bg-clip-text">royal command.</span>
           </h1>
           <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-alt">
             Domicilo gives property owners, tenants, and managers a unified,
@@ -67,50 +117,3 @@ export const Hero = () => {
     </section>
   );
 };
-
-const DashboardMock = () => (
-  <div className="grid grid-cols-12 gap-4 p-4 md:p-6">
-    <aside className="hidden md:flex col-span-2 flex-col gap-1.5">
-      {["Overview", "Properties", "Tenants", "Rooms", "Billing", "Reports", "Settings"].map((i, idx) => (
-        <div key={i} className={`px-3 py-2 rounded-lg text-xs font-medium font-alt tracking-wide ${idx === 0 ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground transition-smooth"}`}>{i}</div>
-      ))}
-    </aside>
-    <div className="col-span-12 md:col-span-10 space-y-4">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {[
-          { l: "Active tenants", v: "1,284", d: "+12.4%" },
-          { l: "Monthly revenue", v: "₹18.4L", d: "+8.1%" },
-          { l: "Occupancy", v: "94.2%", d: "+2.3%" },
-          { l: "Pending dues", v: "₹3.2L", d: "−18%" },
-        ].map((k) => (
-          <div key={k.l} className="stat-card">
-            <div className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">{k.l}</div>
-            <div className="mt-1 text-xl md:text-2xl font-bold font-display">{k.v}</div>
-            <div className={`text-[10px] font-medium mt-1 ${k.d.startsWith("+") ? "text-primary" : "text-destructive"}`}>{k.d}</div>
-          </div>
-        ))}
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <div className="md:col-span-2 rounded-xl border border-border/40 bg-background/40 p-4 h-48">
-          <div className="text-xs font-medium font-display mb-3 tracking-wide">Revenue · last 6 months</div>
-          <div className="flex items-end gap-2 h-32">
-            {[40, 65, 50, 78, 72, 92].map((h, i) => (
-              <div key={i} className="flex-1 rounded-t-md bg-gradient-primary opacity-70 hover:opacity-100 transition-smooth cursor-pointer" style={{ height: `${h}%` }} />
-            ))}
-          </div>
-        </div>
-        <div className="rounded-xl border border-border/40 bg-background/40 p-4 h-48">
-          <div className="text-xs font-medium font-display mb-3 tracking-wide">Recent transactions</div>
-          <div className="space-y-2">
-            {[["Sara M.", "+₹1,200"], ["Apt 4B", "+₹950"], ["John D.", "−₹50"], ["Tower A", "+₹2,100"]].map(([n, a]) => (
-              <div key={n} className="flex items-center justify-between text-xs py-0.5">
-                <span className="text-muted-foreground font-alt">{n}</span>
-                <span className={`font-medium ${a.startsWith("+") ? "text-green-600 dark:text-green-400" : "text-destructive"}`}>{a}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-);

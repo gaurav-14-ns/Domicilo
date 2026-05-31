@@ -15,6 +15,7 @@ type Props = {
 
 type State = {
   hasError: boolean;
+  error?: any;
 };
 
 export class AppErrorBoundary extends React.Component<
@@ -31,9 +32,12 @@ export class AppErrorBoundary extends React.Component<
     };
   }
 
-  static getDerivedStateFromError() {
+  static getDerivedStateFromError(
+    error: any
+  ) {
     return {
       hasError: true,
+      error,
     };
   }
 
@@ -59,31 +63,52 @@ export class AppErrorBoundary extends React.Component<
     if (
       this.state.hasError
     ) {
+      const msg =
+        this.state.error
+          ?.message ??
+        "The application encountered an unexpected error.";
+
       return (
-        <div className="min-h-screen flex items-center justify-center p-6 bg-background">
-          <div className="w-full max-w-md rounded-2xl border border-border bg-card p-8 text-center shadow-lg">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10 text-destructive">
-              <AlertTriangle className="h-7 w-7" />
+        <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+          <div className="w-full max-w-lg rounded-2xl border border-border/60 bg-gradient-card p-8 text-center shadow-elegant">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+              <AlertTriangle className="h-8 w-8" />
             </div>
 
-            <h1 className="text-2xl font-bold font-display">
+            <h1 className="text-2xl font-bold font-display tracking-tight">
               Something went wrong
             </h1>
 
-            <p className="mt-2 text-sm text-muted-foreground">
-              The application encountered an unexpected error.
-              Reload the page to continue.
+            <p className="mt-2 text-sm text-muted-foreground font-alt leading-relaxed">
+              {msg}
             </p>
 
-            <Button
-              className="mt-6 w-full"
-              onClick={
-                this.reload
-              }
-            >
-              <RefreshCw className="h-4 w-4" />
-              Reload application
-            </Button>
+            <p className="mt-1 text-xs text-muted-foreground/60 font-mono">
+              Please check the browser console (F12) for full details.
+            </p>
+
+            <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
+              <Button
+                className="w-full sm:w-auto"
+                onClick={
+                  this.reload
+                }
+              >
+                <RefreshCw className="h-4 w-4" />
+                Reload application
+              </Button>
+
+              <Button
+                variant="outline"
+                className="w-full sm:w-auto"
+                onClick={() => {
+                  window.location.href =
+                    "/auth";
+                }}
+              >
+                Back to sign in
+              </Button>
+            </div>
           </div>
         </div>
       );
