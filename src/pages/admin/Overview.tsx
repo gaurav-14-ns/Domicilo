@@ -77,7 +77,7 @@ export default function AdminOverview() {
           .from("profiles")
           .select(`
             id,
-            status,
+            suspended,
             created_at
           `);
 
@@ -134,10 +134,9 @@ export default function AdminOverview() {
           .from("leads")
           .select(`
             id,
-            status,
             created_at
           `)
-          .neq("status", "closed");
+          .order("created_at", { ascending: false });
 
         // =====================================================
         // SUSPENDED ACCOUNTS
@@ -147,10 +146,10 @@ export default function AdminOverview() {
           .from("profiles")
           .select(`
             id,
-            status,
+            suspended,
             created_at
           `)
-          .eq("status", "suspended");
+          .eq("suspended", true);
 
         // =====================================================
         // CHURNED SUBSCRIPTIONS
@@ -282,7 +281,7 @@ export default function AdminOverview() {
           const hasSubscription = subscribedOwnerIds.has(profile.id);
 
           const isNotSuspended =
-            profile.status !== "suspended";
+            !profile.suspended;
 
           return (
             isOwner &&

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,7 +8,7 @@ import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Search, MapPin, Bed, Bath, Home, SlidersHorizontal, X, IndianRupee, Building2, CheckCircle2, Phone, Mail } from "lucide-react";
+import { Search, MapPin, Bed, Bath, Home, SlidersHorizontal, X, IndianRupee, Building2, CheckCircle2, Phone, Mail, Crown } from "lucide-react";
 import { AnimatedSection, AnimatedStagger } from "@/components/AnimatedSection";
 
 const AMENITIES = ["WiFi", "Parking", "AC", "Gym", "Pool", "Power Backup", "Security", "Lift"];
@@ -123,6 +124,19 @@ export default function BrowseProperties() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Top nav */}
+      <div className="border-b border-border/40 bg-background/80 backdrop-blur-xl sticky top-0 z-30">
+        <div className="container flex items-center justify-between h-14">
+          <Link to="/" className="flex items-center gap-2">
+            <img src="/favicon.png" alt="Domicilo" className="h-8 w-8 rounded-lg object-cover shadow-glow" />
+            <span className="font-display font-bold tracking-wide hidden sm:inline">Domicilo</span>
+          </Link>
+          <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-smooth font-alt">
+            Back to home
+          </Link>
+        </div>
+      </div>
+
       {/* Header */}
       <div className="bg-gradient-primary py-16 md:py-24 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 25% 25%, white 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
@@ -322,7 +336,7 @@ export default function BrowseProperties() {
                     <div className="absolute bottom-3 left-3">
                       <span className="text-sm font-bold text-primary-foreground bg-primary/90 px-3 py-1.5 rounded-lg font-num shadow-glow flex items-center gap-1">
                         <IndianRupee className="h-3 w-3" />
-                        {l.priceMonthly.toLocaleString("en-IN")}/mo
+                        {l.priceMonthly > 0 ? `${l.priceMonthly.toLocaleString("en-IN")}/mo` : "—"}
                       </span>
                     </div>
                   </div>
@@ -379,7 +393,7 @@ export default function BrowseProperties() {
                 <div className="grid grid-cols-3 gap-3">
                   <div className="rounded-lg bg-primary/5 border border-primary/10 p-3 text-center">
                     <IndianRupee className="h-4 w-4 mx-auto text-primary mb-1" />
-                    <div className="text-lg font-bold font-num text-primary">₹{selectedListing.priceMonthly.toLocaleString("en-IN")}</div>
+                    <div className="text-lg font-bold font-num text-primary">{selectedListing.priceMonthly > 0 ? `₹${selectedListing.priceMonthly.toLocaleString("en-IN")}` : "—"}</div>
                     <div className="text-[10px] text-muted-foreground">per month</div>
                   </div>
                   <div className="rounded-lg bg-primary/5 border border-primary/10 p-3 text-center">
@@ -448,6 +462,17 @@ export default function BrowseProperties() {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Footer */}
+      <footer className="border-t border-border/40 bg-muted/30">
+        <div className="container py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <Crown className="h-4 w-4 text-primary" />
+            <span className="font-display font-bold tracking-wide">Domicilo</span>
+          </div>
+          <p className="text-xs text-muted-foreground font-alt">&copy; 2026 Domicilo. All rights reserved.</p>
+        </div>
+      </footer>
     </div>
   );
 }

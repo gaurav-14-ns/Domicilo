@@ -149,7 +149,7 @@ export default function Users() {
             "profiles"
           )
           .select(
-            "id, email, full_name, status"
+            "id, email, full_name, suspended"
           );
 
       if (
@@ -278,8 +278,9 @@ export default function Users() {
                 "-",
 
               status:
-                p.status ??
-                "active",
+                p.suspended
+                  ? "suspended"
+                  : "active",
 
               propertyCount,
 

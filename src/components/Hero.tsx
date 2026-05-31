@@ -1,4 +1,4 @@
-import { ArrowRight, Sparkles, ShieldCheck, IndianRupee, Home } from "lucide-react";
+import { ArrowRight, Sparkles, ShieldCheck, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -41,10 +41,6 @@ export const Hero = () => {
             <Button variant="outline" size="xl" className="w-full sm:w-auto text-base" onClick={() => nav("/properties")}>
               <Home className="h-4 w-4 mr-1" />
               Browse Properties
-            </Button>
-            <Button variant="outline" size="xl" className="w-full sm:w-auto text-base hidden sm:inline-flex" onClick={() => nav("/#pricing")}>
-              <IndianRupee className="h-4 w-4 mr-1" />
-              See pricing
             </Button>
           </div>
           <div className="mt-8 flex items-center justify-center gap-2 text-xs text-muted-foreground">

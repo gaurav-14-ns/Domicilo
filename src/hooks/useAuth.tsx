@@ -322,13 +322,13 @@ const locale =
   data: profile,
 } = await supabase
   .from("profiles")
-  .select("status")
+  .select("suspended")
   .eq("id", u.id)
   .maybeSingle();
 
 if (
-  profile?.status ===
-  "suspended"
+  profile?.suspended ===
+  true
 ) {
   safeSetLoading(true);
 

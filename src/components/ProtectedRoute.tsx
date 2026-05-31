@@ -141,7 +141,7 @@ export const ProtectedRoute = ({
                 "profiles"
               )
               .select(
-                "status"
+                "suspended"
               )
               .eq(
                 "id",
@@ -179,17 +179,18 @@ export const ProtectedRoute = ({
             return;
           }
 
-          const status =
-            data?.status ??
-            "active";
+          const suspended =
+            data?.suspended ??
+            false;
 
           setAccountStatus(
-            status
+            suspended
+              ? "suspended"
+              : "active"
           );
 
           if (
-            status ===
-            "suspended"
+            suspended
           ) {
 
             toast.error(
@@ -304,11 +305,7 @@ export const ProtectedRoute = ({
     );
   }
 
-  if (
-    !user ||
-    accountStatus ===
-      "suspended"
-  ) {
+  if (!user) {
 
     return (
       <Navigate
