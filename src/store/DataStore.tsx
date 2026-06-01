@@ -302,6 +302,7 @@ const mountedRef =
     if (
       mountedRef.current
     ) {
+      setLoading(true);
       setError(null);
     }
 
@@ -717,16 +718,11 @@ const mountedRef =
   useEffect(() => {
     if (!user) {
       fetchedRef.current = false;
-      setLoading(false);
       return;
     }
-    if (!role) {
-      setLoading(true);
-      return;
-    }
+    if (!role) return;
     if (fetchedRef.current) return;
     fetchedRef.current = true;
-    setLoading(true);
     fetchAll();
   }, [user, role, fetchAll]);
 
