@@ -720,9 +720,13 @@ const mountedRef =
       fetchedRef.current = false;
       return;
     }
-    if (!role) return;
+    if (!role) {
+      setLoading(true);
+      return;
+    }
     if (fetchedRef.current) return;
     fetchedRef.current = true;
+    setLoading(true);
     fetchAll();
   }, [user, role, fetchAll]);
 
