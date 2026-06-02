@@ -471,7 +471,7 @@ const mountedRef =
         } = await supabase
           .from("tenants")
           .select("*")
-          .eq(
+          .ilike(
             "email",
             user.email
           );
@@ -1372,6 +1372,8 @@ const removeProperty = useCallback(async (id: string) => {
     return;
   }
 
+  try {
+
   let currencyCode = data.settings.currencyCode;
 
   let locale = data.settings.locale;
@@ -1417,48 +1419,55 @@ const removeProperty = useCallback(async (id: string) => {
     }
   }
 
-  await supabase
-    .from("transactions")
-    .insert({
+  const { error: insertError } =
+    await supabase
+      .from("transactions")
+      .insert({
 
-      owner_id:
-        user.id,
+        owner_id:
+          user.id,
 
-      tenant_id:
-        t.tenantId ||
-        null,
+        tenant_id:
+          t.tenantId ||
+          null,
 
-      property_id:
-        t.propertyId ||
-        null,
+        property_id:
+          t.propertyId ||
+          null,
 
-      date:
-        t.date ||
-        todayISO(),
+        date:
+          t.date ||
+          todayISO(),
 
-      type:
-        t.type,
+        type:
+          t.type,
 
-      amount:
-        t.amount,
+        amount:
+          t.amount,
 
-      currency_code:
-        currencyCode,
+        currency_code:
+          currencyCode,
 
-      locale:
-        locale,
+        locale:
+          locale,
 
-      status:
-        t.status,
+        status:
+          t.status,
 
-      note:
-        t.note ?? null,
+        note:
+          t.note ?? null,
 
-      auto:
-        !!t.auto,
-    });
+        auto:
+          !!t.auto,
+      });
 
-  await refresh();
+    if (insertError) throw insertError;
+
+    await refresh();
+
+  } catch (error: any) {
+    toast.error(error?.message || "Failed to add transaction.");
+  }
 
 }, [
   user,

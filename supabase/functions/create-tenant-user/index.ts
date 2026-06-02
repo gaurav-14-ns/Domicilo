@@ -179,28 +179,26 @@ const {
     // Create tenant profile
     // --------------------------------------------------
 
-    const {
-      error:
-        tenantProfileError,
-    } =
-      await supabase
-        .from(
-          "tenant_profiles"
-        )
-        .upsert({
+      const {
+        error:
+          tenantProfileError,
+      } =
+        await supabase
+          .from(
+            "tenant_profiles"
+          )
+          .upsert({
 
-          user_id:
-            userId,
+            user_id:
+              userId,
 
-          owner_id,
+            email:
+              normalizedEmail,
 
-          email:
-            normalizedEmail,
+            phone:
+              phone ?? "",
 
-          phone:
-            phone ?? "",
-
-        });
+          });
 
     if (
       tenantProfileError
