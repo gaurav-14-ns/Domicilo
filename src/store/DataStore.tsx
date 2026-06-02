@@ -188,7 +188,7 @@ const DataStoreContext = createContext<DataStoreContextValue | null>(null);
 export function DataStoreProvider({ children }: { children: ReactNode }) {
   const { user, role } = useAuth();
   const [data, setData] = useState<AppData>(initialData);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] =
   useState<string | null>(
     null
