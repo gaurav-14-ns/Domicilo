@@ -28,6 +28,7 @@ import { Crown } from "lucide-react";
 import { TrialBanner } from "@/components/TrialBanner";
 
 import { LoadingState } from "@/components/states/LoadingState";
+import { ErrorState } from "@/components/states/ErrorState";
 
 function DashboardContent({
   role,
@@ -43,6 +44,8 @@ function DashboardContent({
 
   const {
     loading,
+    error,
+    refresh,
   } = useDataStore();
 
   useEffect(() => {
@@ -60,6 +63,20 @@ function DashboardContent({
     return (
       <div className="min-h-screen w-full bg-background grid place-items-center">
         <LoadingState title="Loading your dashboard..." />
+      </div>
+    );
+  }
+
+  if (
+    error
+  ) {
+    return (
+      <div className="min-h-screen w-full bg-background grid place-items-center p-6">
+        <ErrorState
+          title="Could not load data"
+          description={error}
+          onRetry={refresh}
+        />
       </div>
     );
   }

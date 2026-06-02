@@ -213,7 +213,13 @@ export function DataStoreProvider({ children }: { children: ReactNode }) {
   useRef(false);
   const lastFetchedRoleRef =
   useRef<AppRole | null>(null);
-  
+  const loadingTimeoutRef =
+  useRef<
+    ReturnType<
+      typeof setTimeout
+    > | null
+  >(null);
+
   const realtimeRefreshTimeout =
   useRef<
     ReturnType<
@@ -720,6 +726,30 @@ export function DataStoreProvider({ children }: { children: ReactNode }) {
   }, [
     user,
   ]);
+
+  // Safety timeout: force loading false after 30s so the UI never hangs forever
+  useEffect(() => {
+    if (!loading) {
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
+        loadingTimeoutRef.current = null;
+      }
+      return;
+    }
+    loadingTimeoutRef.current = setTimeout(() => {
+      if (mountedRef.current) {
+        console.warn("[DataStore] loading timed out after 30s, forcing false");
+        setLoading(false);
+        setError("Loading took too long. Please try refreshing.");
+      }
+    }, 30000);
+    return () => {
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
+        loadingTimeoutRef.current = null;
+      }
+    };
+  }, [loading]);
 
   // First load: wait for both user and role, then fetch ONCE per role
   useEffect(() => {
