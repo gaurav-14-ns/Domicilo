@@ -38,6 +38,8 @@ export const AuthProvider = ({
   children: ReactNode;
 }) => {
   const mountedRef = useRef(true);
+  const fetchRolePromiseRef =
+    useRef<Promise<void> | null>(null);
 
   const [session, setSession] =
     useState<Session | null>(null);
@@ -87,16 +89,33 @@ export const AuthProvider = ({
     useCallback(
       async (
         u: User
-      ): Promise<AppRole> => {
+      ): Promise<{
+        role: AppRole;
+        suspended: boolean;
+      }> => {
         try {
-          const {
-            data: existing,
-            error,
-          } = await supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", u.id)
-            .maybeSingle();
+          const [
+            roleResult,
+            profileResult,
+          ] = await Promise.all([
+            supabase
+              .from("user_roles")
+              .select("role")
+              .eq("user_id", u.id)
+              .maybeSingle(),
+            supabase
+              .from("profiles")
+              .select(
+                "full_name, suspended"
+              )
+              .eq("id", u.id)
+              .maybeSingle(),
+          ]);
+
+          const existing =
+            roleResult.data;
+          const error =
+            roleResult.error;
 
           if (error) {
             console.error(
@@ -106,39 +125,40 @@ export const AuthProvider = ({
           }
 
           if (existing?.role) {
-            return existing.role as AppRole;
+            return {
+              role:
+                existing.role as AppRole,
+              suspended:
+                profileResult.data
+                  ?.suspended ===
+                true,
+            };
           }
 
-          const meta = (u.user_metadata ??
-  {}) as Record<
-  string,
-  any
->;
+          const profileData =
+            profileResult.data;
+          const meta =
+            (u.user_metadata ??
+              {}) as Record<
+              string,
+              any
+            >;
 
-const {
-  data: profileData,
-} = await supabase
-  .from("profiles")
-  .select("full_name")
-  .eq("id", u.id)
-  .maybeSingle();
+          const nextRole: AppRole =
+            (meta.role as AppRole) ||
+            "tenant";
 
-const nextRole: AppRole =
-  (meta.role as AppRole) ||
-  "tenant";
+          const fullName =
+            profileData?.full_name ||
+            meta.full_name ||
+            "";
 
-const fullName =
-  profileData?.full_name ||
-  meta.full_name ||
-  "";
+          const currency =
+            meta.currency_code ||
+            "INR";
 
-const currency =
-  meta.currency_code ||
-  "INR";
-
-const locale =
-  meta.locale ||
-  "en-IN";
+          const locale =
+            meta.locale || "en-IN";
 
           const operations = [];
 
@@ -297,14 +317,20 @@ const locale =
             }
           }
 
-          return nextRole;
+          return {
+            role: nextRole,
+            suspended: false,
+          };
         } catch (error) {
           console.error(
             "ensureUserRecords failed:",
             error
           );
 
-          return "tenant";
+          return {
+            role: "tenant",
+            suspended: false,
+          };
         }
       },
       []
@@ -313,22 +339,27 @@ const locale =
   const fetchRole =
     useCallback(
       async (u: User) => {
-        try {
-          const resolvedRole =
-            await ensureUserRecords(
-              u
-            );
-          const {
-  data: profile,
-} = await supabase
-  .from("profiles")
-  .select("suspended")
-  .eq("id", u.id)
-  .maybeSingle();
+        // Dedup: bootstrap + onAuthStateChange both call fetchRole during
+        // sign-in. Only the first runs; subsequent calls await its result.
+        if (fetchRolePromiseRef.current) {
+          await fetchRolePromiseRef.current.catch(
+            () => {}
+          );
+          return;
+        }
+
+        fetchRolePromiseRef.current =
+          (async () => {
+            const {
+              role: resolvedRole,
+              suspended,
+            } =
+              await ensureUserRecords(
+                u
+              );
 
 if (
-  profile?.suspended ===
-  true
+  suspended
 ) {
   safeSetLoading(true);
 
@@ -350,9 +381,14 @@ if (
   return;
 }
 
-          safeSetRole(
-            resolvedRole
-          );
+            safeSetRole(
+              resolvedRole
+            );
+          })();
+
+        try {
+          await fetchRolePromiseRef
+            .current;
         } catch (error) {
           console.error(
             "Role fetch failed:",
@@ -362,6 +398,9 @@ if (
           safeSetRole(
             "tenant"
           );
+        } finally {
+          fetchRolePromiseRef.current =
+            null;
         }
       },
       [ensureUserRecords]

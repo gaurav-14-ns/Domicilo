@@ -338,16 +338,20 @@ export function DataStoreProvider({ children }: { children: ReactNode }) {
           .maybeSingle();
 
       const commonProfile =
-        supabase
-          .from(
-            "tenant_profiles"
-          )
-          .select("*")
-          .eq(
-            "user_id",
-            user.id
-          )
-          .maybeSingle();
+        currentRole === "tenant"
+          ? supabase
+              .from(
+                "tenant_profiles"
+              )
+              .select("*")
+              .eq(
+                "user_id",
+                user.id
+              )
+              .maybeSingle()
+          : Promise.resolve({
+              data: null,
+            });
 
       let propertiesPromise,
         tenantsPromise,
