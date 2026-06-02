@@ -287,26 +287,28 @@ const mountedRef =
   // -------------------------------------------------------------------------
   // Fetch everything (scoped by RLS automatically).
   // -------------------------------------------------------------------------
- const fetchAll =
-  useCallback(async () => {
-    if (!user) {
-      if (
-        mountedRef.current
-      ) {
-        setData(
-          initialData
-        );
-      }
+  const fetchAll =
+   useCallback(async () => {
+     if (!user) {
+       if (
+         mountedRef.current
+       ) {
+         setData(
+           initialData
+         );
+       }
+       console.log("[DataStore] fetchAll: no user, skipped");
+       return;
+     }
 
-      return;
-    }
+     console.log("[DataStore] fetchAll: starting for role", roleRef.current, "user", user.id);
 
-    if (
-      mountedRef.current
-    ) {
-      setLoading(true);
-      setError(null);
-    }
+     if (
+       mountedRef.current
+     ) {
+       setLoading(true);
+       setError(null);
+     }
 
     try {
       const currentRole = roleRef.current;
@@ -618,6 +620,7 @@ const mountedRef =
       if (
         mountedRef.current
       ) {
+        console.log("[DataStore] fetchAll: setting data, props count", (properties ?? []).length, "tenants count", (tenants ?? []).length, "txs count", txRows.length);
         setData({
           properties: (
             properties ??
@@ -683,7 +686,7 @@ const mountedRef =
       error: any
     ) {
       console.error(
-        "DataStore fetch failed:",
+        "[DataStore] fetchAll FAILED:",
         error
       );
 
@@ -704,6 +707,7 @@ const mountedRef =
         );
       }
     } finally {
+      console.log("[DataStore] fetchAll: completed, setting loading=false");
       if (
         mountedRef.current
       ) {
@@ -718,18 +722,23 @@ const mountedRef =
 
   // First load: wait for both user and role, then fetch ONCE per role
   useEffect(() => {
+    console.log("[DataStore] effect: user=", !!user, "role=", role, "fetchedRef=", fetchedRef.current, "lastFetchedRoleRef=", lastFetchedRoleRef.current);
     if (!user) {
+      console.log("[DataStore] effect: no user, resetting fetchedRef");
       fetchedRef.current = false;
       return;
     }
     if (!role) {
+      console.log("[DataStore] effect: has user, no role yet, loading=true");
       setLoading(true);
       return;
     }
     // Re-fetch if role changed since last fetch (e.g. fallback "tenant" then resolved "owner")
     if (fetchedRef.current && lastFetchedRoleRef.current === role) {
+      console.log("[DataStore] effect: already fetched for this role, skipping");
       return;
     }
+    console.log("[DataStore] effect: proceeding with fetchAll for role", role);
     fetchedRef.current = true;
     lastFetchedRoleRef.current = role;
     setLoading(true);
