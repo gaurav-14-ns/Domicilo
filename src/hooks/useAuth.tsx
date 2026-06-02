@@ -38,8 +38,6 @@ export const AuthProvider = ({
   children: ReactNode;
 }) => {
   const mountedRef = useRef(true);
-  const fetchRolePromiseRef =
-    useRef<Promise<void> | null>(null);
 
   const [session, setSession] =
     useState<Session | null>(null);
@@ -315,15 +313,7 @@ const locale =
   const fetchRole =
     useCallback(
       async (u: User) => {
-        // Dedup: both bootstrap and onAuthStateChange call fetchRole for the
-        // same user during sign-in. Only one runs; the other awaits the result.
-        if (fetchRolePromiseRef.current) {
-          const p = fetchRolePromiseRef.current;
-          await p.catch(() => {});
-          return;
-        }
-
-        const run = async () => {
+        try {
           const resolvedRole =
             await ensureUserRecords(
               u
@@ -363,12 +353,6 @@ if (
           safeSetRole(
             resolvedRole
           );
-        };
-
-        const promise = run();
-        fetchRolePromiseRef.current = promise;
-        try {
-          await promise;
         } catch (error) {
           console.error(
             "Role fetch failed:",
@@ -378,8 +362,6 @@ if (
           safeSetRole(
             "tenant"
           );
-        } finally {
-          fetchRolePromiseRef.current = null;
         }
       },
       [ensureUserRecords]
