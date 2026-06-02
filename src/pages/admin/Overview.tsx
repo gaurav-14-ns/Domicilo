@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 
@@ -27,9 +27,12 @@ interface Metrics {
 
 export default function AdminOverview() {
   const [loading, setLoading] = useState(true);
+  const mountedRef = useRef(true);
 
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+  const [debouncedFrom, setDebouncedFrom] = useState("");
+  const [debouncedTo, setDebouncedTo] = useState("");
 
   const [metrics, setMetrics] = useState<Metrics>({
     activeOwners: 0,
@@ -45,20 +48,33 @@ export default function AdminOverview() {
   const resetFilters = () => {
     setFromDate("");
     setToDate("");
+    setDebouncedFrom("");
+    setDebouncedTo("");
   };
 
+  // Debounce: sync raw filter state to debounced state after 500ms of inactivity.
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedFrom(fromDate);
+      setDebouncedTo(toDate);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [fromDate, toDate]);
+
+  useEffect(() => {
+    mountedRef.current = true;
     const loadMetrics = async () => {
       try {
+        if (!mountedRef.current) return;
         setLoading(true);
 
         const applyDateFilter = (query: any) => {
-          if (fromDate) {
-            query = query.gte("created_at", fromDate);
+          if (debouncedFrom) {
+            query = query.gte("created_at", debouncedFrom);
           }
 
-          if (toDate) {
-            query = query.lte("created_at", `${toDate}T23:59:59`);
+          if (debouncedTo) {
+            query = query.lte("created_at", `${debouncedTo}T23:59:59`);
           }
 
           return query;
@@ -335,6 +351,7 @@ export default function AdminOverview() {
         // FINAL METRICS
         // =====================================================
 
+        if (!mountedRef.current) return;
         setMetrics({
           activeOwners: activeOwners.length,
 
@@ -365,7 +382,8 @@ export default function AdminOverview() {
     };
 
     loadMetrics();
-  }, [fromDate, toDate]);
+    return () => { mountedRef.current = false; };
+  }, [debouncedFrom, debouncedTo]);
 
   const cards = useMemo(
     () => [

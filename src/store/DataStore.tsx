@@ -198,12 +198,16 @@ export function DataStoreProvider({ children }: { children: ReactNode }) {
     null
   );
 
-const mountedRef =
+  const mountedRef =
   useRef(true);
 
   const roleRef =
   useRef(role);
   roleRef.current = role;
+
+  const userRef =
+  useRef(user);
+  userRef.current = user;
 
   const fetchedRef =
   useRef(false);
@@ -219,19 +223,21 @@ const mountedRef =
 
   // -------------------------------------------------------------------------
   // Periodic maintenance: auto-generate rent + overdue escalation.
-  // Runs every 30 minutes and on mount, but NOT on every data fetch.
+  // Uses refs so it does NOT trigger re-creation on user/role changes.
+  // Called from fetchAll (with fresh data) AND on a 30-min interval.
   // -------------------------------------------------------------------------
   const runMaintenance =
   useCallback(async () => {
-    if (!user || role !== "owner") return;
+    const uid = userRef.current?.id;
+    const r = roleRef.current;
+    if (!uid || r !== "owner") return;
     try {
-      // 1. Fetch raw data needed for maintenance
-      const { data: tenants } = await supabase.from("tenants").select("*").eq("owner_id", user.id).order("created_at", { ascending: true });
-      const { data: txs } = await supabase.from("transactions").select("*").eq("owner_id", user.id).order("date", { ascending: false });
-      const { data: properties } = await supabase.from("properties").select("*").eq("owner_id", user.id).order("created_at", { ascending: true });
+      const { data: tenants } = await supabase.from("tenants").select("*").eq("owner_id", uid).order("created_at", { ascending: true });
+      const { data: txs } = await supabase.from("transactions").select("*").eq("owner_id", uid).order("date", { ascending: false });
+      const { data: properties } = await supabase.from("properties").select("*").eq("owner_id", uid).order("created_at", { ascending: true });
       if (!tenants || !txs) return;
 
-      // 2. Auto-generate rent
+      // Auto-generate rent
       const current = monthKey(new Date());
       const existingKeys = new Set(
         txs
@@ -250,7 +256,7 @@ const mountedRef =
           if (existingKeys.has(key)) continue;
           if (t.status === "paused" && m === current) continue;
           additions.push({
-            owner_id: user.id,
+            owner_id: uid,
             tenant_id: t.id,
             property_id: t.property_id,
             date: `${m}-01`,
@@ -270,38 +276,35 @@ const mountedRef =
         if (rentErr && rentErr.code !== "23505") console.warn("auto-rent insert", rentErr);
       }
 
-      // 3. Overdue escalation
+      // Overdue escalation
       const overdueThreshold = new Date();
       overdueThreshold.setDate(overdueThreshold.getDate() - 7);
       const overdueIds = (txs ?? [])
         .filter((tx: any) => tx.status === "pending" && tx.date && new Date(tx.date) < overdueThreshold)
         .map((tx: any) => tx.id);
       if (overdueIds.length > 0) {
-        await supabase.from("transactions").update({ status: "overdue" }).eq("owner_id", user.id).in("id", overdueIds);
+        await supabase.from("transactions").update({ status: "overdue" }).eq("owner_id", uid).in("id", overdueIds);
       }
     } catch (e) {
       console.error("Maintenance task failed:", e);
     }
-  }, [user, role]);
+  }, []);
 
   // -------------------------------------------------------------------------
   // Fetch everything (scoped by RLS automatically).
   // -------------------------------------------------------------------------
   const fetchAll =
    useCallback(async () => {
-     if (!user) {
-       if (
-         mountedRef.current
-       ) {
-         setData(
-           initialData
-         );
-       }
-       console.log("[DataStore] fetchAll: no user, skipped");
-       return;
-     }
-
-     console.log("[DataStore] fetchAll: starting for role", roleRef.current, "user", user.id);
+      if (!user) {
+        if (
+          mountedRef.current
+        ) {
+          setData(
+            initialData
+          );
+        }
+        return;
+      }
 
      if (
        mountedRef.current
@@ -620,7 +623,6 @@ const mountedRef =
       if (
         mountedRef.current
       ) {
-        console.log("[DataStore] fetchAll: setting data, props count", (properties ?? []).length, "tenants count", (tenants ?? []).length, "txs count", txRows.length);
         setData({
           properties: (
             properties ??
@@ -707,7 +709,6 @@ const mountedRef =
         );
       }
     } finally {
-      console.log("[DataStore] fetchAll: completed, setting loading=false");
       if (
         mountedRef.current
       ) {
@@ -722,23 +723,18 @@ const mountedRef =
 
   // First load: wait for both user and role, then fetch ONCE per role
   useEffect(() => {
-    console.log("[DataStore] effect: user=", !!user, "role=", role, "fetchedRef=", fetchedRef.current, "lastFetchedRoleRef=", lastFetchedRoleRef.current);
     if (!user) {
-      console.log("[DataStore] effect: no user, resetting fetchedRef");
       fetchedRef.current = false;
       return;
     }
     if (!role) {
-      console.log("[DataStore] effect: has user, no role yet, loading=true");
       setLoading(true);
       return;
     }
     // Re-fetch if role changed since last fetch (e.g. fallback "tenant" then resolved "owner")
     if (fetchedRef.current && lastFetchedRoleRef.current === role) {
-      console.log("[DataStore] effect: already fetched for this role, skipping");
       return;
     }
-    console.log("[DataStore] effect: proceeding with fetchAll for role", role);
     fetchedRef.current = true;
     lastFetchedRoleRef.current = role;
     setLoading(true);
@@ -746,13 +742,15 @@ const mountedRef =
   }, [user, role, fetchAll]);
 
   // Periodic maintenance: auto-rent + overdue escalation every 30 min.
-  // Runs once on mount and then every 30 minutes thereafter.
+  // Runs immediately on mount for owners (to backfill rent transactions),
+  // then sets up a periodic check. runMaintenance has [] deps and uses refs,
+  // so calling it here does NOT cause re-renders or effect re-fires.
   useEffect(() => {
     if (!user || role !== "owner") return;
     runMaintenance();
     const interval = setInterval(runMaintenance, 30 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [user, role, runMaintenance]);
+  }, [user, role]);
 
   // Realtime: refetch on any owned/assigned data change so cross-portal edits sync.
   useEffect(() => {
