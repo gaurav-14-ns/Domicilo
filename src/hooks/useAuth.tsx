@@ -404,13 +404,18 @@ if (
             data.session
               ?.user
           ) {
-            fetchRole(
-              data
-                .session
-                .user
-            ).catch(
-              console.error
-            );
+            try {
+              await fetchRole(
+                data
+                  .session
+                  .user
+              );
+            } catch (error) {
+              console.error(
+                "Role fetch in bootstrap failed:",
+                error
+              );
+            }
           } else {
             safeSetRole(
               null
@@ -459,13 +464,16 @@ if (
             if (
               s?.user
             ) {
-              setTimeout(() => {
-                fetchRole(
+              try {
+                await fetchRole(
                   s.user
-                ).catch(
-                  console.error
                 );
-              }, 0);
+              } catch (error) {
+                console.error(
+                  "Role fetch in auth change failed:",
+                  error
+                );
+              }
             } else {
               safeSetRole(
                 null

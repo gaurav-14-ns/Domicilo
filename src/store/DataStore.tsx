@@ -2,7 +2,7 @@ import {
   createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, ReactNode,
 } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth, type AppRole } from "@/hooks/useAuth";
 import type {
   AppData, Property, Tenant, Transaction, AdminOrg, Settings, TenantProfile,
 } from "./types";
@@ -207,6 +207,8 @@ const mountedRef =
 
   const fetchedRef =
   useRef(false);
+  const lastFetchedRoleRef =
+  useRef<AppRole | null>(null);
   
   const realtimeRefreshTimeout =
   useRef<
@@ -714,7 +716,7 @@ const mountedRef =
     user,
   ]);
 
-  // First load: wait for both user and role, then fetch ONCE
+  // First load: wait for both user and role, then fetch ONCE per role
   useEffect(() => {
     if (!user) {
       fetchedRef.current = false;
@@ -724,8 +726,12 @@ const mountedRef =
       setLoading(true);
       return;
     }
-    if (fetchedRef.current) return;
+    // Re-fetch if role changed since last fetch (e.g. fallback "tenant" then resolved "owner")
+    if (fetchedRef.current && lastFetchedRoleRef.current === role) {
+      return;
+    }
     fetchedRef.current = true;
+    lastFetchedRoleRef.current = role;
     setLoading(true);
     fetchAll();
   }, [user, role, fetchAll]);
