@@ -188,7 +188,7 @@ const DataStoreContext = createContext<DataStoreContextValue | null>(null);
 export function DataStoreProvider({ children }: { children: ReactNode }) {
   const { user, role } = useAuth();
   const [data, setData] = useState<AppData>(initialData);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] =
   useState<string | null>(
     null
@@ -198,28 +198,18 @@ export function DataStoreProvider({ children }: { children: ReactNode }) {
     null
   );
 
-  const mountedRef =
+const mountedRef =
   useRef(true);
 
   const roleRef =
   useRef(role);
   roleRef.current = role;
 
-  const userRef =
-  useRef(user);
-  userRef.current = user;
-
   const fetchedRef =
   useRef(false);
   const lastFetchedRoleRef =
   useRef<AppRole | null>(null);
-  const loadingTimeoutRef =
-  useRef<
-    ReturnType<
-      typeof setTimeout
-    > | null
-  >(null);
-
+  
   const realtimeRefreshTimeout =
   useRef<
     ReturnType<
@@ -229,21 +219,19 @@ export function DataStoreProvider({ children }: { children: ReactNode }) {
 
   // -------------------------------------------------------------------------
   // Periodic maintenance: auto-generate rent + overdue escalation.
-  // Uses refs so it does NOT trigger re-creation on user/role changes.
-  // Called from fetchAll (with fresh data) AND on a 30-min interval.
+  // Runs every 30 minutes and on mount, but NOT on every data fetch.
   // -------------------------------------------------------------------------
   const runMaintenance =
   useCallback(async () => {
-    const uid = userRef.current?.id;
-    const r = roleRef.current;
-    if (!uid || r !== "owner") return;
+    if (!user || role !== "owner") return;
     try {
-      const { data: tenants } = await supabase.from("tenants").select("*").eq("owner_id", uid).order("created_at", { ascending: true });
-      const { data: txs } = await supabase.from("transactions").select("*").eq("owner_id", uid).order("date", { ascending: false });
-      const { data: properties } = await supabase.from("properties").select("*").eq("owner_id", uid).order("created_at", { ascending: true });
+      // 1. Fetch raw data needed for maintenance
+      const { data: tenants } = await supabase.from("tenants").select("*").eq("owner_id", user.id).order("created_at", { ascending: true });
+      const { data: txs } = await supabase.from("transactions").select("*").eq("owner_id", user.id).order("date", { ascending: false });
+      const { data: properties } = await supabase.from("properties").select("*").eq("owner_id", user.id).order("created_at", { ascending: true });
       if (!tenants || !txs) return;
 
-      // Auto-generate rent
+      // 2. Auto-generate rent
       const current = monthKey(new Date());
       const existingKeys = new Set(
         txs
@@ -262,7 +250,7 @@ export function DataStoreProvider({ children }: { children: ReactNode }) {
           if (existingKeys.has(key)) continue;
           if (t.status === "paused" && m === current) continue;
           additions.push({
-            owner_id: uid,
+            owner_id: user.id,
             tenant_id: t.id,
             property_id: t.property_id,
             date: `${m}-01`,
@@ -282,42 +270,43 @@ export function DataStoreProvider({ children }: { children: ReactNode }) {
         if (rentErr && rentErr.code !== "23505") console.warn("auto-rent insert", rentErr);
       }
 
-      // Overdue escalation
+      // 3. Overdue escalation
       const overdueThreshold = new Date();
       overdueThreshold.setDate(overdueThreshold.getDate() - 7);
       const overdueIds = (txs ?? [])
         .filter((tx: any) => tx.status === "pending" && tx.date && new Date(tx.date) < overdueThreshold)
         .map((tx: any) => tx.id);
       if (overdueIds.length > 0) {
-        await supabase.from("transactions").update({ status: "overdue" }).eq("owner_id", uid).in("id", overdueIds);
+        await supabase.from("transactions").update({ status: "overdue" }).eq("owner_id", user.id).in("id", overdueIds);
       }
     } catch (e) {
       console.error("Maintenance task failed:", e);
     }
-  }, []);
+  }, [user, role]);
 
   // -------------------------------------------------------------------------
   // Fetch everything (scoped by RLS automatically).
   // -------------------------------------------------------------------------
-  const fetchAll =
-   useCallback(async () => {
-      if (!user) {
-        if (
-          mountedRef.current
-        ) {
-          setData(
-            initialData
-          );
-        }
-        return;
+ const fetchAll =
+  useCallback(async () => {
+    if (!user) {
+      if (
+        mountedRef.current
+      ) {
+        setData(
+          initialData
+        );
       }
 
-     if (
-       mountedRef.current
-     ) {
-       setLoading(true);
-       setError(null);
-     }
+      return;
+    }
+
+    if (
+      mountedRef.current
+    ) {
+      setLoading(true);
+      setError(null);
+    }
 
     try {
       const currentRole = roleRef.current;
@@ -338,20 +327,16 @@ export function DataStoreProvider({ children }: { children: ReactNode }) {
           .maybeSingle();
 
       const commonProfile =
-        currentRole === "tenant"
-          ? supabase
-              .from(
-                "tenant_profiles"
-              )
-              .select("*")
-              .eq(
-                "user_id",
-                user.id
-              )
-              .maybeSingle()
-          : Promise.resolve({
-              data: null,
-            });
+        supabase
+          .from(
+            "tenant_profiles"
+          )
+          .select("*")
+          .eq(
+            "user_id",
+            user.id
+          )
+          .maybeSingle();
 
       let propertiesPromise,
         tenantsPromise,
@@ -698,7 +683,7 @@ export function DataStoreProvider({ children }: { children: ReactNode }) {
       error: any
     ) {
       console.error(
-        "[DataStore] fetchAll FAILED:",
+        "DataStore fetch failed:",
         error
       );
 
@@ -731,30 +716,6 @@ export function DataStoreProvider({ children }: { children: ReactNode }) {
     user,
   ]);
 
-  // Safety timeout: force loading false after 30s so the UI never hangs forever
-  useEffect(() => {
-    if (!loading) {
-      if (loadingTimeoutRef.current) {
-        clearTimeout(loadingTimeoutRef.current);
-        loadingTimeoutRef.current = null;
-      }
-      return;
-    }
-    loadingTimeoutRef.current = setTimeout(() => {
-      if (mountedRef.current) {
-        console.warn("[DataStore] loading timed out after 30s, forcing false");
-        setLoading(false);
-        setError("Loading took too long. Please try refreshing.");
-      }
-    }, 30000);
-    return () => {
-      if (loadingTimeoutRef.current) {
-        clearTimeout(loadingTimeoutRef.current);
-        loadingTimeoutRef.current = null;
-      }
-    };
-  }, [loading]);
-
   // First load: wait for both user and role, then fetch ONCE per role
   useEffect(() => {
     if (!user) {
@@ -776,15 +737,13 @@ export function DataStoreProvider({ children }: { children: ReactNode }) {
   }, [user, role, fetchAll]);
 
   // Periodic maintenance: auto-rent + overdue escalation every 30 min.
-  // Runs immediately on mount for owners (to backfill rent transactions),
-  // then sets up a periodic check. runMaintenance has [] deps and uses refs,
-  // so calling it here does NOT cause re-renders or effect re-fires.
+  // Runs once on mount and then every 30 minutes thereafter.
   useEffect(() => {
     if (!user || role !== "owner") return;
     runMaintenance();
     const interval = setInterval(runMaintenance, 30 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [user, role]);
+  }, [user, role, runMaintenance]);
 
   // Realtime: refetch on any owned/assigned data change so cross-portal edits sync.
   useEffect(() => {

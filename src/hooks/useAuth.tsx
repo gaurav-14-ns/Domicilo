@@ -87,33 +87,16 @@ export const AuthProvider = ({
     useCallback(
       async (
         u: User
-      ): Promise<{
-        role: AppRole;
-        suspended: boolean;
-      }> => {
+      ): Promise<AppRole> => {
         try {
-          const [
-            roleResult,
-            profileResult,
-          ] = await Promise.all([
-            supabase
-              .from("user_roles")
-              .select("role")
-              .eq("user_id", u.id)
-              .maybeSingle(),
-            supabase
-              .from("profiles")
-              .select(
-                "full_name, suspended"
-              )
-              .eq("id", u.id)
-              .maybeSingle(),
-          ]);
-
-          const existing =
-            roleResult.data;
-          const error =
-            roleResult.error;
+          const {
+            data: existing,
+            error,
+          } = await supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", u.id)
+            .maybeSingle();
 
           if (error) {
             console.error(
@@ -123,40 +106,39 @@ export const AuthProvider = ({
           }
 
           if (existing?.role) {
-            return {
-              role:
-                existing.role as AppRole,
-              suspended:
-                profileResult.data
-                  ?.suspended ===
-                true,
-            };
+            return existing.role as AppRole;
           }
 
-          const profileData =
-            profileResult.data;
-          const meta =
-            (u.user_metadata ??
-              {}) as Record<
-              string,
-              any
-            >;
+          const meta = (u.user_metadata ??
+  {}) as Record<
+  string,
+  any
+>;
 
-          const nextRole: AppRole =
-            (meta.role as AppRole) ||
-            "tenant";
+const {
+  data: profileData,
+} = await supabase
+  .from("profiles")
+  .select("full_name")
+  .eq("id", u.id)
+  .maybeSingle();
 
-          const fullName =
-            profileData?.full_name ||
-            meta.full_name ||
-            "";
+const nextRole: AppRole =
+  (meta.role as AppRole) ||
+  "tenant";
 
-          const currency =
-            meta.currency_code ||
-            "INR";
+const fullName =
+  profileData?.full_name ||
+  meta.full_name ||
+  "";
 
-          const locale =
-            meta.locale || "en-IN";
+const currency =
+  meta.currency_code ||
+  "INR";
+
+const locale =
+  meta.locale ||
+  "en-IN";
 
           const operations = [];
 
@@ -315,20 +297,14 @@ export const AuthProvider = ({
             }
           }
 
-          return {
-            role: nextRole,
-            suspended: false,
-          };
+          return nextRole;
         } catch (error) {
           console.error(
             "ensureUserRecords failed:",
             error
           );
 
-          return {
-            role: "tenant",
-            suspended: false,
-          };
+          return "tenant";
         }
       },
       []
@@ -338,16 +314,21 @@ export const AuthProvider = ({
     useCallback(
       async (u: User) => {
         try {
-          const {
-            role: resolvedRole,
-            suspended,
-          } =
+          const resolvedRole =
             await ensureUserRecords(
               u
             );
+          const {
+  data: profile,
+} = await supabase
+  .from("profiles")
+  .select("suspended")
+  .eq("id", u.id)
+  .maybeSingle();
 
 if (
-  suspended
+  profile?.suspended ===
+  true
 ) {
   safeSetLoading(true);
 
