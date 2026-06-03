@@ -38,8 +38,6 @@ export const AuthProvider = ({
   children: ReactNode;
 }) => {
   const mountedRef = useRef(true);
-  const fetchRolePromiseRef =
-    useRef<Promise<void> | null>(null);
 
   const [session, setSession] =
     useState<Session | null>(null);
@@ -339,24 +337,14 @@ export const AuthProvider = ({
   const fetchRole =
     useCallback(
       async (u: User) => {
-        // Dedup: bootstrap + onAuthStateChange both call fetchRole during
-        // sign-in. Only the first runs; subsequent calls await its result.
-        if (fetchRolePromiseRef.current) {
-          await fetchRolePromiseRef.current.catch(
-            () => {}
-          );
-          return;
-        }
-
-        fetchRolePromiseRef.current =
-          (async () => {
-            const {
-              role: resolvedRole,
-              suspended,
-            } =
-              await ensureUserRecords(
-                u
-              );
+        try {
+          const {
+            role: resolvedRole,
+            suspended,
+          } =
+            await ensureUserRecords(
+              u
+            );
 
 if (
   suspended
@@ -381,14 +369,9 @@ if (
   return;
 }
 
-            safeSetRole(
-              resolvedRole
-            );
-          })();
-
-        try {
-          await fetchRolePromiseRef
-            .current;
+          safeSetRole(
+            resolvedRole
+          );
         } catch (error) {
           console.error(
             "Role fetch failed:",
@@ -398,9 +381,6 @@ if (
           safeSetRole(
             "tenant"
           );
-        } finally {
-          fetchRolePromiseRef.current =
-            null;
         }
       },
       [ensureUserRecords]
