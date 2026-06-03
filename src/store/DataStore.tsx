@@ -188,7 +188,7 @@ const DataStoreContext = createContext<DataStoreContextValue | null>(null);
 export function DataStoreProvider({ children }: { children: ReactNode }) {
   const { user, role } = useAuth();
   const [data, setData] = useState<AppData>(initialData);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] =
   useState<string | null>(
     null
@@ -735,6 +735,37 @@ const mountedRef =
     setLoading(true);
     fetchAll();
   }, [user, role, fetchAll]);
+
+  // Safety timeout: show error after 30 s of loading
+  const loadingTimeoutRef =
+    useRef<
+      ReturnType<
+        typeof setTimeout
+      > | null
+    >(null);
+
+  useEffect(() => {
+    if (loading) {
+      loadingTimeoutRef.current =
+        setTimeout(() => {
+          if (mountedRef.current) {
+            setError(
+              "Taking longer than expected. Please check your connection."
+            );
+            setLoading(false);
+          }
+        }, 30000);
+    }
+    return () => {
+      if (
+        loadingTimeoutRef.current
+      ) {
+        clearTimeout(
+          loadingTimeoutRef.current
+        );
+      }
+    };
+  }, [loading]);
 
   // Periodic maintenance: auto-rent + overdue escalation every 30 min.
   // Runs once on mount and then every 30 minutes thereafter.

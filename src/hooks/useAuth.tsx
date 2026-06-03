@@ -89,14 +89,28 @@ export const AuthProvider = ({
         u: User
       ): Promise<AppRole> => {
         try {
+          const [roleResult, profileResult] =
+            await Promise.all([
+              supabase
+                .from("user_roles")
+                .select("role")
+                .eq("user_id", u.id)
+                .maybeSingle(),
+              supabase
+                .from("profiles")
+                .select("full_name")
+                .eq("id", u.id)
+                .maybeSingle(),
+            ]);
+
           const {
             data: existing,
             error,
-          } = await supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", u.id)
-            .maybeSingle();
+          } = roleResult;
+
+          const {
+            data: profileData,
+          } = profileResult;
 
           if (error) {
             console.error(
@@ -114,14 +128,6 @@ export const AuthProvider = ({
   string,
   any
 >;
-
-const {
-  data: profileData,
-} = await supabase
-  .from("profiles")
-  .select("full_name")
-  .eq("id", u.id)
-  .maybeSingle();
 
 const nextRole: AppRole =
   (meta.role as AppRole) ||
@@ -447,10 +453,29 @@ if (
           _event,
           s
         ) => {
+          let safetyTimeout:
+            ReturnType<
+              typeof setTimeout
+            > | null =
+            null;
+
           try {
             safeSetLoading(
               true
             );
+
+            // Safety: force loading to false
+            // after 20 s even if fetchRole
+            // stalls on this device/browser
+            safetyTimeout =
+              setTimeout(
+                () => {
+                  safeSetLoading(
+                    false
+                  );
+                },
+                20000
+              );
 
             safeSetSession(
               s
@@ -489,6 +514,10 @@ if (
               null
             );
           } finally {
+            clearTimeout(
+              safetyTimeout
+            );
+
             safeSetLoading(
               false
             );
