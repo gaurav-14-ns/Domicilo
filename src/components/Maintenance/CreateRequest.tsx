@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Loader2, Plus } from "lucide-react";
 import type { MaintenancePriority } from "@/types/maintenance";
+import { toast } from "sonner";
 
 type Props = {
   onCreate: (title: string, description: string, priority: MaintenancePriority) => Promise<void>;
@@ -34,7 +35,10 @@ export function CreateRequest({ onCreate }: Props) {
       setDescription("");
       setPriority("medium");
       setOpen(false);
-    } catch { } finally {
+    } catch (e) {
+      toast.error("Failed to create maintenance request");
+      console.error("Create maintenance request failed:", e);
+    } finally {
       setBusy(false);
     }
   };

@@ -81,7 +81,12 @@ export default function BrowseProperties() {
     if (minBed > 0) query = query.gte("bedrooms", minBed);
 
     query.order("created_at", { ascending: false }).then(({ data, error }) => {
-      if (!error && data) {
+      if (error) {
+        console.error("Failed to fetch properties:", error);
+        setLoading(false);
+        return;
+      }
+      if (data) {
         let results = data.map((r: any) => ({
           id: r.id, name: r.name, address: r.address ?? "", city: r.city ?? "", state: r.state ?? "", pincode: r.pincode ?? "",
           priceMonthly: Number(r.price_monthly) || 0, amenities: r.amenities ?? [],
@@ -107,6 +112,9 @@ export default function BrowseProperties() {
 
         setListings(results);
       }
+      setLoading(false);
+    }).catch((err) => {
+      console.error("Failed to fetch properties:", err);
       setLoading(false);
     });
   }, [selectedState, selectedCity, selectedType, maxPrice, minBed, selectedAmenities, q]);

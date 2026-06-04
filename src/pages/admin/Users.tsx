@@ -1055,11 +1055,11 @@ if (
                       "profiles"
                     )
                     .update({
-                      status:
+                      suspended:
   pendingAction.status ===
   "suspended"
-    ? "suspended"
-    : "active",
+    ? true
+    : false,
                     })
                     .in(
                       "id",

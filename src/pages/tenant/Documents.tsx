@@ -8,9 +8,7 @@ export default function TenantDocuments() {
   const myDocs = docs.filter(
     (d) =>
       d.reference_type === "tenant" &&
-      d.reference_id &&
-      user?.email &&
-      d.name.includes(user.email),
+      d.reference_id === user?.id,
   );
 
   return (

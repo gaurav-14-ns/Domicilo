@@ -14,10 +14,14 @@ export function useDocuments() {
   const fetchDocs = useCallback(async () => {
     if (!user) return;
     setLoading(true);
-    const { data: rows } = await supabase
+    const { data: rows, error } = await supabase
       .from("documents")
       .select("*")
       .order("created_at", { ascending: false });
+    if (error) {
+      console.error("Failed to fetch documents:", error);
+      toast.error("Failed to load documents");
+    }
     setDocs((rows ?? []) as Document[]);
     setLoading(false);
   }, [user]);

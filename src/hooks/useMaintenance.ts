@@ -14,10 +14,14 @@ export function useMaintenance() {
   const fetchRequests = useCallback(async () => {
     if (!user) return;
     setLoading(true);
-    const { data: rows } = await supabase
+    const { data: rows, error } = await supabase
       .from("maintenance_requests")
       .select("*")
       .order("created_at", { ascending: false });
+    if (error) {
+      console.error("Failed to fetch maintenance requests:", error);
+      toast.error("Failed to load maintenance requests");
+    }
     setRequests((rows ?? []) as MaintenanceRequest[]);
     setLoading(false);
   }, [user]);

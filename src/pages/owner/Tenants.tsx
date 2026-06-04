@@ -519,31 +519,31 @@ const {
           "Check your email for invite link",
       }
     );
+  } else {
+    await addTenant({
+      name,
+      phone:
+        phoneClean,
+      email,
+      propertyId:
+        form.propertyId,
+      room,
+      rent,
+      deposit,
+      startDate:
+        form.startDate,
+      status:
+        form.status,
+    } as any);
+
+    toast.success(
+      "Tenant added",
+      {
+        description:
+          name,
+      }
+    );
   }
-
-  await addTenant({
-    name,
-    phone:
-      phoneClean,
-    email,
-    propertyId:
-      form.propertyId,
-    room,
-    rent,
-    deposit,
-    startDate:
-      form.startDate,
-    status:
-      form.status,
-  } as any);
-
-  toast.success(
-    "Tenant added",
-    {
-      description:
-        name,
-    }
-  );
 }
       setOpen(false);
 
