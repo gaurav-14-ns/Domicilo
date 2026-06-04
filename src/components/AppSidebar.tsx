@@ -1,4 +1,4 @@
-import { LayoutDashboard, Home, Users, Receipt, BarChart3, Settings, LogOut, ShieldCheck, Wallet, UserCircle, Crown, FileText } from "lucide-react";
+import { LayoutDashboard, Home, Users, Receipt, BarChart3, Settings, LogOut, ShieldCheck, Wallet, UserCircle, Crown, FileText, Wrench } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useNavigate } from "react-router-dom";
 import {
@@ -27,6 +27,7 @@ const ownerItems = [
   { title: "Reports", url: "/owner/reports", icon: BarChart3 },
   { title: "Settings", url: "/owner/settings", icon: Settings },
   { title: "Documents", url: "/owner/documents", icon: FileText },
+  { title: "Maintenance", url: "/owner/maintenance", icon: Wrench },
 ];
 
 const tenantItems = [
@@ -35,6 +36,7 @@ const tenantItems = [
   { title: "Transactions", url: "/tenant/transactions", icon: Receipt },
   { title: "Profile", url: "/tenant/profile", icon: UserCircle },
   { title: "Documents", url: "/tenant/documents", icon: FileText },
+  { title: "Maintenance", url: "/tenant/maintenance", icon: Wrench },
 ];
 
 const adminItems = [

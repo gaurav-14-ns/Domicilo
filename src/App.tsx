@@ -30,18 +30,21 @@ const OwnerTransactions = lazy(() => import("./pages/owner/Transactions"));
 const Reports = lazy(() => import("./pages/owner/Reports"));
 const OwnerSettings = lazy(() => import("./pages/owner/Settings"));
 const OwnerDocuments = lazy(() => import("./pages/owner/Documents"));
+const OwnerMaintenance = lazy(() => import("./pages/owner/Maintenance"));
 
 const TenantOverview = lazy(() => import("./pages/tenant/Overview"));
 const Dues = lazy(() => import("./pages/tenant/Dues"));
 const TenantTransactions = lazy(() => import("./pages/tenant/Transactions"));
 const Profile = lazy(() => import("./pages/tenant/Profile"));
 const TenantDocuments = lazy(() => import("./pages/tenant/Documents"));
+const TenantMaintenance = lazy(() => import("./pages/tenant/Maintenance"));
 
 const AdminLeads = lazy(() => import("./pages/admin/Leads"));
 const AdminOverview = lazy(() => import("./pages/admin/Overview"));
 const AdminUsers = lazy(() => import("./pages/admin/Users"));
 const System = lazy(() => import("./pages/admin/System"));
 const AdminDocuments = lazy(() => import("./pages/admin/Documents"));
+const AdminMaintenance = lazy(() => import("./pages/admin/Maintenance"));
 
 const LoadingFallback = () => (
   <div className="p-6">
@@ -92,6 +95,7 @@ const App = () => (
                     <Route path="reports" element={<Reports />} />
                     <Route path="settings" element={<OwnerSettings />} />
                     <Route path="documents" element={<OwnerDocuments />} />
+                    <Route path="maintenance" element={<OwnerMaintenance />} />
                   </Route>
 
                   <Route
@@ -107,6 +111,7 @@ const App = () => (
                     <Route path="transactions" element={<TenantTransactions />} />
                     <Route path="profile" element={<Profile />} />
                     <Route path="documents" element={<TenantDocuments />} />
+                    <Route path="maintenance" element={<TenantMaintenance />} />
                   </Route>
 
                   <Route
@@ -122,6 +127,7 @@ const App = () => (
                     <Route path="leads" element={<AdminLeads />} />
                     <Route path="system" element={<System />} />
                     <Route path="documents" element={<AdminDocuments />} />
+                    <Route path="maintenance" element={<AdminMaintenance />} />
                   </Route>
 
                   <Route path="/dashboard" element={<Navigate to="/auth" replace />} />

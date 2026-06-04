@@ -1,0 +1,22 @@
+import { useMaintenance } from "@/hooks/useMaintenance";
+import { RequestList } from "@/components/Maintenance/RequestList";
+
+export default function AdminMaintenance() {
+  const { requests, loading, updateStatus } = useMaintenance();
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-display font-bold">All Maintenance Requests</h1>
+        <p className="text-sm text-muted-foreground">
+          Manage all maintenance requests across the platform.
+        </p>
+      </div>
+      <RequestList
+        requests={requests}
+        loading={loading}
+        onUpdateStatus={updateStatus}
+      />
+    </div>
+  );
+}
