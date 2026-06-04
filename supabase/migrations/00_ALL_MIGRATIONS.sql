@@ -746,11 +746,20 @@ create trigger on_auth_user_created
  after insert on auth.users
  for each row execute function public.handle_new_user();
 
-CREATE POLICY "Users can insert their own role"
-ON public.user_roles
-FOR INSERT
-TO authenticated
-WITH CHECK (auth.uid() = user_id);
+do $$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname='public' and tablename='user_roles' and policyname='Users can insert their own role'
+  ) then
+    CREATE POLICY "Users can insert their own role"
+    ON public.user_roles
+    FOR INSERT
+    TO authenticated
+    WITH CHECK (auth.uid() = user_id);
+  end if;
+end
+$$;
 
 -- Allow anyone (anon + authenticated) to check if an admin exists
 CREATE OR REPLACE FUNCTION public.admin_exists()
@@ -815,16 +824,25 @@ FOR EACH ROW EXECUTE FUNCTION public.prevent_admin_suspend();
 -- TENANTS: allow tenant to update own profile fields
 -- ============================================================
 
-create policy "tenant updates own record"
-on public.tenants
-for update
-to authenticated
-using (
-  lower(email) = lower(coalesce((auth.jwt()->>'email'), ''))
-)
-with check (
-  lower(email) = lower(coalesce((auth.jwt()->>'email'), ''))
-);
+do $$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname='public' and tablename='tenants' and policyname='tenant updates own record'
+  ) then
+    create policy "tenant updates own record"
+    on public.tenants
+    for update
+    to authenticated
+    using (
+      lower(email) = lower(coalesce((auth.jwt()->>'email'), ''))
+    )
+    with check (
+      lower(email) = lower(coalesce((auth.jwt()->>'email'), ''))
+    );
+  end if;
+end
+$$;
 
 -- ============================================================
 -- 1. Fix: add "overdue" to transactions status check constraint
