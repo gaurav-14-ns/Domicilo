@@ -66,7 +66,7 @@ export type Transaction = {
   note?: string;
   auto?: boolean;
   method?: string;
-  receipt_no?: string;
+  receiptNo?: string;
 };
 
 export type AdminOrg = {

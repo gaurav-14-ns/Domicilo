@@ -81,9 +81,9 @@ export function TransactionRow({
           }
 
           {
-            t.receipt_no && (
+            t.receiptNo && (
               <div className="text-xs text-muted-foreground mt-2">
-                Receipt: {t.receipt_no}
+                Receipt: {t.receiptNo}
               </div>
             )
           }

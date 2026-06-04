@@ -5,22 +5,22 @@ export type CurrencyCode =
   | "INR" | "USD" | "GBP" | "EUR" | "AUD" | "CAD" | "SGD"
   | "AED" | "JPY" | "CNY" | "CHF" | "ZAR" | "BRL" | "MXN" | "NZD";
 
-export const SUPPORTED_CURRENCIES: { code: CurrencyCode; label: string; locale: string }[] = [
-  { code: "INR", label: "Indian Rupee (₹)",  locale: "en-IN" },
-  { code: "USD", label: "US Dollar ($)",     locale: "en-US" },
-  { code: "GBP", label: "British Pound (£)", locale: "en-GB" },
-  { code: "EUR", label: "Euro (€)",          locale: "en-IE" },
-  { code: "AUD", label: "Australian $ (A$)", locale: "en-AU" },
-  { code: "CAD", label: "Canadian $ (C$)",   locale: "en-CA" },
-  { code: "SGD", label: "Singapore $ (S$)",  locale: "en-SG" },
-  { code: "AED", label: "UAE Dirham (د.إ)",  locale: "ar-AE" },
-  { code: "JPY", label: "Japanese Yen (¥)",  locale: "ja-JP" },
-  { code: "CNY", label: "Chinese Yuan (¥)",  locale: "zh-CN" },
-  { code: "CHF", label: "Swiss Franc",        locale: "de-CH" },
-  { code: "ZAR", label: "South African Rand", locale: "en-ZA" },
-  { code: "BRL", label: "Brazilian Real (R$)",locale: "pt-BR" },
-  { code: "MXN", label: "Mexican Peso ($)",   locale: "es-MX" },
-  { code: "NZD", label: "NZ Dollar (NZ$)",    locale: "en-NZ" },
+export const SUPPORTED_CURRENCIES: { code: CurrencyCode; label: string; locale: string; symbol: string }[] = [
+  { code: "INR", label: "Indian Rupee (₹)",  locale: "en-IN", symbol: "₹" },
+  { code: "USD", label: "US Dollar ($)",     locale: "en-US", symbol: "$" },
+  { code: "GBP", label: "British Pound (£)", locale: "en-GB", symbol: "£" },
+  { code: "EUR", label: "Euro (€)",          locale: "en-IE", symbol: "€" },
+  { code: "AUD", label: "Australian $ (A$)", locale: "en-AU", symbol: "A$" },
+  { code: "CAD", label: "Canadian $ (C$)",   locale: "en-CA", symbol: "C$" },
+  { code: "SGD", label: "Singapore $ (S$)",  locale: "en-SG", symbol: "S$" },
+  { code: "AED", label: "UAE Dirham (د.إ)",  locale: "ar-AE", symbol: "د.إ" },
+  { code: "JPY", label: "Japanese Yen (¥)",  locale: "ja-JP", symbol: "¥" },
+  { code: "CNY", label: "Chinese Yuan (¥)",  locale: "zh-CN", symbol: "¥" },
+  { code: "CHF", label: "Swiss Franc",        locale: "de-CH", symbol: "Fr" },
+  { code: "ZAR", label: "South African Rand", locale: "en-ZA", symbol: "R" },
+  { code: "BRL", label: "Brazilian Real (R$)",locale: "pt-BR", symbol: "R$" },
+  { code: "MXN", label: "Mexican Peso ($)",   locale: "es-MX", symbol: "$" },
+  { code: "NZD", label: "NZ Dollar (NZ$)",    locale: "en-NZ", symbol: "NZ$" },
 ];
 
 const REGION_TO_CURRENCY: Record<string, CurrencyCode> = {

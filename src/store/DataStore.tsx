@@ -106,7 +106,7 @@ const mapTx = (r: any, tenantsById: Map<string, any>, propertiesById: Map<string
     note: r.note ?? undefined,
     auto: !!r.auto,
     method: r.method ?? undefined,
-    receipt_no: r.receipt_no ?? undefined,
+    receiptNo: r.receipt_no ?? undefined,
   };
 };
 

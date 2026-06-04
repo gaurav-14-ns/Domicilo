@@ -162,7 +162,7 @@ export default function TenantTransactions() {
         Method:
           t.method ?? "",
         Receipt:
-          t.receipt_no ?? "",
+          t.receiptNo ?? "",
         Note:
           t.note ?? "",
       })

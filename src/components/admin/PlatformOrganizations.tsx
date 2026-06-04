@@ -56,10 +56,10 @@ export const PlatformOrganizations =
             } =
               await supabase
                 .from(
-                  "owner_settings"
+                  "app_settings"
                 )
                 .select(
-                  "owner_id, company_name"
+                  "user_id, company_name"
                 );
 
             const {
@@ -105,7 +105,7 @@ export const PlatformOrganizations =
                       (
                         s
                       ) =>
-                        s.owner_id ===
+                        s.user_id ===
                         p.id
                     )
                       ?.company_name ??
