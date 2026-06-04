@@ -512,4 +512,264 @@
   100% { opacity: 0; transform: scale(1.15); }
 }
 
+/* =========================================================================
+   PREMIUM ADDITIONS - Super Royal Feel
+   ========================================================================= */
+
+/* Premium skeleton shimmer loading */
+@keyframes shimmer-skeleton {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton-premium {
+  background: linear-gradient(90deg,
+    hsl(var(--muted)) 25%,
+    hsl(var(--muted-foreground) / 0.15) 50%,
+    hsl(var(--muted)) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer-skeleton 1.8s ease-in-out infinite;
+  border-radius: var(--radius);
+}
+
+/* Card diagonal shine on hover */
+.card-shine {
+  position: relative;
+  overflow: hidden;
+}
+.card-shine::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    hsl(var(--primary) / 0.06) 45%,
+    hsl(var(--primary) / 0.1) 50%,
+    hsl(var(--primary) / 0.06) 55%,
+    transparent 60%
+  );
+  transform: translateX(-100%);
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+.card-shine:hover::before {
+  transform: translateX(100%);
+}
+
+.dark .card-shine::before {
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    hsl(45 65% 52% / 0.08) 45%,
+    hsl(45 65% 52% / 0.15) 50%,
+    hsl(45 65% 52% / 0.08) 55%,
+    transparent 60%
+  );
+}
+
+/* Gold sparkle decorative element */
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+  20% { opacity: 1; transform: scale(1) rotate(180deg); }
+  80% { opacity: 1; transform: scale(1) rotate(180deg); }
+}
+
+.sparkle-dot {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: hsl(45 65% 52%);
+  box-shadow: 0 0 10px hsl(45 65% 52% / 0.6);
+  animation: sparkle 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Scale-in entrance animation */
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-scale-in {
+  animation: scale-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Slide-in from left */
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.animate-slide-in-left {
+  animation: slide-in-left 0.5s var(--transition-smooth) both;
+}
+
+/* Slide-in from right */
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.animate-slide-in-right {
+  animation: slide-in-right 0.5s var(--transition-smooth) both;
+}
+
+/* Slow rotation for decorative elements */
+@keyframes rotate-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-rotate-slow {
+  animation: rotate-slow 20s linear infinite;
+}
+
+/* Premium glass card variant */
+.glass-card-premium {
+  background: hsl(var(--card) / 0.4);
+  backdrop-filter: blur(24px) saturate(1.2);
+  -webkit-backdrop-filter: blur(24px) saturate(1.2);
+  border: 1px solid hsl(var(--border) / 0.4);
+  box-shadow: 0 8px 32px hsl(var(--primary) / 0.06);
+}
+
+.dark .glass-card-premium {
+  background: hsl(var(--card) / 0.35);
+  border: 1px solid hsl(45 65% 52% / 0.08);
+  box-shadow: 0 8px 32px hsl(0 0% 0% / 0.3);
+}
+
+/* Premium scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.2);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.35);
+}
+
+/* Corner accent decoration */
+.corner-accent {
+  position: relative;
+}
+.corner-accent::before,
+.corner-accent::after {
+  content: '';
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-color: hsl(var(--primary) / 0.2);
+  border-style: solid;
+  pointer-events: none;
+}
+.corner-accent::before {
+  top: 0;
+  left: 0;
+  border-width: 2px 0 0 2px;
+}
+.corner-accent::after {
+  bottom: 0;
+  right: 0;
+  border-width: 0 2px 2px 0;
+}
+
+.dark .corner-accent::before,
+.dark .corner-accent::after {
+  border-color: hsl(45 65% 52% / 0.25);
+}
+
+/* Smooth number transition */
+.number-transition {
+  font-variant-numeric: tabular-nums;
+  transition: all 0.4s var(--transition-smooth);
+}
+
+/* Button glow on hover */
+.btn-glow {
+  position: relative;
+  transition: all 0.3s var(--transition-smooth);
+}
+.btn-glow:hover {
+  box-shadow: 0 0 30px hsl(var(--primary) / 0.3), 0 0 60px hsl(var(--primary) / 0.1);
+}
+.btn-glow:active {
+  transform: scale(0.97);
+}
+
+/* Depth shadow for elevated elements */
+.shadow-depth {
+  box-shadow:
+    0 4px 6px -1px hsl(0 0% 0% / 0.06),
+    0 10px 15px -3px hsl(0 0% 0% / 0.08),
+    0 0 40px hsl(var(--primary) / 0.04);
+}
+
+.dark .shadow-depth {
+  box-shadow:
+    0 4px 6px -1px hsl(0 0% 0% / 0.2),
+    0 10px 15px -3px hsl(0 0% 0% / 0.3),
+    0 0 40px hsl(0 0% 0% / 0.15);
+}
+
+/* Reveal animation - combines scale + fade */
+@keyframes reveal {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); filter: blur(4px); }
+  to { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+}
+.animate-reveal {
+  animation: reveal 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* Bounce-in for notifications */
+@keyframes bounce-in {
+  0% { opacity: 0; transform: scale(0.3) translateY(-20px); }
+  50% { transform: scale(1.05) translateY(4px); }
+  70% { transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.animate-bounce-in {
+  animation: bounce-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Staggered item entrance for lists/tables */
+.stagger-items > * {
+  opacity: 0;
+  animation: slide-up 0.5s var(--transition-smooth) forwards;
+}
+.stagger-items > *:nth-child(1) { animation-delay: 30ms; }
+.stagger-items > *:nth-child(2) { animation-delay: 60ms; }
+.stagger-items > *:nth-child(3) { animation-delay: 90ms; }
+.stagger-items > *:nth-child(4) { animation-delay: 120ms; }
+.stagger-items > *:nth-child(5) { animation-delay: 150ms; }
+.stagger-items > *:nth-child(6) { animation-delay: 180ms; }
+.stagger-items > *:nth-child(7) { animation-delay: 210ms; }
+.stagger-items > *:nth-child(8) { animation-delay: 240ms; }
+.stagger-items > *:nth-child(9) { animation-delay: 270ms; }
+.stagger-items > *:nth-child(10) { animation-delay: 300ms; }
+
+/* Gold accent bar */
+.accent-bar {
+  position: relative;
+}
+.accent-bar::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, hsl(var(--primary)), transparent);
+  border-radius: 2px;
+}
+
+.dark .accent-bar::after {
+  background: linear-gradient(90deg, hsl(45 65% 52%), transparent);
+}
+
 
