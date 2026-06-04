@@ -45,6 +45,19 @@ export default function BrowseProperties() {
   const [cities, setCities] = useState<string[]>([]);
   const [loadingCities, setLoadingCities] = useState(false);
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
+  const [ownerEmail, setOwnerEmail] = useState("");
+  const [ownerName, setOwnerName] = useState("");
+
+  // Fetch owner contact info when detail dialog opens
+  useEffect(() => {
+    if (!selectedListing?.ownerId) { setOwnerEmail(""); setOwnerName(""); return; }
+    let cancelled = false;
+    supabase.from("profiles").select("email, full_name").eq("id", selectedListing.ownerId).maybeSingle().then(({ data }) => {
+      if (cancelled) return;
+      if (data) { setOwnerEmail(data.email ?? ""); setOwnerName(data.full_name ?? ""); }
+    });
+    return () => { cancelled = true; };
+  }, [selectedListing?.ownerId]);
 
   // Fetch distinct cities when state changes
   useEffect(() => {
@@ -463,13 +476,19 @@ export default function BrowseProperties() {
                   <p className="text-primary-foreground font-display font-semibold text-sm">Interested in this property?</p>
                   <p className="text-primary-foreground/70 text-xs mt-1 font-alt">Contact the owner to schedule a visit.</p>
                   <div className="flex items-center justify-center gap-4 mt-3">
-                    <span className="flex items-center gap-1.5 text-primary-foreground/80 text-xs">
-                      <Phone className="h-3 w-3" /> Enquire
-                    </span>
-                    <span className="flex items-center gap-1.5 text-primary-foreground/80 text-xs">
-                      <Mail className="h-3 w-3" /> Send message
-                    </span>
+                    {ownerEmail ? (
+                      <a href={`mailto:${ownerEmail}`} className="inline-flex items-center gap-1.5 text-primary-foreground/80 text-xs hover:text-primary-foreground transition-smooth">
+                        <Mail className="h-3 w-3" /> {ownerName ? `Email ${ownerName}` : "Send message"}
+                      </a>
+                    ) : (
+                      <span className="flex items-center gap-1.5 text-primary-foreground/50 text-xs">
+                        <Mail className="h-3 w-3" /> Owner contact unavailable
+                      </span>
+                    )}
                   </div>
+                  <p className="text-primary-foreground/50 text-[10px] mt-2 font-alt">
+                    {ownerName ? `Listed by ${ownerName}` : ""}
+                  </p>
                 </div>
               </div>
             )}
