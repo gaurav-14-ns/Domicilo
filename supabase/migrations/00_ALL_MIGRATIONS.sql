@@ -746,11 +746,20 @@ create trigger on_auth_user_created
  after insert on auth.users
  for each row execute function public.handle_new_user();
 
-CREATE POLICY "Users can insert their own role"
-ON public.user_roles
-FOR INSERT
-TO authenticated
-WITH CHECK (auth.uid() = user_id);
+do $$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname='public' and tablename='user_roles' and policyname='Users can insert their own role'
+  ) then
+    CREATE POLICY "Users can insert their own role"
+    ON public.user_roles
+    FOR INSERT
+    TO authenticated
+    WITH CHECK (auth.uid() = user_id);
+  end if;
+end
+$$;
 
 -- Allow anyone (anon + authenticated) to check if an admin exists
 CREATE OR REPLACE FUNCTION public.admin_exists()
@@ -815,16 +824,25 @@ FOR EACH ROW EXECUTE FUNCTION public.prevent_admin_suspend();
 -- TENANTS: allow tenant to update own profile fields
 -- ============================================================
 
-create policy "tenant updates own record"
-on public.tenants
-for update
-to authenticated
-using (
-  lower(email) = lower(coalesce((auth.jwt()->>'email'), ''))
-)
-with check (
-  lower(email) = lower(coalesce((auth.jwt()->>'email'), ''))
-);
+do $$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname='public' and tablename='tenants' and policyname='tenant updates own record'
+  ) then
+    create policy "tenant updates own record"
+    on public.tenants
+    for update
+    to authenticated
+    using (
+      lower(email) = lower(coalesce((auth.jwt()->>'email'), ''))
+    )
+    with check (
+      lower(email) = lower(coalesce((auth.jwt()->>'email'), ''))
+    );
+  end if;
+end
+$$;
 
 -- ============================================================
 -- 1. Fix: add "overdue" to transactions status check constraint
@@ -947,33 +965,43 @@ values ('documents', 'documents', false)
 on conflict (id) do nothing;
 
 -- Storage RLS: owners can CRUD their own folder, admins can read all
-create policy "owners CRUD own documents"
-  on storage.objects for all
-  to authenticated
-  using (
-    bucket_id = 'documents'
-    and (storage.foldername(name))[1] = auth.uid()::text
-  )
-  with check (
-    bucket_id = 'documents'
-    and (storage.foldername(name))[1] = auth.uid()::text
-  );
+do $$
+begin
+  if not exists (select 1 from pg_policies where schemaname='storage' and tablename='objects' and policyname='owners CRUD own documents') then
+    create policy "owners CRUD own documents"
+      on storage.objects for all
+      to authenticated
+      using (
+        bucket_id = 'documents'
+        and (storage.foldername(name))[1] = auth.uid()::text
+      )
+      with check (
+        bucket_id = 'documents'
+        and (storage.foldername(name))[1] = auth.uid()::text
+      );
+  end if;
 
-create policy "admins read all documents"
-  on storage.objects for select
-  to authenticated
-  using (
-    bucket_id = 'documents'
-    and public.has_role(auth.uid(), 'admin')
-  );
+  if not exists (select 1 from pg_policies where schemaname='storage' and tablename='objects' and policyname='admins read all documents') then
+    create policy "admins read all documents"
+      on storage.objects for select
+      to authenticated
+      using (
+        bucket_id = 'documents'
+        and public.has_role(auth.uid(), 'admin')
+      );
+  end if;
 
-create policy "tenants read linked documents"
-  on storage.objects for select
-  to authenticated
-  using (
-    bucket_id = 'documents'
-    and public.has_role(auth.uid(), 'tenant')
-  );
+  if not exists (select 1 from pg_policies where schemaname='storage' and tablename='objects' and policyname='tenants read linked documents') then
+    create policy "tenants read linked documents"
+      on storage.objects for select
+      to authenticated
+      using (
+        bucket_id = 'documents'
+        and public.has_role(auth.uid(), 'tenant')
+      );
+  end if;
+end
+$$;
 
 -- =========================================================================
 -- MAINTENANCE REQUESTS

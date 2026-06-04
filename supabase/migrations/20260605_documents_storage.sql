@@ -57,30 +57,40 @@ values ('documents', 'documents', false)
 on conflict (id) do nothing;
 
 -- Storage RLS: owners can CRUD their own folder, admins can read all
-create policy "owners CRUD own documents"
-  on storage.objects for all
-  to authenticated
-  using (
-    bucket_id = 'documents'
-    and (storage.foldername(name))[1] = auth.uid()::text
-  )
-  with check (
-    bucket_id = 'documents'
-    and (storage.foldername(name))[1] = auth.uid()::text
-  );
+do $$
+begin
+  if not exists (select 1 from pg_policies where schemaname='storage' and tablename='objects' and policyname='owners CRUD own documents') then
+    create policy "owners CRUD own documents"
+      on storage.objects for all
+      to authenticated
+      using (
+        bucket_id = 'documents'
+        and (storage.foldername(name))[1] = auth.uid()::text
+      )
+      with check (
+        bucket_id = 'documents'
+        and (storage.foldername(name))[1] = auth.uid()::text
+      );
+  end if;
 
-create policy "admins read all documents"
-  on storage.objects for select
-  to authenticated
-  using (
-    bucket_id = 'documents'
-    and public.has_role(auth.uid(), 'admin')
-  );
+  if not exists (select 1 from pg_policies where schemaname='storage' and tablename='objects' and policyname='admins read all documents') then
+    create policy "admins read all documents"
+      on storage.objects for select
+      to authenticated
+      using (
+        bucket_id = 'documents'
+        and public.has_role(auth.uid(), 'admin')
+      );
+  end if;
 
-create policy "tenants read linked documents"
-  on storage.objects for select
-  to authenticated
-  using (
-    bucket_id = 'documents'
-    and public.has_role(auth.uid(), 'tenant')
-  );
+  if not exists (select 1 from pg_policies where schemaname='storage' and tablename='objects' and policyname='tenants read linked documents') then
+    create policy "tenants read linked documents"
+      on storage.objects for select
+      to authenticated
+      using (
+        bucket_id = 'documents'
+        and public.has_role(auth.uid(), 'tenant')
+      );
+  end if;
+end
+$$;
