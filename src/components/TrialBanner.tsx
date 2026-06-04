@@ -1,18 +1,23 @@
 import { Link } from "react-router-dom";
-import { useSubscription } from "@/hooks/useSubscription";
-import { Sparkles, AlertTriangle, Crown } from "lucide-react";
+import { useSubscriptionData } from "@/store/DataStore";
+import { AlertTriangle, Crown } from "lucide-react";
 
 export function TrialBanner() {
-  const { subscription, isTrial, trialDaysLeft, needsPaidUpgrade } = useSubscription();
-  if (!subscription) return null;
-  if (subscription.status === "active") return null;
+  const sub = useSubscriptionData();
+  if (!sub) return null;
+  if (sub.status === "active") return null;
 
-  if (needsPaidUpgrade) {
+  const trialEnd = sub.trialEnd ? new Date(sub.trialEnd).getTime() : 0;
+  const trialDaysLeft = trialEnd ? Math.max(0, Math.ceil((trialEnd - Date.now()) / 86400_000)) : 0;
+  const isTrial = sub.status === "trial" && trialDaysLeft > 0;
+  const needsUpgrade = sub.status === "expired" || sub.status === "cancelled" || sub.status === "overdue";
+
+  if (needsUpgrade) {
     return (
       <div className="rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 flex items-start sm:items-center gap-3 flex-col sm:flex-row">
         <AlertTriangle className="h-5 w-5 text-destructive shrink-0" />
         <div className="flex-1 text-sm font-alt">
-          <span className="font-medium">Your plan is {subscription.status}.</span>{" "}
+          <span className="font-medium">Your plan is {sub.status}.</span>{" "}
           <span className="text-muted-foreground">Upgrade to keep premium features. Your data is safe.</span>
         </div>
         <Link to="/owner/settings" className="text-sm font-semibold text-destructive hover:underline">

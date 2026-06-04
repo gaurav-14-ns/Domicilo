@@ -32,6 +32,7 @@ const initialData: AppData = {
   adminOrgs: [],
   settings: defaultSettings,
   tenantProfile: { phone: "", emergency: "", email: "" },
+  subscription: null,
 };
 
 // ---------------------------------------------------------------------------
@@ -341,7 +342,9 @@ const mountedRef =
       let propertiesPromise,
         tenantsPromise,
         txsPromise,
-        orgsPromise;
+        orgsPromise,
+        subPromise =
+          Promise.resolve({ data: null });
 
       if (
         isOwner
@@ -399,6 +402,13 @@ const mountedRef =
                   false,
               }
             );
+
+        subPromise =
+          supabase
+            .from("subscriptions")
+            .select("*")
+            .eq("owner_id", user.id)
+            .maybeSingle();
 
         orgsPromise =
           Promise.resolve(
@@ -580,6 +590,9 @@ const mountedRef =
         {
           data: orgs,
         },
+        {
+          data: subRow,
+        },
       ] =
         await Promise.all([
           propertiesPromise,
@@ -588,6 +601,7 @@ const mountedRef =
           commonSettings,
           commonProfile,
           orgsPromise,
+          subPromise,
         ]);
 
       const txRows =
@@ -677,6 +691,18 @@ const mountedRef =
             mapTenantProfile(
               profile
             ),
+
+          subscription:
+            subRow
+              ? {
+                  id: subRow.id,
+                  plan: subRow.plan,
+                  status: subRow.status,
+                  trialEnd: subRow.trial_end ?? null,
+                  amount: Number(subRow.amount) || 0,
+                  currencyCode: subRow.currency_code || "INR",
+                }
+              : null,
         });
       }
     } catch (
@@ -715,6 +741,26 @@ const mountedRef =
   }, [
     user,
   ]);
+
+  // Early fetch: settings + tenant_profile as soon as user is available
+  // (before role resolves, overlapped with auth's ensureUserRecords)
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const [settingsResult, profileResult] = await Promise.all([
+        supabase.from("app_settings").select("*").eq("user_id", user.id).maybeSingle(),
+        supabase.from("tenant_profiles").select("*").eq("user_id", user.id).maybeSingle(),
+      ]);
+      if (cancelled || !mountedRef.current) return;
+      setData((prev) => ({
+        ...prev,
+        settings: mapSettings(settingsResult.data),
+        tenantProfile: mapTenantProfile(profileResult.data),
+      }));
+    })();
+    return () => { cancelled = true; };
+  }, [user?.id]);
 
   // First load: wait for both user and role, then fetch ONCE per role
   useEffect(() => {
@@ -1850,3 +1896,4 @@ export const useTransactions = () => useDataStore().data.transactions;
 export const useAdminOrgs = () => useDataStore().data.adminOrgs;
 export const useSettings = () => useDataStore().data.settings;
 export const useTenantProfile = () => useDataStore().data.tenantProfile;
+export const useSubscriptionData = () => useDataStore().data.subscription;

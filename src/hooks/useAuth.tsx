@@ -98,7 +98,7 @@ export const AuthProvider = ({
                 .maybeSingle(),
               supabase
                 .from("profiles")
-                .select("full_name")
+                .select("full_name, suspended")
                 .eq("id", u.id)
                 .maybeSingle(),
             ]);
@@ -138,6 +138,9 @@ const fullName =
   meta.full_name ||
   "";
 
+const suspended =
+  profileData?.suspended === true;
+
 const currency =
   meta.currency_code ||
   "INR";
@@ -146,7 +149,11 @@ const locale =
   meta.locale ||
   "en-IN";
 
-          const operations = [];
+if (suspended) {
+  throw new Error("SUSPENDED");
+}
+
+          const operations: Promise<any>[] = [];
 
           operations.push(
             supabase
@@ -236,6 +243,32 @@ const locale =
             );
           }
 
+          if (nextRole === "owner") {
+            operations.push(
+              (async () => {
+                const { data: existingSub } =
+                  await supabase
+                    .from("subscriptions")
+                    .select("id")
+                    .eq("owner_id", u.id)
+                    .maybeSingle();
+                if (!existingSub) {
+                  await supabase
+                    .from("subscriptions")
+                    .insert({
+                      owner_id: u.id,
+                      plan: "starter",
+                      status: "trial",
+                      trial_end:
+                        new Date(Date.now() + 14 * 86400_000).toISOString(),
+                      amount: 999,
+                      currency_code: currency,
+                    });
+                }
+              })()
+            );
+          }
+
           try {
             await Promise.allSettled(
               operations
@@ -245,62 +278,6 @@ const locale =
               "User setup operations failed:",
               error
             );
-          }
-
-          if (
-            nextRole ===
-            "owner"
-          ) {
-            try {
-              const {
-                data:
-                  existingSub,
-              } =
-                await supabase
-                  .from(
-                    "subscriptions"
-                  )
-                  .select(
-                    "id"
-                  )
-                  .eq(
-                    "owner_id",
-                    u.id
-                  )
-                  .maybeSingle();
-
-              if (
-                !existingSub
-              ) {
-                await supabase
-                  .from(
-                    "subscriptions"
-                  )
-                  .insert({
-                    owner_id:
-                      u.id,
-                    plan:
-                      "starter",
-                    status:
-                      "trial",
-                    trial_end:
-                      new Date(
-                        Date.now() +
-                          14 *
-                            86400_000
-                      ).toISOString(),
-                    amount:
-                      999,
-                    currency_code:
-                      currency,
-                  });
-              }
-            } catch (error) {
-              console.error(
-                "Subscription bootstrap failed:",
-                error
-              );
-            }
           }
 
           return nextRole;
@@ -324,47 +301,24 @@ const locale =
             await ensureUserRecords(
               u
             );
-          const {
-  data: profile,
-} = await supabase
-  .from("profiles")
-  .select("suspended")
-  .eq("id", u.id)
-  .maybeSingle();
-
-if (
-  profile?.suspended ===
-  true
-) {
-  safeSetLoading(true);
-
-  await supabase.auth.signOut();
-
-  safeSetRole(null);
-
-  safeSetUser(null);
-
-  safeSetSession(null);
-
-  window.location.href =
-    "/auth";
-
-  toast.error(
-    "Your account has been suspended."
-  );
-
-  return;
-}
-
           safeSetRole(
             resolvedRole
           );
-        } catch (error) {
+        } catch (error: any) {
+          if (error?.message === "SUSPENDED") {
+            safeSetLoading(true);
+            await supabase.auth.signOut();
+            safeSetRole(null);
+            safeSetUser(null);
+            safeSetSession(null);
+            window.location.href = "/auth";
+            toast.error("Your account has been suspended.");
+            return;
+          }
           console.error(
             "Role fetch failed:",
             error
           );
-
           safeSetRole(
             "tenant"
           );

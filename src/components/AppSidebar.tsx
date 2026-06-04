@@ -17,7 +17,7 @@ import {
 import { useAuth, AppRole } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { useSubscription } from "@/hooks/useSubscription";
+import { useSubscriptionData } from "@/store/DataStore";
 
 const ownerItems = [
   { title: "Overview", url: "/owner", icon: LayoutDashboard, end: true },
@@ -51,9 +51,10 @@ export function AppSidebar({ role }: { role: AppRole }) {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const { signOut, user } = useAuth();
-  const sub = useSubscription();
-  const trialDaysLeft = sub?.trialDaysLeft ?? null;
-  const isTrial = sub?.isTrial ?? false;
+  const sub = useSubscriptionData();
+  const trialEnd = sub?.trialEnd ? new Date(sub.trialEnd).getTime() : 0;
+  const trialDaysLeft = trialEnd ? Math.max(0, Math.ceil((trialEnd - Date.now()) / 86400_000)) : null;
+  const isTrial = sub?.status === "trial" && (trialDaysLeft ?? 0) > 0;
   const nav = useNavigate();
 
   const items = role === "owner" ? ownerItems : role === "tenant" ? tenantItems : adminItems;

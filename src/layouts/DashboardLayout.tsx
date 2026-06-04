@@ -27,7 +27,6 @@ import { Crown } from "lucide-react";
 
 import { TrialBanner } from "@/components/TrialBanner";
 
-import { LoadingState } from "@/components/states/LoadingState";
 import { ErrorState } from "@/components/states/ErrorState";
 
 function DashboardContent({
@@ -56,16 +55,6 @@ function DashboardContent({
     location.pathname,
     setOpenMobile,
   ]);
-
-  if (
-    loading
-  ) {
-    return (
-      <div className="min-h-screen w-full bg-background grid place-items-center">
-        <LoadingState title="Loading your dashboard..." />
-      </div>
-    );
-  }
 
   if (
     error
@@ -112,12 +101,95 @@ function DashboardContent({
             </div>
           )}
 
-          <SafeSection name="PageContent">
-            <Outlet />
-          </SafeSection>
+          {loading ? (
+            <SkeletonDashboard role={role} />
+          ) : (
+            <SafeSection name="PageContent">
+              <Outlet />
+            </SafeSection>
+          )}
         </main>
       </div>
     </>
+  );
+}
+
+function SkeletonDashboard({ role }: { role: AppRole }) {
+  const card = (className = "") => (
+    <div className={`rounded-xl border border-border/40 p-5 ${className}`}>
+      <div className="skeleton-premium h-3 w-24 mb-3" />
+      <div className="skeleton-premium h-7 w-16 mb-2" />
+      <div className="skeleton-premium h-3 w-32" />
+    </div>
+  );
+
+  if (role === "tenant") {
+    return (
+      <div className="space-y-6 stagger-items">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {card()}
+          {card()}
+          {card()}
+        </div>
+        <div className="rounded-xl border border-border/40 p-5">
+          <div className="skeleton-premium h-3 w-32 mb-4" />
+          <div className="space-y-3">
+            {[1,2,3].map(i => (
+              <div key={i} className="flex items-center gap-3">
+                <div className="skeleton-premium h-10 w-10 rounded-full" />
+                <div className="flex-1">
+                  <div className="skeleton-premium h-3 w-40 mb-1" />
+                  <div className="skeleton-premium h-3 w-24" />
+                </div>
+                <div className="skeleton-premium h-3 w-16" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6 stagger-items">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {card()}
+        {card()}
+        {card()}
+        {card()}
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="rounded-xl border border-border/40 p-5">
+          <div className="skeleton-premium h-3 w-32 mb-4" />
+          <div className="space-y-3">
+            {[1,2,3].map(i => (
+              <div key={i} className="flex items-center gap-3">
+                <div className="skeleton-premium h-8 w-8 rounded" />
+                <div className="flex-1">
+                  <div className="skeleton-premium h-3 w-32 mb-1" />
+                  <div className="skeleton-premium h-3 w-20" />
+                </div>
+                <div className="skeleton-premium h-3 w-12" />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="rounded-xl border border-border/40 p-5">
+          <div className="skeleton-premium h-3 w-28 mb-4" />
+          <div className="space-y-3">
+            {[1,2,3].map(i => (
+              <div key={i} className="flex items-center gap-3">
+                <div className="skeleton-premium h-8 w-8 rounded-full" />
+                <div className="flex-1">
+                  <div className="skeleton-premium h-3 w-36 mb-1" />
+                  <div className="skeleton-premium h-3 w-24" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

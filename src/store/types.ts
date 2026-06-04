@@ -95,6 +95,15 @@ export type TenantProfile = {
   email?: string;
 };
 
+export type SubscriptionInfo = {
+  id: string;
+  plan: string;
+  status: string;
+  trialEnd: string | null;
+  amount: number;
+  currencyCode: string;
+} | null;
+
 export type AppData = {
   properties: Property[];
   tenants: Tenant[];
@@ -102,4 +111,5 @@ export type AppData = {
   adminOrgs: AdminOrg[];
   settings: Settings;
   tenantProfile: TenantProfile;
+  subscription: SubscriptionInfo;
 };
