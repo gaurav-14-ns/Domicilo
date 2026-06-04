@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useLocation } from "react-router-dom";
 
 interface Props {
@@ -9,11 +9,13 @@ export function PageTransition({ children }: Props) {
   const location = useLocation();
   const [display, setDisplay] = useState<ReactNode>(children);
   const [stage, setStage] = useState<"enter" | "done">("done");
+  const childrenRef = useRef(children);
+  childrenRef.current = children;
 
   useEffect(() => {
     setStage("enter");
     const timer = setTimeout(() => {
-      setDisplay(children);
+      setDisplay(childrenRef.current);
       requestAnimationFrame(() => setStage("done"));
     }, 50);
     return () => clearTimeout(timer);

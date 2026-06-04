@@ -760,7 +760,7 @@ const mountedRef =
       }));
     })();
     return () => { cancelled = true; };
-  }, [user?.id]);
+  }, [user]);
 
   // First load: wait for both user and role, then fetch ONCE per role
   useEffect(() => {

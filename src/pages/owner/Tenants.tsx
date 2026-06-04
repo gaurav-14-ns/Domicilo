@@ -136,11 +136,15 @@ export default function Tenants() {
     moveOutTenant,
   } = useDataStore();
 
-  const tenants = Array.isArray(
-    data?.tenants
-  )
-    ? data.tenants
-    : [];
+  const tenants = useMemo(
+    () =>
+      Array.isArray(
+        data?.tenants
+      )
+        ? data.tenants
+        : [],
+    [data?.tenants]
+  );
 
   const properties = Array.isArray(
     data?.properties

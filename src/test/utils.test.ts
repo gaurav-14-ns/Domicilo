@@ -5,6 +5,7 @@ import { monthKey, todayISO, monthsBetween, toCSV } from "../lib/format";
 describe("utils", () => {
   it("cn merges class names", () => {
     expect(cn("foo", "bar")).toBe("foo bar");
+    // eslint-disable-next-line no-constant-binary-expression
     expect(cn("foo", false && "bar")).toBe("foo");
     expect(cn("foo", undefined, "bar")).toBe("foo bar");
   });

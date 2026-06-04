@@ -103,11 +103,15 @@ export default function Properties() {
     removeProperty,
   } = useDataStore();
 
-  const list = Array.isArray(
-    data?.properties
-  )
-    ? data.properties
-    : [];
+  const list = useMemo(
+    () =>
+      Array.isArray(
+        data?.properties
+      )
+        ? data.properties
+        : [],
+    [data?.properties]
+  );
 
   const {
     propertyAtLimit,

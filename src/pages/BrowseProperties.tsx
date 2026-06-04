@@ -50,6 +50,7 @@ export default function BrowseProperties() {
   useEffect(() => {
     if (!selectedState) { setCities([]); setSelectedCity(""); return; }
     setLoadingCities(true);
+    let cancelled = false;
     supabase
       .from("properties")
       .select("city")
@@ -59,11 +60,14 @@ export default function BrowseProperties() {
       .neq("city", "")
       .order("city")
       .then(({ data }) => {
+        if (cancelled) return;
         const unique = [...new Set((data ?? []).map((r: any) => r.city).filter(Boolean))] as string[];
         setCities(unique);
         if (!unique.includes(selectedCity)) setSelectedCity("");
         setLoadingCities(false);
       });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedState]);
 
   // Fetch listings
