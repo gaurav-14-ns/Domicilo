@@ -2,6 +2,7 @@ import type { CurrencyCode } from "@/lib/currency";
 
 export type Property = {
   id: string;
+  ownerId: string;
   name: string;
   address: string;
   units: number;

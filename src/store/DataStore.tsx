@@ -47,6 +47,7 @@ const mapProperty = (r: any, tenants: any[], txs: any[]): Property => {
     .reduce((s, t) => s + Math.max(0, Number(t.amount) || 0), 0);
   return {
     id: r.id,
+    ownerId: r.owner_id,
     name: r.name,
     address: r.address ?? "",
     units: Number(r.units) || 0,

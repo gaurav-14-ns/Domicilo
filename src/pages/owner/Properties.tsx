@@ -537,6 +537,9 @@ export default function Properties() {
                   <div className="space-y-2">
                     <Label>
                       Occupied
+                      <span className="ml-1 text-[10px] text-muted-foreground font-normal">
+                        (auto)
+                      </span>
                     </Label>
 
                     <Input
@@ -545,22 +548,7 @@ export default function Properties() {
                       value={
                         form.occupied
                       }
-                      onChange={(
-                        e
-                      ) =>
-                        setForm(
-                          {
-                            ...form,
-                            occupied:
-                              e
-                                .target
-                                .value,
-                          }
-                        )
-                      }
-                      disabled={
-                        !!editId
-                      }
+                      disabled
                     />
                   </div>
                 </div>

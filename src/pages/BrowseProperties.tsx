@@ -23,7 +23,7 @@ const INDIAN_STATES = [
 ];
 
 type Listing = {
-  id: string; name: string; address: string; city: string; state: string; pincode: string;
+  id: string; ownerId: string; name: string; address: string; city: string; state: string; pincode: string;
   priceMonthly: number; amenities: string[]; description: string; images: string[];
   bedrooms: number; bathrooms: number; propertyType: string; units: number; available: boolean;
 };
@@ -92,11 +92,11 @@ export default function BrowseProperties() {
       }
       if (data) {
         let results = data.map((r: any) => ({
-          id: r.id, name: r.name, address: r.address ?? "", city: r.city ?? "", state: r.state ?? "", pincode: r.pincode ?? "",
+          id: r.id, ownerId: r.owner_id, name: r.name, address: r.address ?? "", city: r.city ?? "", state: r.state ?? "", pincode: r.pincode ?? "",
           priceMonthly: Number(r.price_monthly) || 0, amenities: r.amenities ?? [],
           description: r.description ?? "", images: r.images ?? [],
           bedrooms: Number(r.bedrooms) || 1, bathrooms: Number(r.bathrooms) || 1,
-          propertyType: r.property_type ?? "Apartment", units: Number(r.units) || 1, available: r.available ?? true,
+          propertyType: r.property_type ?? "Apartment", units: Number(r.units) || 0, available: r.available ?? true,
         })) as Listing[];
 
         // Client-side filter for amenities
