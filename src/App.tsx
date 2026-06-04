@@ -29,16 +29,19 @@ const OwnerTenants = lazy(() => import("./pages/owner/Tenants"));
 const OwnerTransactions = lazy(() => import("./pages/owner/Transactions"));
 const Reports = lazy(() => import("./pages/owner/Reports"));
 const OwnerSettings = lazy(() => import("./pages/owner/Settings"));
+const OwnerDocuments = lazy(() => import("./pages/owner/Documents"));
 
 const TenantOverview = lazy(() => import("./pages/tenant/Overview"));
 const Dues = lazy(() => import("./pages/tenant/Dues"));
 const TenantTransactions = lazy(() => import("./pages/tenant/Transactions"));
 const Profile = lazy(() => import("./pages/tenant/Profile"));
+const TenantDocuments = lazy(() => import("./pages/tenant/Documents"));
 
 const AdminLeads = lazy(() => import("./pages/admin/Leads"));
 const AdminOverview = lazy(() => import("./pages/admin/Overview"));
 const AdminUsers = lazy(() => import("./pages/admin/Users"));
 const System = lazy(() => import("./pages/admin/System"));
+const AdminDocuments = lazy(() => import("./pages/admin/Documents"));
 
 const LoadingFallback = () => (
   <div className="p-6">
@@ -88,6 +91,7 @@ const App = () => (
                     <Route path="transactions" element={<OwnerTransactions />} />
                     <Route path="reports" element={<Reports />} />
                     <Route path="settings" element={<OwnerSettings />} />
+                    <Route path="documents" element={<OwnerDocuments />} />
                   </Route>
 
                   <Route
@@ -102,6 +106,7 @@ const App = () => (
                     <Route path="dues" element={<Dues />} />
                     <Route path="transactions" element={<TenantTransactions />} />
                     <Route path="profile" element={<Profile />} />
+                    <Route path="documents" element={<TenantDocuments />} />
                   </Route>
 
                   <Route
@@ -116,6 +121,7 @@ const App = () => (
                     <Route path="users" element={<AdminUsers />} />
                     <Route path="leads" element={<AdminLeads />} />
                     <Route path="system" element={<System />} />
+                    <Route path="documents" element={<AdminDocuments />} />
                   </Route>
 
                   <Route path="/dashboard" element={<Navigate to="/auth" replace />} />
