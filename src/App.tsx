@@ -45,6 +45,7 @@ const AdminUsers = lazy(() => import("./pages/admin/Users"));
 const System = lazy(() => import("./pages/admin/System"));
 const AdminDocuments = lazy(() => import("./pages/admin/Documents"));
 const AdminMaintenance = lazy(() => import("./pages/admin/Maintenance"));
+const AdminAuditLog = lazy(() => import("./pages/admin/AuditLog"));
 
 const LoadingFallback = () => (
   <div className="p-6">
@@ -128,6 +129,7 @@ const App = () => (
                     <Route path="system" element={<System />} />
                     <Route path="documents" element={<AdminDocuments />} />
                     <Route path="maintenance" element={<AdminMaintenance />} />
+                    <Route path="audit" element={<AdminAuditLog />} />
                   </Route>
 
                   <Route path="/dashboard" element={<Navigate to="/auth" replace />} />

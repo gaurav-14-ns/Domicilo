@@ -1,4 +1,4 @@
-import { LayoutDashboard, Home, Users, Receipt, BarChart3, Settings, LogOut, ShieldCheck, Wallet, UserCircle, Crown, FileText, Wrench } from "lucide-react";
+import { LayoutDashboard, Home, Users, Receipt, BarChart3, Settings, LogOut, ShieldCheck, Wallet, UserCircle, Crown, FileText, Wrench, ScrollText } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useNavigate } from "react-router-dom";
 import {
@@ -44,6 +44,7 @@ const adminItems = [
   { title: "Users", url: "/admin/users", icon: Users },
   { title: "Leads", url: "/admin/leads", icon: BarChart3 },
   { title: "System", url: "/admin/system", icon: ShieldCheck },
+  { title: "Audit Log", url: "/admin/audit", icon: ScrollText },
 ];
 
 export function AppSidebar({ role }: { role: AppRole }) {
