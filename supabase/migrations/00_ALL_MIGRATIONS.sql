@@ -746,20 +746,11 @@ create trigger on_auth_user_created
  after insert on auth.users
  for each row execute function public.handle_new_user();
 
-do $$
-begin
-  if not exists (
-    select 1 from pg_policies
-    where schemaname='public' and tablename='user_roles' and policyname='Users can insert their own role'
-  ) then
-    CREATE POLICY "Users can insert their own role"
-    ON public.user_roles
-    FOR INSERT
-    TO authenticated
-    WITH CHECK (auth.uid() = user_id);
-  end if;
-end
-$$;
+CREATE POLICY "Users can insert their own role"
+ON public.user_roles
+FOR INSERT
+TO authenticated
+WITH CHECK (auth.uid() = user_id);
 
 -- Allow anyone (anon + authenticated) to check if an admin exists
 CREATE OR REPLACE FUNCTION public.admin_exists()
@@ -824,25 +815,16 @@ FOR EACH ROW EXECUTE FUNCTION public.prevent_admin_suspend();
 -- TENANTS: allow tenant to update own profile fields
 -- ============================================================
 
-do $$
-begin
-  if not exists (
-    select 1 from pg_policies
-    where schemaname='public' and tablename='tenants' and policyname='tenant updates own record'
-  ) then
-    create policy "tenant updates own record"
-    on public.tenants
-    for update
-    to authenticated
-    using (
-      lower(email) = lower(coalesce((auth.jwt()->>'email'), ''))
-    )
-    with check (
-      lower(email) = lower(coalesce((auth.jwt()->>'email'), ''))
-    );
-  end if;
-end
-$$;
+create policy "tenant updates own record"
+on public.tenants
+for update
+to authenticated
+using (
+  lower(email) = lower(coalesce((auth.jwt()->>'email'), ''))
+)
+with check (
+  lower(email) = lower(coalesce((auth.jwt()->>'email'), ''))
+);
 
 -- ============================================================
 -- 1. Fix: add "overdue" to transactions status check constraint
@@ -905,4 +887,153 @@ drop policy if exists "owner inserts own sub" on public.subscriptions;
 create policy "owner inserts own sub" on public.subscriptions
   for insert to authenticated
   with check (owner_id = auth.uid());
+
+-- =========================================================================
+-- DOCUMENTS TABLE
+-- =========================================================================
+create table if not exists public.documents (
+ id uuid primary key default gen_random_uuid(),
+ owner_id uuid not null references auth.users(id) on delete cascade,
+ name text not null,
+ file_path text not null,
+ file_size integer not null default 0,
+ mime_type text not null default 'application/octet-stream',
+ category text not null default 'other' check (category in ('lease','receipt','noc','other')),
+ reference_type text default 'general' check (reference_type in ('property','tenant','general')),
+ reference_id uuid,
+ created_at timestamptz not null default now(),
+ updated_at timestamptz not null default now()
+);
+
+create index if not exists idx_documents_owner on public.documents(owner_id);
+create index if not exists idx_documents_reference on public.documents(reference_type, reference_id);
+alter table public.documents enable row level security;
+
+do $$
+begin
+  if not exists (select 1 from pg_policies where schemaname='public' and tablename='documents' and policyname='owners manage own documents') then
+    create policy "owners manage own documents" on public.documents
+      for all to authenticated using (owner_id = auth.uid()) with check (owner_id = auth.uid());
+  end if;
+
+  if not exists (select 1 from pg_policies where schemaname='public' and tablename='documents' and policyname='admin reads all documents') then
+    create policy "admin reads all documents" on public.documents
+      for select to authenticated using (public.has_role(auth.uid(), 'admin'));
+  end if;
+
+  if not exists (select 1 from pg_policies where schemaname='public' and tablename='documents' and policyname='tenant reads linked documents') then
+    create policy "tenant reads linked documents" on public.documents
+      for select to authenticated using (
+        reference_type = 'tenant'
+        and exists (
+          select 1 from public.tenants t
+          where t.id = reference_id
+            and lower(t.email) = lower(coalesce((auth.jwt()->>'email'),''))
+        )
+      );
+  end if;
+end
+$$;
+
+drop trigger if exists trg_documents_updated on public.documents;
+create trigger trg_documents_updated before update on public.documents
+ for each row execute function public.touch_updated_at();
+
+-- =========================================================================
+-- STORAGE BUCKET: documents
+-- =========================================================================
+insert into storage.buckets (id, name, public)
+values ('documents', 'documents', false)
+on conflict (id) do nothing;
+
+-- Storage RLS: owners can CRUD their own folder, admins can read all
+create policy "owners CRUD own documents"
+  on storage.objects for all
+  to authenticated
+  using (
+    bucket_id = 'documents'
+    and (storage.foldername(name))[1] = auth.uid()::text
+  )
+  with check (
+    bucket_id = 'documents'
+    and (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+create policy "admins read all documents"
+  on storage.objects for select
+  to authenticated
+  using (
+    bucket_id = 'documents'
+    and public.has_role(auth.uid(), 'admin')
+  );
+
+create policy "tenants read linked documents"
+  on storage.objects for select
+  to authenticated
+  using (
+    bucket_id = 'documents'
+    and public.has_role(auth.uid(), 'tenant')
+  );
+
+-- =========================================================================
+-- MAINTENANCE REQUESTS
+-- =========================================================================
+create table if not exists public.maintenance_requests (
+ id uuid primary key default gen_random_uuid(),
+ owner_id uuid not null references auth.users(id) on delete cascade,
+ tenant_id uuid references public.tenants(id) on delete set null,
+ title text not null,
+ description text not null,
+ priority text not null default 'medium' check (priority in ('low','medium','high','urgent')),
+ status text not null default 'open' check (status in ('open','in_progress','resolved','closed')),
+ created_at timestamptz not null default now(),
+ updated_at timestamptz not null default now()
+);
+
+create index if not exists idx_mr_owner on public.maintenance_requests(owner_id);
+create index if not exists idx_mr_tenant on public.maintenance_requests(tenant_id);
+create index if not exists idx_mr_status on public.maintenance_requests(status);
+alter table public.maintenance_requests enable row level security;
+
+do $$
+begin
+  if not exists (select 1 from pg_policies where schemaname='public' and tablename='maintenance_requests' and policyname='owners manage own maintenance') then
+    create policy "owners manage own maintenance" on public.maintenance_requests
+      for all to authenticated using (owner_id = auth.uid()) with check (owner_id = auth.uid());
+  end if;
+
+  if not exists (select 1 from pg_policies where schemaname='public' and tablename='maintenance_requests' and policyname='tenants create own requests') then
+    create policy "tenants create own requests" on public.maintenance_requests
+      for insert to authenticated with check (
+        exists (
+          select 1 from public.tenants t
+          where t.id = tenant_id
+            and lower(t.email) = lower(coalesce((auth.jwt()->>'email'),''))
+        )
+      );
+  end if;
+
+  if not exists (select 1 from pg_policies where schemaname='public' and tablename='maintenance_requests' and policyname='tenants read own requests') then
+    create policy "tenants read own requests" on public.maintenance_requests
+      for select to authenticated using (
+        exists (
+          select 1 from public.tenants t
+          where t.id = tenant_id
+            and lower(t.email) = lower(coalesce((auth.jwt()->>'email'),''))
+        )
+      );
+  end if;
+
+  if not exists (select 1 from pg_policies where schemaname='public' and tablename='maintenance_requests' and policyname='admin manages all maintenance') then
+    create policy "admin manages all maintenance" on public.maintenance_requests
+      for all to authenticated
+      using (public.has_role(auth.uid(), 'admin'))
+      with check (public.has_role(auth.uid(), 'admin'));
+  end if;
+end
+$$;
+
+drop trigger if exists trg_mr_updated on public.maintenance_requests;
+create trigger trg_mr_updated before update on public.maintenance_requests
+ for each row execute function public.touch_updated_at();
 
