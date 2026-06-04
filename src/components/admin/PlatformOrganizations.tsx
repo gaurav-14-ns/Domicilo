@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 
@@ -30,7 +30,11 @@ export const PlatformOrganizations =
       setLoading,
     ] = useState(true);
 
+    const mountedRef =
+      useRef(true);
+
     useEffect(() => {
+      mountedRef.current = true;
       const load =
         async () => {
           try {
@@ -129,19 +133,32 @@ export const PlatformOrganizations =
                 })
               );
 
-            setRows(out);
+            if (
+              mountedRef.current
+            ) {
+              setRows(out);
+            }
           } catch (err) {
             console.error(
               err
             );
           } finally {
-            setLoading(
-              false
-            );
+            if (
+              mountedRef.current
+            ) {
+              setLoading(
+                false
+              );
+            }
           }
         };
 
       load();
+
+      return () => {
+        mountedRef.current =
+          false;
+      };
     }, []);
 
     if (loading) {

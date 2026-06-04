@@ -25,7 +25,7 @@ export function DocumentList({ documents, loading, getUrl, onRemove }: Props) {
     );
   }
 
-  if (documents.length === 0) {
+  if (!documents || documents.length === 0) {
     return (
       <p className="text-sm text-muted-foreground py-4 text-center">
         No documents uploaded yet.

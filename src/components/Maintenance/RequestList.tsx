@@ -39,7 +39,7 @@ export function RequestList({ requests, loading, onUpdateStatus }: Props) {
     );
   }
 
-  if (requests.length === 0) {
+  if (!requests || requests.length === 0) {
     return (
       <div className="flex flex-col items-center py-12 text-muted-foreground">
         <Wrench className="h-8 w-8 mb-2" />

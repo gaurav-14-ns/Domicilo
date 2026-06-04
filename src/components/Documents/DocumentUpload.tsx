@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { DocumentCategory } from "@/types/documents";
+import { toast } from "sonner";
 
 type Props = {
   onUpload: (file: File, category: DocumentCategory) => Promise<void>;
@@ -47,7 +48,10 @@ export function DocumentUpload({ onUpload }: Props) {
           onChange={(e) => {
             const f = e.target.files?.[0];
             if (f) {
-              if (f.size > maxSize) return;
+              if (f.size > maxSize) {
+                toast.error(`File too large (max 10 MB)`);
+                return;
+              }
               setFile(f);
             }
           }}
