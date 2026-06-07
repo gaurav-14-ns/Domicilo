@@ -18,6 +18,7 @@ export function FloatingActionMenu() {
   const [position, setPosition] = useState<"left" | "right">("right");
   const dragRef = useRef({ startX: 0, threshold: 0 });
   const menuRef = useRef<HTMLDivElement>(null);
+  const touchStartedInside = useRef(false);
 
   const isDashboard = loc.pathname.startsWith("/owner") || loc.pathname.startsWith("/tenant") || loc.pathname.startsWith("/admin");
   if (isDashboard) return null;
@@ -40,31 +41,48 @@ export function FloatingActionMenu() {
   }, []);
 
   const closeMenu = useCallback(() => {
+    if (animating === "leaving") return;
     setAnimating("leaving");
     setTimeout(() => {
       setOpen(false);
       setAnimating("idle");
-    }, 220);
-  }, []);
+    }, 450);
+  }, [animating]);
 
   const handleNav = useCallback((href: string) => {
     closeMenu();
-    setTimeout(() => nav(href), 50);
+    setTimeout(() => nav(href), 100);
   }, [nav, closeMenu]);
 
-  // Close menu on scroll
+  // Track if touch/click started inside menu
   useEffect(() => {
     if (!open) return;
-    const onScroll = () => closeMenu();
+    touchStartedInside.current = false;
+
+    const onDown = (e: PointerEvent) => {
+      touchStartedInside.current = !!menuRef.current?.contains(e.target as Node);
+    };
+    document.addEventListener("pointerdown", onDown);
+    return () => document.removeEventListener("pointerdown", onDown);
+  }, [open]);
+
+  // Close on scroll only if touch did NOT start inside menu
+  useEffect(() => {
+    if (!open) return;
+    const onScroll = () => {
+      if (!touchStartedInside.current) closeMenu();
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, [open, closeMenu]);
 
-  // Close on out-click (click outside the visual menu card)
+  // Close on click outside menu
   useEffect(() => {
     if (!open) return;
     const onPointerDown = (e: PointerEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        const fabBtn = document.querySelector("[data-fab-toggle]");
+        if (fabBtn?.contains(e.target as Node)) return;
         closeMenu();
       }
     };
@@ -109,7 +127,7 @@ export function FloatingActionMenu() {
           <div className="border-t border-primary/10 my-1" />
           {user ? (
             <button
-              onClick={() => { closeMenu(); setTimeout(() => nav(dashboardPathFor(role)), 50); }}
+              onClick={() => { closeMenu(); setTimeout(() => nav(dashboardPathFor(role)), 100); }}
               className="group flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-primary hover:bg-primary/10 transition-all duration-300 hover:shadow-[0_0_20px_hsl(var(--primary)/0.25)] hover:scale-[1.02]"
             >
               <Crown className="h-4 w-4 transition-all duration-300 group-hover:scale-110" />
@@ -141,10 +159,11 @@ export function FloatingActionMenu() {
 
       <button
         type="button"
+        data-fab-toggle
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
         onClick={() => (open ? closeMenu() : openMenu())}
-        className={`h-14 w-14 rounded-full bg-gradient-primary text-primary-foreground shadow-glow animate-fab-glow flex items-center justify-center transition-all duration-300 ${
+        className={`h-14 w-14 rounded-full bg-gradient-primary text-primary-foreground shadow-glow animate-fab-glow flex items-center justify-center transition-all duration-500 ${
           open ? "rotate-45 scale-110 shadow-lg" : "hover:scale-110"
         } touch-none select-none`}
         aria-label={open ? "Close menu" : "Open menu"}

@@ -341,6 +341,16 @@ const mountedRef =
           )
           .maybeSingle();
 
+      // Start tenant email lookup early (parallel) for tenant role
+      const tenantLookup =
+        currentRole === "tenant"
+          ? supabase
+              .from("tenants")
+              .select("*")
+              .ilike("email", user.email)
+              .maybeSingle()
+          : null;
+
       let propertiesPromise,
         tenantsPromise,
         txsPromise,
@@ -480,38 +490,22 @@ const mountedRef =
         currentRole ===
         "tenant"
       ) {
-        const {
-          data: myTenantRows,
-        } = await supabase
-          .from("tenants")
-          .select("*")
-          .ilike(
-            "email",
-            user.email
-          );
-
-        const myTenant =
-          (myTenantRows ??
-            [])[0];
-
         propertiesPromise =
           Promise.resolve(
-            {
-              data: [],
-            }
+            { data: [] }
           );
 
         tenantsPromise =
-          Promise.resolve(
-            {
-              data:
-                myTenant
-                  ? [
-                      myTenant,
-                    ]
-                  : [],
-            }
-          );
+          (tenantLookup ?? Promise.resolve({ data: null }))
+            .then(
+              ({ data: t }: any) => ({
+                data: t ? [t] : [],
+              })
+            );
+
+        const myTenant =
+          await (tenantLookup ?? Promise.resolve({ data: null }))
+            .then((r: any) => r.data ?? null);
 
         txsPromise =
           myTenant
@@ -532,16 +526,12 @@ const mountedRef =
                   }
                 )
             : Promise.resolve(
-                {
-                  data: [],
-                }
+                { data: [] }
               );
 
         orgsPromise =
           Promise.resolve(
-            {
-              data: [],
-            }
+            { data: [] }
           );
       } else {
         propertiesPromise =
