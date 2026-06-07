@@ -17,6 +17,10 @@ export function FloatingActionMenu() {
   const [position, setPosition] = useState<"left" | "right">("right");
   const dragRef = useRef({ startX: 0, threshold: 0 });
 
+  // Hide on authenticated dashboard pages
+  const isDashboard = loc.pathname.startsWith("/owner") || loc.pathname.startsWith("/tenant") || loc.pathname.startsWith("/admin");
+  if (isDashboard) return null;
+
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     dragRef.current.startX = e.clientX;
     dragRef.current.threshold = 60;

@@ -1,10 +1,7 @@
-import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./ThemeToggle";
 import { useAuth, dashboardPathFor } from "@/hooks/useAuth";
-import { FloatingActionMenu } from "./FloatingActionMenu";
 
 const links = [
   { label: "Browse Properties", href: "/properties" },
@@ -15,8 +12,6 @@ const links = [
 ];
 
 export const Navbar = () => {
-  const [open, setOpen] = useState(false);
-
   const nav = useNavigate();
 
   const loc = useLocation();
@@ -88,7 +83,6 @@ export const Navbar = () => {
   };
 
   return (
-    <>
     <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-xl bg-background/80 border-b border-border/40">
       <div className="container flex h-16 items-center justify-between">
         <Link
@@ -167,91 +161,8 @@ export const Navbar = () => {
 
         <div className="md:hidden flex items-center gap-1">
           <ThemeToggle />
-
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() =>
-              setOpen(!open)
-            }
-            aria-label="Menu"
-          >
-            {open ? (
-              <X />
-            ) : (
-              <Menu />
-            )}
-          </Button>
         </div>
       </div>
-
-      {open && (
-        <div className="md:hidden border-t border-border/40 bg-background/95 backdrop-blur-xl">
-          <div className="container py-4 flex flex-col gap-3">
-            {links.map((l) => (
-              <Link
-                key={l.href}
-                to={l.href}
-                onClick={(e) => {
-                  setOpen(false);
-                  handleClick(e, l.href);
-                }}
-                className={`text-sm font-medium py-2 transition-smooth ${
-                  isActive(l.href)
-                    ? "text-foreground"
-                    : "text-muted-foreground"
-                }`}
-              >
-                {l.label}
-              </Link>
-            ))}
-
-            <div className="flex gap-2 pt-2 border-t border-border/40">
-              {user ? (
-                <Button
-                  variant="hero"
-                  size="sm"
-                  className="flex-1 shadow-glow"
-                  onClick={() => {
-                    setOpen(false);
-                    goDashboard();
-                  }}
-                >
-                  Dashboard
-                </Button>
-              ) : (
-                <>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1"
-                    onClick={() => {
-                      setOpen(false);
-                      goAuth();
-                    }}
-                  >
-                    Sign in
-                  </Button>
-
-                  <Button
-                    variant="hero"
-                    size="sm"
-                    className="flex-1 shadow-glow"
-                    onClick={() => {
-                      setOpen(false);
-                      goAuth();
-                    }}
-                  >
-                    Start free
-                  </Button>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </header>
-    <FloatingActionMenu />
-    </>
   );
 };

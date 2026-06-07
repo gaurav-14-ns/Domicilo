@@ -12,6 +12,7 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { PageTransition } from "@/components/PageTransition";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { LoadingState } from "@/components/states/LoadingState";
+import { FloatingActionMenu } from "@/components/FloatingActionMenu";
 
 const Index = lazy(() => import("./pages/Index.tsx"));
 const BrowseProperties = lazy(() => import("./pages/BrowseProperties.tsx"));
@@ -135,6 +136,7 @@ const App = () => (
                   <Route path="/dashboard" element={<Navigate to="/auth" replace />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
+                <FloatingActionMenu />
                 </Suspense>
               </PageTransition>
             </DataStoreProvider>
