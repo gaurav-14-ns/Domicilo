@@ -8,6 +8,7 @@ import {
   useEffect,
   useState,
   useCallback,
+  useRef,
 } from "react";
 
 import {
@@ -59,6 +60,8 @@ export const ProtectedRoute = ({
     useLocation();
 
   const online = useOnlineStatus();
+
+  const hasResolvedOnce = useRef(false);
 
   const [
     roleTimeoutReached,
@@ -134,8 +137,8 @@ export const ProtectedRoute = ({
   }
 
   if (
-    loading ||
-    waitingForRole
+    !hasResolvedOnce.current &&
+    (loading || waitingForRole)
   ) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
@@ -211,5 +214,6 @@ export const ProtectedRoute = ({
     );
   }
 
+  hasResolvedOnce.current = true;
   return <>{children}</>;
 };

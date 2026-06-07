@@ -762,7 +762,9 @@ const mountedRef =
       return;
     }
     if (!role) {
-      setLoading(true);
+      if (!fetchedRef.current) {
+        setLoading(true);
+      }
       return;
     }
     // Re-fetch if user or role changed since last fetch
