@@ -15,8 +15,6 @@ import {
 
 import { AppSidebar } from "@/components/AppSidebar";
 
-import { ThemeToggle } from "@/components/ThemeToggle";
-
 import { SafeSection } from "@/components/SafeSection";
 
 import { AppRole } from "@/hooks/useAuth";
@@ -88,7 +86,6 @@ function DashboardContent({
           </div>
           </div>
 
-          <ThemeToggle />
         </header>
 
         <main className="flex-1 overflow-auto p-4 md:p-6 animate-page-enter">

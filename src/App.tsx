@@ -60,8 +60,7 @@ const App = () => (
   <AppErrorBoundary>
   <ThemeProvider
     attribute="class"
-    defaultTheme="light"
-    enableSystem
+    forcedTheme="dark"
   >
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -136,9 +135,9 @@ const App = () => (
                   <Route path="/dashboard" element={<Navigate to="/auth" replace />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
-                <FloatingActionMenu />
                 </Suspense>
               </PageTransition>
+              <FloatingActionMenu />
             </DataStoreProvider>
           </AuthProvider>
         </BrowserRouter>

@@ -1,6 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "./ThemeToggle";
 import { useAuth, dashboardPathFor } from "@/hooks/useAuth";
 
 const links = [
@@ -126,8 +125,6 @@ export const Navbar = () => {
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
-          <ThemeToggle />
-
           {user ? (
             <Button
               variant="hero"
@@ -159,9 +156,7 @@ export const Navbar = () => {
           )}
         </div>
 
-        <div className="md:hidden flex items-center gap-1">
-          <ThemeToggle />
-        </div>
+        <div className="md:hidden" />
       </div>
     </header>
   );
