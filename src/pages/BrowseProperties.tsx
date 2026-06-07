@@ -182,11 +182,11 @@ export default function BrowseProperties() {
         <div className="absolute bottom-0 right-1/4 h-32 w-32 bg-primary/20 blur-[100px] rounded-full animate-pulse-glow" aria-hidden style={{ animationDelay: "1s" }} />
         <div className="container relative">
           <AnimatedSection className="text-center">
-            <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-primary-foreground/80 mb-3 font-display">
-              <Crown className="h-3.5 w-3.5 text-amber-400" />
+            <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-royal-500/90 mb-3 font-display [text-shadow:0_0_20px_hsl(240_60%_26%/0.4)]">
+              <Crown className="h-3.5 w-3.5 text-royal-500" />
               Find Your Home
             </div>
-            <h1 className="font-display text-4xl md:text-6xl font-bold text-balance text-premium-shimmer">
+            <h1 className="font-display text-4xl md:text-6xl font-bold text-balance text-royal-500 [text-shadow:0_0_30px_hsl(240_60%_26%/0.5),0_0_60px_hsl(240_60%_26%/0.3)]">
               Browse Properties
             </h1>
             <p className="mt-4 text-primary-foreground/80 text-lg max-w-2xl mx-auto font-alt">

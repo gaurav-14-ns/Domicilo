@@ -16,6 +16,7 @@ type Props = {
 type State = {
   hasError: boolean;
   error?: any;
+  errorKey: number;
 };
 
 export class AppErrorBoundary extends React.Component<
@@ -29,6 +30,7 @@ export class AppErrorBoundary extends React.Component<
 
     this.state = {
       hasError: false,
+      errorKey: 0,
     };
   }
 
@@ -49,7 +51,6 @@ export class AppErrorBoundary extends React.Component<
       "Application crash:",
       error
     );
-
     console.error(
       errorInfo
     );
@@ -81,10 +82,6 @@ export class AppErrorBoundary extends React.Component<
 
             <p className="mt-2 text-sm text-muted-foreground font-alt leading-relaxed">
               {msg}
-            </p>
-
-            <p className="mt-1 text-xs text-muted-foreground/60 font-mono">
-              Please check the browser console (F12) for full details.
             </p>
 
             <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">

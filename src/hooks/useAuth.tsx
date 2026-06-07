@@ -56,17 +56,35 @@ export const AuthProvider = ({
   const online = useOnlineStatus();
   const lastOnlineRef = useRef(online);
 
+  const cachedUser = (() => {
+    try {
+      const raw = localStorage.getItem("domicilo_user");
+      return raw ? JSON.parse(raw) as User : null;
+    } catch {
+      return null;
+    }
+  })();
+
+  const cachedRole = (() => {
+    try {
+      const raw = localStorage.getItem("domicilo_role");
+      return raw as AppRole | null;
+    } catch {
+      return null;
+    }
+  })();
+
   const [session, setSession] =
     useState<Session | null>(null);
 
   const [user, setUser] =
-    useState<User | null>(null);
+    useState<User | null>(cachedUser);
 
   const [role, setRole] =
-    useState<AppRole | null>(null);
+    useState<AppRole | null>(cachedRole);
 
   const [loading, setLoading] =
-    useState(true);
+    useState(!cachedUser);
 
   const safeSetLoading = (
     value: boolean
@@ -321,6 +339,10 @@ if (suspended) {
           safeSetRole(
             resolvedRole
           );
+          try {
+            localStorage.setItem("domicilo_user", JSON.stringify(u));
+            localStorage.setItem("domicilo_role", resolvedRole);
+          } catch {} // ignore quota errors
         } catch (error: any) {
           if (error?.message === "SUSPENDED") {
             safeSetLoading(true);
@@ -388,6 +410,7 @@ if (suspended) {
             safeSetUser(null);
             safeSetRole(null);
             safeSetLoading(false);
+            try { localStorage.removeItem("domicilo_user"); localStorage.removeItem("domicilo_role"); } catch {}
             return;
           }
 
@@ -547,6 +570,7 @@ if (suspended) {
           safeSetSession(
             null
           );
+          try { localStorage.removeItem("domicilo_user"); localStorage.removeItem("domicilo_role"); } catch {}
         }
       },
       []

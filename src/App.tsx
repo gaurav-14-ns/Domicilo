@@ -57,7 +57,6 @@ const LoadingFallback = () => (
 const queryClient = new QueryClient();
 
 const App = () => (
-  <AppErrorBoundary>
   <ThemeProvider
     attribute="class"
     forcedTheme="dark"
@@ -69,6 +68,7 @@ const App = () => (
           <AuthProvider>
             <DataStoreProvider>
               <ScrollToTop />
+              <AppErrorBoundary>
               <PageTransition>
                 <Suspense fallback={<LoadingFallback />}>
                 <Routes>
@@ -137,6 +137,7 @@ const App = () => (
                 </Routes>
                 </Suspense>
               </PageTransition>
+              </AppErrorBoundary>
               <FloatingActionMenu />
             </DataStoreProvider>
           </AuthProvider>
@@ -144,7 +145,6 @@ const App = () => (
       </TooltipProvider>
     </QueryClientProvider>
     </ThemeProvider>
-</AppErrorBoundary>
 );
 
 export default App;
