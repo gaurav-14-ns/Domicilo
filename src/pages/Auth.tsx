@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import {
   useNavigate,
@@ -389,6 +389,9 @@ useEffect(() => {
             : "Owner account created"
         );
 
+        signinSuccessRef.current =
+          true;
+
         setName("");
         setSignupEmail(
           ""
@@ -410,10 +413,13 @@ useEffect(() => {
               err.message,
           }
         );
-      } finally {
+
         safeSetBusy(false);
       }
     };
+
+  const signinSuccessRef =
+    useRef(false);
 
   // SIGNIN
 
@@ -454,6 +460,9 @@ useEffect(() => {
           "Welcome back"
         );
 
+        signinSuccessRef.current =
+          true;
+
       } catch (
         err: any
       ) {
@@ -464,7 +473,7 @@ useEffect(() => {
               err.message,
           }
         );
-      } finally {
+
         safeSetBusy(false);
       }
     };

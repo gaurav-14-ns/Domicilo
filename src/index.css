@@ -884,4 +884,164 @@
   -webkit-backdrop-filter: blur(20px) saturate(1.3);
 }
 
+/* =========================================================================
+   STELLAR BACKGROUND - Cosmic animated starfield
+   ========================================================================= */
+
+/* Fixed starfield overlay behind all content */
+.dark .starfield-bg,
+.starfield-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Nebula glow - soft colored mist that drifts */
+.starfield-bg::before {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  background:
+    radial-gradient(ellipse 40% 30% at 25% 30%, hsl(260 60% 30% / 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 35% 25% at 70% 60%, hsl(42 80% 40% / 0.08) 0%, transparent 55%),
+    radial-gradient(ellipse 30% 35% at 50% 80%, hsl(300 50% 25% / 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 25% 20% at 10% 70%, hsl(200 60% 30% / 0.05) 0%, transparent 50%);
+  animation: nebula-drift 40s ease-in-out infinite alternate;
+}
+
+/* Tiny stars layer (many dim stars) */
+.starfield-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 200%;
+  background: transparent;
+  box-shadow:
+    0.5px 0.5px 0 hsl(42 80% 85% / 0.35), 22px 8px 0 hsl(42 80% 85% / 0.3), 35px 28px 0 hsl(42 80% 85% / 0.4), 48px 5px 0 hsl(42 80% 85% / 0.25),
+    60px 18px 0 hsl(42 80% 85% / 0.35), 75px 12px 0 hsl(42 80% 85% / 0.3), 88px 25px 0 hsl(42 80% 85% / 0.4), 95px 8px 0 hsl(42 80% 85% / 0.25),
+    12px 35px 0 hsl(42 80% 85% / 0.3), 28px 42px 0 hsl(42 80% 85% / 0.35), 40px 55px 0 hsl(42 80% 85% / 0.25), 52px 38px 0 hsl(42 80% 85% / 0.4),
+    65px 50px 0 hsl(42 80% 85% / 0.3), 78px 35px 0 hsl(42 80% 85% / 0.35), 85px 60px 0 hsl(42 80% 85% / 0.3), 92px 45px 0 hsl(42 80% 85% / 0.25),
+    5px 65px 0 hsl(42 80% 85% / 0.35), 18px 72px 0 hsl(42 80% 85% / 0.3), 30px 85px 0 hsl(42 80% 85% / 0.4), 42px 68px 0 hsl(42 80% 85% / 0.25),
+    55px 78px 0 hsl(42 80% 85% / 0.35), 68px 88px 0 hsl(42 80% 85% / 0.3), 80px 72px 0 hsl(42 80% 85% / 0.4), 90px 82px 0 hsl(42 80% 85% / 0.25),
+    15px 92px 0 hsl(42 80% 85% / 0.3), 25px 10px 0 hsl(42 80% 85% / 0.35), 38px 18px 0 hsl(42 80% 85% / 0.25), 50px 25px 0 hsl(42 80% 85% / 0.4),
+    62px 15px 0 hsl(42 80% 85% / 0.3), 72px 45px 0 hsl(42 80% 85% / 0.35), 82px 55px 0 hsl(42 80% 85% / 0.3), 98px 35px 0 hsl(42 80% 85% / 0.25),
+    8px 48px 0 hsl(42 80% 85% / 0.35), 32px 60px 0 hsl(42 80% 85% / 0.3), 45px 12px 0 hsl(42 80% 85% / 0.4), 58px 65px 0 hsl(42 80% 85% / 0.25),
+    70px 30px 0 hsl(42 80% 85% / 0.35), 85px 18px 0 hsl(42 80% 85% / 0.3), 92px 55px 0 hsl(42 80% 85% / 0.4), 3px 80px 0 hsl(42 80% 85% / 0.25),
+    20px 55px 0 hsl(42 80% 85% / 0.3), 36px 35px 0 hsl(42 80% 85% / 0.35), 48px 48px 0 hsl(42 80% 85% / 0.25), 63px 72px 0 hsl(42 80% 85% / 0.4),
+    76px 58px 0 hsl(42 80% 85% / 0.3), 88px 68px 0 hsl(42 80% 85% / 0.35), 95px 18px 0 hsl(42 80% 85% / 0.3), 6px 28px 0 hsl(42 80% 85% / 0.25),
+    42px 8px 0 hsl(42 80% 85% / 0.35), 55px 55px 0 hsl(42 80% 85% / 0.3), 68px 5px 0 hsl(42 80% 85% / 0.4), 78px 42px 0 hsl(42 80% 85% / 0.25),
+    85px 38px 0 hsl(42 80% 85% / 0.35), 92px 72px 0 hsl(42 80% 85% / 0.3), 15px 18px 0 hsl(42 80% 85% / 0.4), 28px 68px 0 hsl(42 80% 85% / 0.25),
+    35px 75px 0 hsl(42 80% 85% / 0.3), 52px 85px 0 hsl(42 80% 85% / 0.35), 66px 22px 0 hsl(42 80% 85% / 0.25);
+  transform: translateY(0);
+  animation: star-drift 60s linear infinite;
+}
+
+/* Bright stars layer (larger, glowing) - separate pseudo-element via extra wrapper */
+.starfield-bright {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.starfield-bright::before {
+  content: '';
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: hsl(42 80% 90% / 0.7);
+  box-shadow:
+    0 0 6px 2px hsl(42 80% 70% / 0.3),
+    15% 22% 0 0 hsl(42 80% 90%),
+    58% 15% 0 0 hsl(42 80% 90%),
+    82% 65% 0 0 hsl(42 80% 90%),
+    35% 80% 0 0 hsl(42 80% 90%),
+    72% 40% 0 0 hsl(42 80% 90%),
+    10% 55% 0 0 hsl(42 80% 90%),
+    45% 10% 0 0 hsl(42 80% 90%),
+    90% 48% 0 0 hsl(42 80% 90%),
+    68% 72% 0 0 hsl(42 80% 90%),
+    22% 90% 0 0 hsl(42 80% 90%);
+  animation: twinkle-bright 3s ease-in-out infinite alternate, star-float 8s ease-in-out infinite alternate;
+  top: 0;
+  left: 0;
+}
+
+/* Shooting star */
+.starfield-shooting {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.starfield-shooting::before {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 4px 2px hsl(42 80% 90% / 0.6), 0 0 8px 4px hsl(42 80% 80% / 0.3);
+  top: -5%;
+  left: 80%;
+  animation: shooting-star 8s ease-in-out infinite;
+}
+
+.starfield-shooting::after {
+  content: '';
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 3px 1px hsl(42 80% 90% / 0.4);
+  top: -5%;
+  left: 30%;
+  animation: shooting-star 12s ease-in-out infinite 4s;
+}
+
+/* Keyframes */
+@keyframes nebula-drift {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(3%, 2%) rotate(2deg); }
+  66% { transform: translate(-2%, -1%) rotate(-1deg); }
+  100% { transform: translate(1%, -3%) rotate(1deg); }
+}
+
+@keyframes star-drift {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
+@keyframes twinkle-bright {
+  0%, 100% { opacity: 0.6; filter: brightness(0.8); transform: scale(1); }
+  50% { opacity: 1; filter: brightness(1.3); transform: scale(1.1); }
+}
+
+@keyframes star-float {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(8px, -5px); }
+}
+
+@keyframes shooting-star {
+  0% { transform: translate(0, 0) rotate(-35deg); opacity: 0; }
+  5% { opacity: 1; }
+  15% { transform: translate(-200px, 250px) rotate(-35deg); opacity: 1; }
+  20% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* Ensure content sits above starfield */
+.dark #root,
+#root {
+  position: relative;
+  z-index: 1;
+}
+
 

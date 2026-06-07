@@ -61,6 +61,9 @@ const App = () => (
     attribute="class"
     forcedTheme="dark"
   >
+    <div className="starfield-bg" aria-hidden="true" />
+    <div className="starfield-bright" aria-hidden="true" />
+    <div className="starfield-shooting" aria-hidden="true" />
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Sonner />
