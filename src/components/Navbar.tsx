@@ -156,7 +156,6 @@ export const Navbar = () => {
           )}
         </div>
 
-        <div className="md:hidden" />
       </div>
     </header>
   );
