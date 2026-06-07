@@ -185,7 +185,7 @@ export default function ResetPassword() {
       ) {
 
         toast.error(
-          err.message ||
+          err?.message ??
           "Failed to update password."
         );
 

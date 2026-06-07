@@ -575,9 +575,8 @@ export default function BrowseProperties() {
                 try {
                   const { data: { user } } = await supabase.auth.getUser();
                   const { error } = await supabase.from("leads").insert({
-                    property_id: selectedListing.id,
-                    owner_id: selectedListing.ownerId,
-                    user_id: user?.id ?? null,
+                    name: selectedListing.name,
+                    email: user?.email ?? "anonymous@browse.enquiry",
                     message: enquiryMessage.trim(),
                     source: "browse_enquiry",
                   });
@@ -586,7 +585,7 @@ export default function BrowseProperties() {
                   setEnquiryOpen(false);
                   setEnquiryMessage("");
                 } catch (e: any) {
-                  toast.error(e.message || "Failed to send enquiry. Try again.");
+                  toast.error(e?.message ?? "Failed to send enquiry. Try again.");
                 } finally {
                   setSendingEnquiry(false);
                 }

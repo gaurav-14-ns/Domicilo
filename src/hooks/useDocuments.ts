@@ -6,7 +6,7 @@ import type { Document, DocumentCategory, DocumentReferenceType } from "@/types/
 import { toast } from "sonner";
 
 export function useDocuments() {
-  const { user } = useAuth();
+  const { user, role } = useAuth();
   const { data } = useDataStore();
   const [docs, setDocs] = useState<Document[]>([]);
   const [loading, setLoading] = useState(false);
@@ -19,10 +19,11 @@ export function useDocuments() {
   const fetchDocs = useCallback(async () => {
     if (!user) return;
     setLoading(true);
-    const { data: rows, error } = await supabase
-      .from("documents")
-      .select("*")
-      .order("created_at", { ascending: false });
+    let query = supabase.from("documents").select("*");
+    if (role === "owner") {
+      query = query.eq("owner_id", user.id);
+    }
+    const { data: rows, error } = await query.order("created_at", { ascending: false });
     if (!mountedRef.current) return;
     if (error) {
       console.error("Failed to fetch documents:", error);
@@ -32,7 +33,7 @@ export function useDocuments() {
     }
     setDocs((rows ?? []) as Document[]);
     setLoading(false);
-  }, [user?.id]);
+  }, [user?.id, role]);
 
   useEffect(() => {
     fetchDocs();
@@ -76,16 +77,21 @@ export function useDocuments() {
 
   const removeDoc = useCallback(
     async (doc: Document) => {
+      if (!user) return;
       const { error: storageErr } = await supabase.storage
         .from("documents")
         .remove([doc.file_path]);
       if (storageErr) console.error("Storage remove failed:", storageErr);
 
-      await supabase.from("documents").delete().eq("id", doc.id);
+      let query = supabase.from("documents").delete();
+      if (role === "owner") {
+        query = query.eq("owner_id", user.id);
+      }
+      await query.eq("id", doc.id);
       toast.success("Document deleted");
       setDocs((prev) => prev.filter((d) => d.id !== doc.id));
     },
-    [],
+    [user?.id, role],
   );
 
   const getUrl = useCallback((doc: Document) => {

@@ -94,7 +94,7 @@ export default function System() {
       ) {
 
         toast.error(
-          err.message ||
+          err?.message ??
             "Failed to update password."
         );
 

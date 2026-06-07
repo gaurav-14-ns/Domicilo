@@ -192,7 +192,7 @@ export default function Settings() {
     ) {
 
       toast.error(
-        err.message ||
+        err?.message ??
           "Failed to update password."
       );
 

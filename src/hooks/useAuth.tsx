@@ -274,8 +274,8 @@ if (suspended) {
                       "",
                   },
                   {
-                    onConflict:
-                      "user_id",
+                  onConflict:
+                    "user_id,role",
                   }
                 )
             );

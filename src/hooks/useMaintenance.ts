@@ -6,7 +6,7 @@ import type { MaintenanceRequest, MaintenancePriority, MaintenanceStatus } from 
 import { toast } from "sonner";
 
 export function useMaintenance() {
-  const { user } = useAuth();
+  const { user, role } = useAuth();
   const { data } = useDataStore();
   const [requests, setRequests] = useState<MaintenanceRequest[]>([]);
   const [loading, setLoading] = useState(false);
@@ -33,6 +33,9 @@ export function useMaintenance() {
       query = query.eq("tenant_id", tenant.id);
     }
 
+    if (role === "owner") {
+      query = query.eq("owner_id", user.id);
+    }
     const { data: rows, error } = await query.order("created_at", { ascending: false });
 
     if (!mountedRef.current) return;
@@ -44,7 +47,7 @@ export function useMaintenance() {
     }
     setRequests((rows ?? []) as MaintenanceRequest[]);
     setLoading(false);
-  }, [user?.id, data.tenants]);
+  }, [user?.id, role, data.tenants]);
 
   useEffect(() => {
     fetchRequests();
@@ -81,16 +84,17 @@ export function useMaintenance() {
 
   const updateStatus = useCallback(
     async (id: string, status: MaintenanceStatus) => {
-      const { error } = await supabase
-        .from("maintenance_requests")
-        .update({ status })
-        .eq("id", id);
+      let query = supabase.from("maintenance_requests").update({ status });
+      if (role === "owner") {
+        query = query.eq("owner_id", user?.id);
+      }
+      const { error } = await query.eq("id", id);
       if (error) throw error;
       setRequests((prev) =>
         prev.map((r) => (r.id === id ? { ...r, status } : r)),
       );
     },
-    [],
+    [user?.id, role],
   );
 
   return { requests, loading, fetchRequests, create, updateStatus };

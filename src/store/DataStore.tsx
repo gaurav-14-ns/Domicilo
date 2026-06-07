@@ -204,6 +204,11 @@ export function DataStoreProvider({ children }: { children: ReactNode }) {
 const mountedRef =
   useRef(true);
 
+useEffect(() => {
+  mountedRef.current = true;
+  return () => { mountedRef.current = false; };
+}, []);
+
   const roleRef =
   useRef(role);
   roleRef.current = role;
@@ -733,6 +738,7 @@ const mountedRef =
     }
   }, [
     user?.id,
+    user?.email,
   ]);
 
   // Early fetch: settings + tenant_profile as soon as user is available
@@ -962,12 +968,12 @@ const mountedRef =
   const refresh =
   useCallback(
     async () => {
-      fetchedRef.current = false;
       if (
         reconcileRef.current
       ) {
         return reconcileRef.current;
       }
+      fetchedRef.current = false;
 
       const promise =
         fetchAll();
@@ -1549,7 +1555,7 @@ const removeProperty = useCallback(async (id: string) => {
   }
 
 }, [
-  user,
+  user?.id,
   refresh,
   data.settings.currencyCode,
   data.settings.locale,
@@ -1795,7 +1801,7 @@ const removeProperty = useCallback(async (id: string) => {
       await refresh();
     } catch (error: any) {
       console.error("Admin orgs update failed:", error);
-      toast.error(error?.message || "Failed to update organizations.");
+      toast.error(error?.message ?? "Failed to update organizations.");
     }
   }, [data.adminOrgs, refresh]);
 
