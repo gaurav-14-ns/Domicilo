@@ -70,12 +70,21 @@ export const ProtectedRoute = ({
 
   const [retryCount, setRetryCount] = useState(0);
 
+  const waitingForRole =
+    !!user &&
+    !!allow &&
+    role === null &&
+    !roleTimeoutReached;
+
   useEffect(() => {
     setRoleTimeoutReached(false);
     setRetryCount(0);
   }, [user?.id]);
 
+  // Only start the 10s timeout when actually waiting for role.
+  // Cancels automatically when waitingForRole becomes false (role resolves).
   useEffect(() => {
+    if (!waitingForRole) return;
     const timeout =
       setTimeout(() => {
         setRoleTimeoutReached(
@@ -87,17 +96,17 @@ export const ProtectedRoute = ({
       clearTimeout(
         timeout
       );
-  }, [retryCount]);
+  }, [waitingForRole, retryCount]);
 
-  // Auto-retry when coming back online while stuck
+  // Auto-retry when still stuck after timeout (role never resolved)
   useEffect(() => {
-    if (online && roleTimeoutReached) {
+    if (online && roleTimeoutReached && role === null) {
       const t = setTimeout(() => {
         window.location.reload();
       }, 2000);
       return () => clearTimeout(t);
     }
-  }, [online, roleTimeoutReached]);
+  }, [online, roleTimeoutReached, role]);
 
   // Force retry handler
   const handleRetry = useCallback(() => {
@@ -105,12 +114,6 @@ export const ProtectedRoute = ({
     setRoleTimeoutReached(false);
     window.location.reload();
   }, []);
-
-  const waitingForRole =
-    !!user &&
-    !!allow &&
-    role === null &&
-    !roleTimeoutReached;
 
   if (!online && (loading || waitingForRole)) {
     return (
