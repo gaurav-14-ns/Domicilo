@@ -148,7 +148,7 @@
   }
 
   ::selection {
-    @apply bg-primary/20 text-primary-deep;
+    @apply bg-primary/30 text-primary-foreground;
   }
 }
 
@@ -554,9 +554,85 @@
   transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
 }
-.card-shine:hover::before {
-  transform: translateX(100%);
-}
+  .card-shine:hover::before {
+    transform: translateX(100%);
+  }
+
+  /* Enhanced text contrast on light backgrounds */
+  .text-royal-glow {
+    color: hsl(240 60% 26%);
+    text-shadow: 0 0 40px hsl(240 55% 40% / 0.15), 0 2px 4px hsl(240 60% 10% / 0.08);
+  }
+  .dark .text-royal-glow {
+    color: hsl(45 65% 75%);
+    text-shadow: 0 0 40px hsl(45 65% 52% / 0.2), 0 2px 4px hsl(0 0% 0% / 0.3);
+  }
+
+  /* Light-on-dark text with glow */
+  .text-light-glow {
+    color: hsl(240 60% 96%);
+    text-shadow: 0 0 30px hsl(240 60% 50% / 0.2);
+  }
+  .dark .text-light-glow {
+    color: hsl(45 60% 92%);
+    text-shadow: 0 0 30px hsl(45 65% 52% / 0.25), 0 2px 8px hsl(0 0% 0% / 0.4);
+  }
+
+  /* Primary text with extra pop on colored backgrounds */
+  .text-primary-pop {
+    color: hsl(240 60% 26%);
+    text-shadow: 0 1px 3px hsl(240 60% 10% / 0.12);
+  }
+  .dark .text-primary-pop {
+    color: hsl(45 65% 55%);
+    text-shadow: 0 0 20px hsl(45 65% 52% / 0.3), 0 2px 6px hsl(0 0% 0% / 0.3);
+  }
+
+  /* Section heading with strong visual weight */
+  .text-heading-premium {
+    color: hsl(240 60% 22%);
+    text-shadow: 0 2px 8px hsl(240 60% 10% / 0.06);
+  }
+  .dark .text-heading-premium {
+    color: hsl(45 60% 88%);
+    text-shadow: 0 2px 12px hsl(0 0% 0% / 0.3);
+  }
+
+  /* Muted text with better readability */
+  .text-muted-readable {
+    color: hsl(240 25% 38%);
+  }
+  .dark .text-muted-readable {
+    color: hsl(45 25% 65%);
+  }
+
+  /* Enhanced background for cards with better contrast for children text */
+  .bg-card-enhanced {
+    background: hsl(40 60% 98%);
+    border: 1px solid hsl(240 30% 80% / 0.5);
+  }
+  .dark .bg-card-enhanced {
+    background: hsl(240 55% 10%);
+    border: 1px solid hsl(45 40% 40% / 0.15);
+  }
+
+  /* Ultra-premium shimmer for hero headings */
+  .text-premium-shimmer {
+    background: linear-gradient(135deg, hsl(240 60% 26%) 0%, hsl(240 50% 45%) 30%, hsl(45 100% 50%) 60%, hsl(240 50% 45%) 80%, hsl(240 60% 26%) 100%);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shimmer 5s ease-in-out infinite;
+  }
+  .dark .text-premium-shimmer {
+    background: linear-gradient(135deg, hsl(45 65% 55%) 0%, hsl(45 80% 70%) 25%, hsl(45 95% 80%) 50%, hsl(45 80% 70%) 75%, hsl(45 65% 55%) 100%);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shimmer 5s ease-in-out infinite;
+  }
 
 .dark .card-shine::before {
   background: linear-gradient(

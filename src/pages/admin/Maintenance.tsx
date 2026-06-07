@@ -7,7 +7,7 @@ export default function AdminMaintenance() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-display font-bold">All Maintenance Requests</h1>
+        <h1 className="text-2xl md:text-3xl font-display font-bold text-gradient">All Maintenance Requests</h1>
         <p className="text-sm text-muted-foreground">
           Manage all maintenance requests across the platform.
         </p>

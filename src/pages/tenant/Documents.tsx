@@ -14,7 +14,7 @@ export default function TenantDocuments() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-display font-bold">My Documents</h1>
+        <h1 className="text-2xl md:text-3xl font-display font-bold text-gradient">My Documents</h1>
         <p className="text-sm text-muted-foreground">
           Documents shared by your owner.
         </p>

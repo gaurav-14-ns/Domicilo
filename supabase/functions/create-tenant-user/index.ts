@@ -298,6 +298,78 @@ const {
     }
 
     // --------------------------------------------------
+    // Send welcome email + SMS notification
+    // --------------------------------------------------
+
+    try {
+      const RESEND_KEY = Deno.env.get("RESEND_API_KEY") ?? "";
+      const ownerInfo = await supabase.from("profiles").select("full_name, email").eq("id", owner_id).maybeSingle();
+      const ownerName = ownerInfo?.data?.full_name ?? "Your property manager";
+
+      // Welcome email
+      if (RESEND_KEY) {
+        await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${RESEND_KEY}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            from: "Domicilo <notifications@domicilo.app>",
+            to: normalizedEmail,
+            subject: "Welcome to Domicilo — Set your password",
+            html: `
+              <div style="font-family:sans-serif;max-width:480px;margin:0 auto;">
+                <h1 style="color:#1a1a4e;font-size:24px;">Welcome to Domicilo</h1>
+                <p style="color:#444;font-size:15px;line-height:1.6;">Hi <strong>${name}</strong>,</p>
+                <p style="color:#444;font-size:15px;line-height:1.6;">
+                  ${ownerName} has added you as a tenant. You can now log in to your Domicilo dashboard
+                  to view your dues, make payments, and manage your tenancy.
+                </p>
+                <p style="color:#444;font-size:15px;line-height:1.6;">
+                  Click the button below to set your password and get started:
+                </p>
+                <a href="${SITE_URL}/auth/reset-password"
+                   style="display:inline-block;background:#1a1a4e;color:#ffd700;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:600;margin:16px 0;">
+                  Set My Password
+                </a>
+                <p style="color:#888;font-size:13px;line-height:1.5;">
+                  Your property: ${room || "—"} &middot; Rent: ${rent ? `₹${Number(rent).toLocaleString("en-IN")}/mo` : "—"}<br/>
+                  If you have any questions, contact your property manager.
+                </p>
+              </div>
+            `,
+          }),
+        });
+      }
+
+      // SMS notification stub (requires a provider like Twilio, MSG91, etc.)
+      if (phone) {
+        try {
+          const SMS_API_KEY = Deno.env.get("SMS_API_KEY") ?? "";
+          const SMS_FROM = Deno.env.get("SMS_FROM") ?? "DOMICILO";
+          if (SMS_API_KEY) {
+            // Example: MSG91 or Twilio integration
+            await fetch("https://api.msg91.com/api/v5/flow/", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", "authkey": SMS_API_KEY },
+              body: JSON.stringify({
+                flow_id: "welcome_tenant",
+                sender: SMS_FROM,
+                mobiles: phone,
+                var1: name,
+                var2: SITE_URL,
+              }),
+            });
+          }
+        } catch (_smsErr) {
+          // SMS delivery failure is non-critical
+          console.warn("SMS notification skipped:", _smsErr);
+        }
+      }
+    } catch (_notifErr) {
+      // Notification failure is non-critical
+      console.warn("Welcome notification skipped:", _notifErr);
+    }
+
+    // --------------------------------------------------
     // Success
     // --------------------------------------------------
 

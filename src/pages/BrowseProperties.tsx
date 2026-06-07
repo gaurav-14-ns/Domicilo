@@ -7,9 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Search, MapPin, Bed, Bath, Home, SlidersHorizontal, X, IndianRupee, Building2, CheckCircle2, Phone, Mail, Crown } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Search, MapPin, Bed, Bath, Home, SlidersHorizontal, X, IndianRupee, Building2, CheckCircle2, Phone, Mail, Crown, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { AnimatedSection, AnimatedStagger } from "@/components/AnimatedSection";
+import { toast } from "sonner";
 
 const AMENITIES = ["WiFi", "Parking", "AC", "Gym", "Pool", "Power Backup", "Security", "Lift"];
 const PROPERTY_TYPES = ["Apartment", "House", "Villa", "Studio", "Penthouse", "Duplex", "PG"];
@@ -47,14 +49,25 @@ export default function BrowseProperties() {
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const [ownerEmail, setOwnerEmail] = useState("");
   const [ownerName, setOwnerName] = useState("");
+  const [ownerCompany, setOwnerCompany] = useState("");
+  const [enquiryOpen, setEnquiryOpen] = useState(false);
+  const [enquiryMessage, setEnquiryMessage] = useState("");
+  const [sendingEnquiry, setSendingEnquiry] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // Fetch owner contact info when detail dialog opens
   useEffect(() => {
-    if (!selectedListing?.ownerId) { setOwnerEmail(""); setOwnerName(""); return; }
+    if (!selectedListing?.ownerId) { setOwnerEmail(""); setOwnerName(""); setOwnerCompany(""); return; }
     let cancelled = false;
-    supabase.from("profiles").select("email, full_name").eq("id", selectedListing.ownerId).maybeSingle().then(({ data }) => {
+    Promise.all([
+      supabase.from("profiles").select("email, full_name").eq("id", selectedListing.ownerId).maybeSingle(),
+      supabase.from("app_settings").select("company_name").eq("user_id", selectedListing.ownerId).maybeSingle()
+    ]).then(([profile, setting]) => {
       if (cancelled) return;
-      if (data) { setOwnerEmail(data.email ?? ""); setOwnerName(data.full_name ?? ""); }
+      if (profile.data) { setOwnerEmail(profile.data.email ?? ""); setOwnerName(profile.data.full_name ?? ""); }
+      if (setting.data?.company_name) setOwnerCompany(setting.data.company_name);
+    }).catch(() => {
+      // Silently fail — owner info is non-critical
     });
     return () => { cancelled = true; };
   }, [selectedListing?.ownerId]);
@@ -346,9 +359,18 @@ export default function BrowseProperties() {
                 >
                   {/* Header image area */}
                   <div className="h-44 bg-gradient-primary/20 relative overflow-hidden">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <Building2 className="h-14 w-14 text-primary/15" />
-                    </div>
+                    {l.images.length > 0 ? (
+                      <img
+                        src={l.images[0]}
+                        alt={l.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Building2 className="h-14 w-14 text-primary/15" />
+                      </div>
+                    )}
                     {/* Type badge */}
                     <Badge className="absolute top-3 left-3 font-alt font-normal tracking-wide" variant="secondary">
                       {l.propertyType}
@@ -409,13 +431,41 @@ export default function BrowseProperties() {
         )}
 
         {/* Detail Dialog */}
-        <Dialog open={!!selectedListing} onOpenChange={(open) => { if (!open) setSelectedListing(null); }}>
+        <Dialog open={!!selectedListing} onOpenChange={(open) => { if (!open) { setSelectedListing(null); setCurrentImageIndex(0); } }}>
           <DialogContent className="sm:max-w-xl">
-            <DialogHeader>
-              <DialogTitle className="font-display text-xl">{selectedListing?.name}</DialogTitle>
-            </DialogHeader>
             {selectedListing && (
               <div className="space-y-4">
+                {/* Image gallery */}
+                {selectedListing.images.length > 0 && (
+                  <div className="relative h-52 rounded-lg overflow-hidden bg-muted">
+                    <img
+                      src={selectedListing.images[currentImageIndex]}
+                      alt={`${selectedListing.name} — image ${currentImageIndex + 1}`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                    />
+                    {selectedListing.images.length > 1 && (
+                      <>
+                        <button onClick={() => setCurrentImageIndex(i => (i - 1 + selectedListing.images.length) % selectedListing.images.length)} className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1.5 hover:bg-background transition-smooth">
+                          <ChevronLeft className="h-4 w-4" />
+                        </button>
+                        <button onClick={() => setCurrentImageIndex(i => (i + 1) % selectedListing.images.length)} className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1.5 hover:bg-background transition-smooth">
+                          <ChevronRight className="h-4 w-4" />
+                        </button>
+                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+                          {selectedListing.images.map((_, i) => (
+                            <button key={i} onClick={() => setCurrentImageIndex(i)} className={`w-1.5 h-1.5 rounded-full transition-smooth ${i === currentImageIndex ? "bg-primary" : "bg-background/60"}`} />
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+
+                <DialogHeader>
+                  <DialogTitle className="font-display text-xl">{selectedListing?.name}</DialogTitle>
+                </DialogHeader>
+
                 {/* Quick stats */}
                 <div className="grid grid-cols-3 gap-3">
                   <div className="rounded-lg bg-primary/5 border border-primary/10 p-3 text-center">
@@ -471,27 +521,79 @@ export default function BrowseProperties() {
                   </div>
                 )}
 
-                {/* Contact CTA */}
+                {/* Enquire CTA */}
                 <div className="rounded-lg bg-gradient-primary p-4 text-center">
                   <p className="text-primary-foreground font-display font-semibold text-sm">Interested in this property?</p>
-                  <p className="text-primary-foreground/70 text-xs mt-1 font-alt">Contact the owner to schedule a visit.</p>
-                  <div className="flex items-center justify-center gap-4 mt-3">
-                    {ownerEmail ? (
-                      <a href={`mailto:${ownerEmail}`} className="inline-flex items-center gap-1.5 text-primary-foreground/80 text-xs hover:text-primary-foreground transition-smooth">
-                        <Mail className="h-3 w-3" /> {ownerName ? `Email ${ownerName}` : "Send message"}
+                  <p className="text-primary-foreground/70 text-xs mt-1 font-alt">Send an enquiry to the owner.</p>
+                  <div className="flex items-center justify-center gap-3 mt-3">
+                    <Button onClick={() => setEnquiryOpen(true)} size="sm" variant="secondary" className="font-alt">
+                      Send Enquiry
+                    </Button>
+                    {ownerEmail && (
+                      <a href={`mailto:${ownerEmail}?subject=Enquiry about ${selectedListing.name}`} className="inline-flex items-center gap-1.5 text-primary-foreground/80 text-xs hover:text-primary-foreground transition-smooth">
+                        <Mail className="h-3 w-3" /> Email
                       </a>
-                    ) : (
-                      <span className="flex items-center gap-1.5 text-primary-foreground/50 text-xs">
-                        <Mail className="h-3 w-3" /> Owner contact unavailable
-                      </span>
                     )}
                   </div>
                   <p className="text-primary-foreground/50 text-[10px] mt-2 font-alt">
-                    {ownerName ? `Listed by ${ownerName}` : ""}
+                    {ownerName ? `Listed by ${ownerName}${ownerCompany ? ` · ${ownerCompany}` : ""}` : ""}
                   </p>
                 </div>
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Enquiry Dialog */}
+        <Dialog open={enquiryOpen} onOpenChange={setEnquiryOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="font-display">Send Enquiry</DialogTitle>
+              <DialogDescription className="font-alt">
+                Send a message to the owner of <span className="font-semibold text-foreground">{selectedListing?.name}</span>.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-3">
+              <div>
+                <Label className="font-alt text-xs">Your Message</Label>
+                <Textarea
+                  placeholder="Hi, I'm interested in this property. Can we schedule a visit?"
+                  value={enquiryMessage}
+                  onChange={(e) => setEnquiryMessage(e.target.value)}
+                  rows={4}
+                  className="font-alt text-sm mt-1.5"
+                />
+              </div>
+            </div>
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={() => { setEnquiryOpen(false); setEnquiryMessage(""); }} disabled={sendingEnquiry} className="font-alt text-xs">
+                Cancel
+              </Button>
+              <Button onClick={async () => {
+                if (!selectedListing || !enquiryMessage.trim()) return;
+                setSendingEnquiry(true);
+                try {
+                  const { data: { user } } = await supabase.auth.getUser();
+                  const { error } = await supabase.from("leads").insert({
+                    property_id: selectedListing.id,
+                    owner_id: selectedListing.ownerId,
+                    user_id: user?.id ?? null,
+                    message: enquiryMessage.trim(),
+                    source: "browse_enquiry",
+                  });
+                  if (error) throw error;
+                  toast.success("Enquiry sent! The owner will contact you shortly.");
+                  setEnquiryOpen(false);
+                  setEnquiryMessage("");
+                } catch (e: any) {
+                  toast.error(e.message || "Failed to send enquiry. Try again.");
+                } finally {
+                  setSendingEnquiry(false);
+                }
+              }} disabled={sendingEnquiry || !enquiryMessage.trim()} className="font-alt text-xs">
+                {sendingEnquiry ? <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Sending...</> : "Send Enquiry"}
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>

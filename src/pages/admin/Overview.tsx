@@ -13,6 +13,8 @@ import {
   Home,
   Loader2,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface Metrics {
   activeOwners: number;
@@ -398,9 +400,10 @@ export default function AdminOverview() {
       {
         icon: IndianRupee,
         label: "Monthly Revenue",
-        value: `₹${metrics.monthlyRevenue.toLocaleString(
-          "en-IN"
-        )}`,
+        value: metrics.monthlyRevenue.toLocaleString(
+          "en-IN",
+          { style: "currency", currency: "INR", maximumFractionDigits: 0 }
+        ),
         description:
           "Revenue from active subscriptions",
       },
@@ -479,13 +482,12 @@ export default function AdminOverview() {
               From (Date)
             </div>
 
-            <input
+            <Input
               type="date"
               value={fromDate}
               onChange={(e) =>
                 setFromDate(e.target.value)
               }
-              className="h-11 w-full rounded-xl border border-border bg-background px-4 outline-none transition-all focus:ring-2 focus:ring-primary/20"
             />
           </div>
 
@@ -494,27 +496,27 @@ export default function AdminOverview() {
               To (Date)
             </div>
 
-            <input
+            <Input
               type="date"
               value={toDate}
               onChange={(e) =>
                 setToDate(e.target.value)
               }
-              className="h-11 w-full rounded-xl border border-border bg-background px-4 outline-none transition-all focus:ring-2 focus:ring-primary/20"
             />
           </div>
 
           <div className="space-y-2">
-            <div className="text-xs text-transparent">
+            <div className="text-xs text-transparent sr-only">
               Reset
             </div>
 
-            <button
+            <Button
+              variant="outline"
               onClick={resetFilters}
-              className="h-11 w-full rounded-xl border border-border bg-background px-4 font-medium transition-all hover:bg-muted/40 hover:border-primary/30"
+              className="w-full"
             >
               Reset Filters
-            </button>
+            </Button>
           </div>
         </div>
       </div>

@@ -8,6 +8,8 @@ import {
   supabase,
 } from "@/integrations/supabase/client";
 
+import { Loader2 } from "lucide-react";
+
 import {
   Card,
   CardContent,
@@ -157,10 +159,22 @@ export default function ResetPassword() {
           "Password updated successfully."
         );
 
-        await supabase.auth.signOut();
+        // Detect role and redirect to appropriate dashboard
+        const { data: { user } } = await supabase.auth.getUser();
+        let redirectTo = "/auth";
+        if (user) {
+          const { data: roleData } = await supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", user.id)
+            .maybeSingle();
+          if (roleData?.role === "tenant") redirectTo = "/tenant";
+          else if (roleData?.role === "owner") redirectTo = "/owner";
+          else if (roleData?.role === "admin") redirectTo = "/admin";
+        }
 
         navigate(
-          "/auth",
+          redirectTo,
           {
             replace: true,
           }

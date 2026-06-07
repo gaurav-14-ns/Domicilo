@@ -230,9 +230,6 @@ export default function Reports() {
                 Pending
               </SelectItem>
 
-              <SelectItem value="failed">
-                Failed
-              </SelectItem>
             </SelectContent>
           </Select>
         </div>

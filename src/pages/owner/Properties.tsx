@@ -359,12 +359,12 @@ export default function Properties() {
     }
   };
 
-  const remove = (
+  const remove = async (
     id: string,
     n: string
   ) => {
     try {
-      removeProperty(id);
+      await removeProperty(id);
 
       toast.success(
         "Property removed",

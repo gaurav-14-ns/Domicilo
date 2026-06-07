@@ -428,7 +428,7 @@ const [
 
     try {
       if (editId) {
-        updateTenant(
+        await updateTenant(
           editId,
           {
             name,
@@ -572,7 +572,7 @@ const {
     }
   };
 
-  const togglePause = (
+  const togglePause = async (
     t: Tenant
   ) => {
     try {
@@ -582,7 +582,7 @@ const {
           ? "active"
           : "paused";
 
-      setTenantStatus(
+      await setTenantStatus(
         t.id,
         next
       );
@@ -604,11 +604,11 @@ const {
     }
   };
 
-  const deactivate = (
+  const deactivate = async (
     t: Tenant
   ) => {
     try {
-      setTenantStatus(
+      await setTenantStatus(
         t.id,
         "deactivated"
       );
@@ -627,11 +627,11 @@ const {
     }
   };
 
-  const activate = (
+  const activate = async (
     t: Tenant
   ) => {
     try {
-      setTenantStatus(
+      await setTenantStatus(
         t.id,
         "active"
       );
@@ -650,7 +650,7 @@ const {
     }
   };
 
-  const moveOut = (
+  const moveOut = async (
     t: Tenant
   ) => {
     const dues =
@@ -689,7 +689,7 @@ const {
     }
 
     try {
-      moveOutTenant(
+      await moveOutTenant(
         t.id
       );
 
@@ -706,7 +706,7 @@ const {
     }
   };
 
-  const remove = (
+  const remove = async (
     t: Tenant
   ) => {
     if (
@@ -725,7 +725,7 @@ const {
     }
 
     try {
-      removeTenant(
+      await removeTenant(
         t.id
       );
 

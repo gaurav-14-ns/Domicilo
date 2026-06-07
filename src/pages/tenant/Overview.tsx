@@ -12,7 +12,7 @@ export default function TenantOverview() {
   const tenant = useCurrentTenant(data.tenants, user?.email);
   const txs = useTenantTransactions(data.transactions, tenant?.id);
   const outstanding = useTenantDues(data.transactions, tenant?.id);
-  const lastPayment = txs.find((t) => t.status === "completed");
+  const lastPayment = [...txs].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).find((t) => t.status === "completed");
   
   // Use tenant's currency if available, fallback to owner's
   const tenantCurrency = tenant?.currencyCode ?? ownerCode;

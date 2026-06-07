@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 
 import { Input } from "@/components/ui/input";
 
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 import { Loader2, Download } from "lucide-react";
 
 import { toast } from "sonner";
@@ -487,56 +489,29 @@ export default function AdminLeads() {
           }
         />
 
-        <select
-          value={sourceFilter}
-          onChange={(e) =>
-            setSourceFilter(
-              e.target.value
-            )
-          }
-          className="h-10 rounded-md border border-input bg-background px-3"
-        >
-          <option value="all">
-            All Sources
-          </option>
+        <Select value={sourceFilter} onValueChange={setSourceFilter}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="All Sources" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Sources</SelectItem>
+            {uniqueSources.map((source) => (
+              <SelectItem key={source} value={source}>{source}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
-          {uniqueSources.map(
-            (source) => (
-              <option
-                key={source}
-                value={source}
-              >
-                {source}
-              </option>
-            )
-          )}
-        </select>
-
-        <select
-          value={statusFilter}
-          onChange={(e) =>
-            setStatusFilter(
-              e.target.value
-            )
-          }
-          className="h-10 rounded-md border border-input bg-background px-3"
-        >
-          <option value="all">
-            All Statuses
-          </option>
-
-          <option value="new">
-            New
-          </option>
-
-          <option value="contacted">
-            Contacted
-          </option>
-
-          <option value="closed">
-            Closed
-          </option>
-        </select>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="All Statuses" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Statuses</SelectItem>
+            <SelectItem value="new">New</SelectItem>
+            <SelectItem value="contacted">Contacted</SelectItem>
+            <SelectItem value="closed">Closed</SelectItem>
+          </SelectContent>
+        </Select>
 
         <Input
           type="date"

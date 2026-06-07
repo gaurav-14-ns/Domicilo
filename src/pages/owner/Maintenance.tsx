@@ -7,7 +7,7 @@ export default function OwnerMaintenance() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-display font-bold">Maintenance Requests</h1>
+        <h1 className="text-2xl md:text-3xl font-display font-bold text-gradient">Maintenance Requests</h1>
         <p className="text-sm text-muted-foreground">
           View and manage requests from your tenants.
         </p>

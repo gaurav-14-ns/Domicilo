@@ -8,7 +8,7 @@ export default function OwnerDocuments() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-display font-bold">Documents</h1>
+        <h1 className="text-2xl md:text-3xl font-display font-bold text-gradient">Documents</h1>
         <p className="text-sm text-muted-foreground">
           Upload and manage leases, receipts, NOCs, and other documents.
         </p>

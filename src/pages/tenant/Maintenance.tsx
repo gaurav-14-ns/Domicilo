@@ -15,7 +15,7 @@ export default function TenantMaintenance() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-display font-bold">Maintenance</h1>
+        <h1 className="text-2xl md:text-3xl font-display font-bold text-gradient">Maintenance</h1>
         <p className="text-sm text-muted-foreground">
           Submit and track maintenance requests.
         </p>

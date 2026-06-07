@@ -1,6 +1,7 @@
 import { ArrowRight, Sparkles, ShieldCheck, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useRef } from "react";
 
 const statCards = [
   { l: "Active tenants", v: "1,284", d: "+12.4%" },
@@ -51,11 +52,241 @@ const DashboardMock = () => (
   </div>
 );
 
+function SkylineCanvas({ containerRef }: { containerRef: React.RefObject<HTMLDivElement | null> }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animId: number;
+    let particles: { x: number; y: number; size: number; speedX: number; speedY: number; alpha: number; life: number }[] = [];
+    const MAX_PARTICLES = 60;
+
+    const resize = () => {
+      if (!containerRef.current) return;
+      canvas.width = containerRef.current.offsetWidth;
+      canvas.height = containerRef.current.offsetHeight;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    // Generate a burst of particles
+    const spawnParticle = () => {
+      if (particles.length >= MAX_PARTICLES) return;
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: canvas.height * (0.3 + Math.random() * 0.4),
+        size: 1 + Math.random() * 2.5,
+        speedX: (Math.random() - 0.5) * 0.3,
+        speedY: -0.15 - Math.random() * 0.3,
+        alpha: 0.3 + Math.random() * 0.7,
+        life: 0,
+      });
+    };
+    // Initial burst
+    for (let i = 0; i < 30; i++) spawnParticle();
+
+    const isDark = () => document.documentElement.classList.contains("dark");
+
+    const drawBuilding = (x: number, w: number, h: number, color: string) => {
+      ctx.fillStyle = color;
+      ctx.fillRect(x, canvas.height - h, w, h);
+      // Windows
+      ctx.fillStyle = isDark() ? "rgba(255,215,0,0.15)" : "rgba(26,26,78,0.12)";
+      const cols = Math.max(1, Math.floor(w / 18));
+      const rows = Math.max(1, Math.floor(h / 20));
+      for (let r = 0; r < rows && r < 12; r++) {
+        for (let c = 0; c < cols && c < 6; c++) {
+          if (Math.random() > 0.3) {
+            ctx.fillRect(x + 4 + c * 16, canvas.height - h + 6 + r * 18, 8, 10);
+          }
+        }
+      }
+    };
+
+    const drawDome = (cx: number, baseY: number, r: number, color: string) => {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(cx, baseY, r, Math.PI, 0);
+      ctx.fill();
+    };
+
+    const drawMinaret = (x: number, baseY: number, h: number, color: string) => {
+      ctx.fillStyle = color;
+      ctx.fillRect(x - 3, baseY - h, 6, h);
+      // Spire
+      ctx.beginPath();
+      ctx.moveTo(x - 4, baseY - h);
+      ctx.lineTo(x, baseY - h - 12);
+      ctx.lineTo(x + 4, baseY - h);
+      ctx.fill();
+    };
+
+    const drawTaj = (x: number, baseY: number, color: string) => {
+      const s = Math.min(60, (canvas.width - x) / 4);
+      // Main body
+      ctx.fillStyle = color;
+      ctx.fillRect(x - s * 0.4, baseY - s * 1.2, s * 0.8, s * 1.2);
+      // Arch
+      ctx.fillStyle = isDark() ? "rgba(240,240,250,0.06)" : "rgba(26,26,78,0.08)";
+      ctx.beginPath();
+      ctx.ellipse(x, baseY - s * 0.7, s * 0.25, s * 0.35, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Dome
+      ctx.fillStyle = color;
+      drawDome(x, baseY - s * 1.2, s * 0.35, color);
+      // Spire
+      ctx.beginPath();
+      ctx.moveTo(x - 3, baseY - s * 1.55);
+      ctx.lineTo(x, baseY - s * 1.7);
+      ctx.lineTo(x + 3, baseY - s * 1.55);
+      ctx.fill();
+    };
+
+    const drawHawaMahal = (x: number, baseY: number, color: string) => {
+      const w = 70;
+      const h = 90;
+      ctx.fillStyle = color;
+      ctx.fillRect(x, baseY - h, w, h);
+      // Small arched windows
+      ctx.fillStyle = isDark() ? "rgba(255,215,0,0.12)" : "rgba(26,26,78,0.1)";
+      for (let row = 0; row < 5; row++) {
+        for (let col = 0; col < 5; col++) {
+          const wx = x + 5 + col * 13;
+          const wy = baseY - h + 8 + row * 17;
+          ctx.beginPath();
+          ctx.arc(wx + 4, wy + 4, 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      // Top arches
+      for (let i = 0; i < 5; i++) {
+        const cx = x + 7 + i * 13;
+        ctx.beginPath();
+        ctx.arc(cx, baseY - h + 5, 5, Math.PI, 0);
+        ctx.fillStyle = color;
+        ctx.fill();
+      }
+    };
+
+    const drawQutub = (x: number, baseY: number, color: string) => {
+      const w = 24;
+      const h = 110;
+      ctx.fillStyle = color;
+      ctx.fillRect(x - 2, baseY - h, w, h);
+      // Horizontal bands
+      ctx.fillStyle = isDark() ? "rgba(255,215,0,0.08)" : "rgba(26,26,78,0.06)";
+      for (let i = 0; i < 6; i++) {
+        ctx.fillRect(x - 2, baseY - h + i * 18, w, 3);
+      }
+      // Top
+      ctx.beginPath();
+      ctx.arc(x + 10, baseY - h, 8, Math.PI, 0);
+      ctx.fillStyle = color;
+      ctx.fill();
+    };
+
+    const drawIndiaGate = (x: number, baseY: number, color: string) => {
+      const w = 80;
+      const h = 65;
+      ctx.fillStyle = color;
+      ctx.fillRect(x, baseY - h, w, h);
+      // Arch
+      ctx.fillStyle = isDark() ? "rgba(240,240,250,0.06)" : "rgba(26,26,78,0.08)";
+      ctx.beginPath();
+      ctx.ellipse(x + w / 2, baseY - h * 0.55, w * 0.22, h * 0.35, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Top
+      ctx.fillStyle = color;
+      ctx.fillRect(x + 10, baseY - h - 6, w - 20, 6);
+    };
+
+    let frame = 0;
+
+    const animate = () => {
+      frame++;
+      if (!containerRef.current) return;
+      const isD = isDark();
+      const gradColor1 = isD ? "rgba(5,5,30,1)" : "rgba(245,235,220,1)";
+      const gradColor2 = isD ? "rgba(8,8,40,1)" : "rgba(235,220,200,1)";
+      const silhouetteColor = isD ? "rgba(15,15,50,0.35)" : "rgba(26,26,78,0.08)";
+      const goldGlow = isD ? "rgba(255,215,0,0.04)" : "rgba(26,26,78,0.03)";
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Gradient background at bottom
+      const grad = ctx.createLinearGradient(0, canvas.height * 0.75, 0, canvas.height);
+      grad.addColorStop(0, goldGlow);
+      grad.addColorStop(1, gradColor1);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, canvas.height * 0.75, canvas.width, canvas.height * 0.25);
+
+      // Draw Indian landmarks across the horizon
+      const baseY = canvas.height;
+      const spacing = canvas.width / 6;
+
+      drawTaj(spacing * 0.5, baseY, silhouetteColor);
+      drawHawaMahal(spacing * 1.3, baseY, silhouetteColor);
+      drawQutub(spacing * 2.3, baseY, silhouetteColor);
+      drawIndiaGate(spacing * 3.3, baseY, silhouetteColor);
+
+      // Generic buildings to fill gaps
+      for (let i = 0; i < 8; i++) {
+        const bx = spacing * 0.1 + i * (canvas.width / 8);
+        const bw = 20 + Math.random() * 30;
+        const bh = 40 + Math.random() * 70;
+        if (i === 4 || i === 6) continue; // skip where landmarks are
+        drawBuilding(bx, bw, bh, silhouetteColor);
+      }
+      // Minarets
+      drawMinaret(spacing * 0.7, baseY, 80, silhouetteColor);
+      drawMinaret(spacing * 2.1, baseY, 65, silhouetteColor);
+
+      // Update and draw particles
+      if (frame % 8 === 0) spawnParticle();
+      particles = particles.filter((p) => p.life < 300);
+      for (const p of particles) {
+        p.x += p.speedX;
+        p.y += p.speedY;
+        p.life++;
+        const fadeOut = Math.max(0, 1 - p.life / 300);
+        const twinkle = 0.7 + 0.3 * Math.sin(p.life * 0.05 + p.x);
+        ctx.fillStyle = isD
+          ? `rgba(255,215,0,${p.alpha * fadeOut * twinkle * 0.6})`
+          : `rgba(26,26,78,${p.alpha * fadeOut * twinkle * 0.15})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      animId = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener("resize", resize);
+    };
+  }, [containerRef]);
+
+  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden />;
+}
+
 export const Hero = () => {
   const nav = useNavigate();
+  const heroRef = useRef<HTMLDivElement>(null);
   return (
-    <section className="relative pt-32 pb-20 md:pt-44 md:pb-28 overflow-hidden bg-sunset bg-skyline">
+    <section ref={heroRef} className="relative pt-32 pb-20 md:pt-44 md:pb-28 overflow-hidden bg-sunset bg-skyline">
+      <SkylineCanvas containerRef={heroRef} />
       <div className="absolute inset-0 pattern-jaali opacity-40" aria-hidden />
+      {/* Golden sparkle accents */}
+      <div className="absolute top-8 left-[8%] sparkle-dot opacity-60" style={{ animationDelay: "0.5s" }} />
+      <div className="absolute top-16 right-[12%] sparkle-dot opacity-40" style={{ animationDelay: "1.8s" }} />
+      <div className="absolute top-32 left-[45%] sparkle-dot opacity-50" style={{ animationDelay: "3.2s" }} />
       <div className="absolute top-1/4 left-1/3 h-96 w-96 bg-primary/20 blur-[150px] rounded-full animate-pulse-glow" aria-hidden />
       <div className="absolute bottom-0 right-1/4 h-64 w-64 bg-primary/10 blur-[100px] rounded-full" aria-hidden />
       <div className="absolute top-1/3 right-1/4 h-48 w-48 bg-amber-500/10 blur-[120px] rounded-full animate-pulse-glow" aria-hidden style={{ animationDelay: "1s" }} />
@@ -75,7 +306,7 @@ export const Hero = () => {
             <Sparkles className="h-3.5 w-3.5" />
             Premium property management, crafted for India
           </div>
-          <h1 className="font-display text-4xl sm:text-5xl md:text-7xl font-bold leading-[1.08] tracking-tight">
+          <h1 className="font-display text-4xl sm:text-5xl md:text-7xl font-bold leading-[1.08] tracking-tight text-premium-shimmer">
             Manage every property with{" "}
             <span className="text-gold-shimmer bg-clip-text">royal command.</span>
           </h1>

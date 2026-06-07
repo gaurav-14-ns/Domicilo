@@ -199,7 +199,7 @@ export default function DashboardLayout({
   role: AppRole;
 }) {
   return (
-    <SidebarProvider>
+    <SidebarProvider className="h-svh overflow-hidden w-full">
       <DashboardContent
         role={role}
       />
