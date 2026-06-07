@@ -14,17 +14,28 @@ export function useMaintenance() {
   const fetchRequests = useCallback(async () => {
     if (!user) return;
     setLoading(true);
-    const { data: rows, error } = await supabase
-      .from("maintenance_requests")
-      .select("*")
-      .order("created_at", { ascending: false });
+
+    const isTenant = data.tenants.some(
+      (t) => user.email && t.email.toLowerCase() === user.email.toLowerCase(),
+    );
+    const tenant = isTenant
+      ? data.tenants.find((t) => user.email && t.email.toLowerCase() === user.email.toLowerCase())
+      : null;
+
+    let query = supabase.from("maintenance_requests").select("*");
+    if (tenant) {
+      query = query.eq("tenant_id", tenant.id);
+    }
+
+    const { data: rows, error } = await query.order("created_at", { ascending: false });
+
     if (error) {
       console.error("Failed to fetch maintenance requests:", error);
       toast.error("Failed to load maintenance requests");
     }
     setRequests((rows ?? []) as MaintenanceRequest[]);
     setLoading(false);
-  }, [user]);
+  }, [user, data.tenants]);
 
   useEffect(() => {
     fetchRequests();
@@ -38,8 +49,16 @@ export function useMaintenance() {
       tenantId?: string,
     ) => {
       if (!user) throw new Error("Not authenticated");
+
+      // When a tenant creates a request, use the property owner's user_id as owner_id,
+      // so the owner can see it via RLS. The tenant's record stores who the owner is.
+      const tenant = data.tenants.find(
+        (t) => user.email && t.email.toLowerCase() === user.email.toLowerCase(),
+      );
+      const ownerId = tenant?.ownerId || user.id;
+
       const { error } = await supabase.from("maintenance_requests").insert({
-        owner_id: user.id,
+        owner_id: ownerId,
         tenant_id: tenantId ?? null,
         title,
         description,
@@ -49,7 +68,7 @@ export function useMaintenance() {
       toast.success("Maintenance request created");
       fetchRequests();
     },
-    [user, fetchRequests],
+    [user, fetchRequests, data.tenants],
   );
 
   const updateStatus = useCallback(

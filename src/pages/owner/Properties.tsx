@@ -447,7 +447,7 @@ export default function Properties() {
               </Button>
             </DialogTrigger>
 
-            <DialogContent>
+            <DialogContent className="max-h-[85vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>
                   {editId

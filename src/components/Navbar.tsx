@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./ThemeToggle";
 import { useAuth, dashboardPathFor } from "@/hooks/useAuth";
+import { FloatingActionMenu } from "./FloatingActionMenu";
 
 const links = [
   { label: "Browse Properties", href: "/properties" },
@@ -87,6 +88,7 @@ export const Navbar = () => {
   };
 
   return (
+    <>
     <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-xl bg-background/80 border-b border-border/40">
       <div className="container flex h-16 items-center justify-between">
         <Link
@@ -249,5 +251,7 @@ export const Navbar = () => {
         </div>
       )}
     </header>
+    <FloatingActionMenu />
+    </>
   );
 };

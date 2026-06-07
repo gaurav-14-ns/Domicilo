@@ -7,6 +7,7 @@ import {
   ReactNode,
   useEffect,
   useState,
+  useCallback,
 } from "react";
 
 import {
@@ -18,6 +19,25 @@ import {
 import { LoadingState } from "@/components/states/LoadingState";
 
 import { ErrorState } from "@/components/states/ErrorState";
+
+import { WifiOff, RefreshCw } from "lucide-react";
+
+function useOnlineStatus() {
+  const [online, setOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const goOnline = () => setOnline(true);
+    const goOffline = () => setOnline(false);
+    window.addEventListener("online", goOnline);
+    window.addEventListener("offline", goOffline);
+    return () => {
+      window.removeEventListener("online", goOnline);
+      window.removeEventListener("offline", goOffline);
+    };
+  }, []);
+
+  return online;
+}
 
 export const ProtectedRoute = ({
   children,
@@ -32,15 +52,25 @@ export const ProtectedRoute = ({
     user,
     role,
     loading,
+    signOut,
   } = useAuth();
 
   const loc =
     useLocation();
 
+  const online = useOnlineStatus();
+
   const [
     roleTimeoutReached,
     setRoleTimeoutReached,
   ] = useState(false);
+
+  const [retryCount, setRetryCount] = useState(0);
+
+  useEffect(() => {
+    setRoleTimeoutReached(false);
+    setRetryCount(0);
+  }, [user?.id]);
 
   useEffect(() => {
     const timeout =
@@ -48,12 +78,29 @@ export const ProtectedRoute = ({
         setRoleTimeoutReached(
           true
         );
-      }, 8000);
+      }, 10000);
 
     return () =>
       clearTimeout(
         timeout
       );
+  }, [retryCount]);
+
+  // Auto-retry when coming back online while stuck
+  useEffect(() => {
+    if (online && roleTimeoutReached) {
+      const t = setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+      return () => clearTimeout(t);
+    }
+  }, [online, roleTimeoutReached]);
+
+  // Force retry handler
+  const handleRetry = useCallback(() => {
+    setRetryCount((c) => c + 1);
+    setRoleTimeoutReached(false);
+    window.location.reload();
   }, []);
 
   const waitingForRole =
@@ -62,13 +109,51 @@ export const ProtectedRoute = ({
     role === null &&
     !roleTimeoutReached;
 
+  if (!online && (loading || waitingForRole)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6">
+        <div className="text-center max-w-sm">
+          <div className="inline-flex items-center justify-center h-14 w-14 rounded-full bg-destructive/10 text-destructive mb-4">
+            <WifiOff className="h-7 w-7" />
+          </div>
+          <h2 className="font-display font-semibold text-lg mb-1">No internet connection</h2>
+          <p className="text-sm text-muted-foreground font-alt">
+            This page needs an active connection to verify your session.
+            Please connect to the internet and try again.
+          </p>
+          <button
+            onClick={handleRetry}
+            className="mt-4 inline-flex items-center gap-2 text-sm text-primary hover:underline font-alt"
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (
     loading ||
     waitingForRole
   ) {
     return (
-      <div className="p-6">
+      <div className="min-h-screen flex items-center justify-center p-6">
         <LoadingState title="Verifying access..." />
+        <div className="absolute bottom-8 text-center">
+          {roleTimeoutReached ? (
+            <p className="text-sm text-muted-foreground font-alt">
+              Taking longer than expected.
+              <button onClick={handleRetry} className="ml-2 text-primary hover:underline">
+                Retry
+              </button>
+            </p>
+          ) : (
+            <p className="text-xs text-muted-foreground font-alt">
+              Your session is being restored…
+            </p>
+          )}
+        </div>
       </div>
     );
   }
@@ -112,13 +197,15 @@ export const ProtectedRoute = ({
     );
 
     return (
-      <div className="p-6">
+      <div className="min-h-screen flex items-center justify-center p-6">
         <ErrorState
-          title="Unable to determine account role"
-          description="Please reload the application or sign in again."
-          onRetry={() =>
-            window.location.reload()
+          title="Unable to verify your account"
+          description={
+            online
+              ? "Please reload the application or sign in again."
+              : "You appear to be offline. Connect to the internet and try again."
           }
+          onRetry={handleRetry}
         />
       </div>
     );

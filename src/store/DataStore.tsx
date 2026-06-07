@@ -72,6 +72,7 @@ const mapTenant = (r: any, propertiesById: Map<string, any>): Tenant => ({
   name: r.name,
   room: r.room ?? "",
   property: propertiesById.get(r.property_id)?.name ?? "",
+  ownerId: r.owner_id ?? undefined,
   propertyId: r.property_id ?? undefined,
   rent: Number(r.rent) || 0,
   deposit: Number(r.deposit) || 0,

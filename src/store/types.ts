@@ -29,6 +29,7 @@ export type Tenant = {
   name: string;
   room: string;
   property: string;        // property name snapshot (derived from join)
+  ownerId?: string;
   propertyId?: string;
   rent: number;
   deposit: number;

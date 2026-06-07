@@ -14,6 +14,21 @@ import { supabase } from "@/integrations/supabase/client";
 
 import { toast } from "sonner";
 
+function useOnlineStatus() {
+  const [online, setOnline] = useState(navigator.onLine);
+  useEffect(() => {
+    const goOnline = () => setOnline(true);
+    const goOffline = () => setOnline(false);
+    window.addEventListener("online", goOnline);
+    window.addEventListener("offline", goOffline);
+    return () => {
+      window.removeEventListener("online", goOnline);
+      window.removeEventListener("offline", goOffline);
+    };
+  }, []);
+  return online;
+}
+
 export type AppRole = "owner" | "tenant" | "admin";
 
 interface AuthCtx {
@@ -38,6 +53,8 @@ export const AuthProvider = ({
   children: ReactNode;
 }) => {
   const mountedRef = useRef(true);
+  const online = useOnlineStatus();
+  const lastOnlineRef = useRef(online);
 
   const [session, setSession] =
     useState<Session | null>(null);
@@ -497,6 +514,16 @@ if (suspended) {
       listener.subscription.unsubscribe();
     };
   }, [fetchRole]);
+
+  // Re-bootstrap when coming back online (e.g. tab switch, network resume)
+  useEffect(() => {
+    if (online && !lastOnlineRef.current && loading) {
+      lastOnlineRef.current = true;
+      const t = setTimeout(() => window.location.reload(), 500);
+      return () => clearTimeout(t);
+    }
+    lastOnlineRef.current = online;
+  }, [online, loading]);
 
   const signOut =
     useCallback(
