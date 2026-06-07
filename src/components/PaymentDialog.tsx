@@ -293,7 +293,7 @@ toast.success(
         "Payment failed",
         {
           description:
-            err.message,
+            err?.message ?? "Unknown error",
         }
       );
 

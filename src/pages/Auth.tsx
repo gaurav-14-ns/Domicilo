@@ -410,7 +410,7 @@ useEffect(() => {
           "Signup failed",
           {
             description:
-              err.message,
+              err?.message ?? "Unknown error",
           }
         );
 
@@ -470,7 +470,7 @@ useEffect(() => {
           "Sign in failed",
           {
             description:
-              err.message,
+              err?.message ?? "Unknown error",
           }
         );
 
@@ -534,7 +534,7 @@ useEffect(() => {
           "Reset failed",
           {
             description:
-              err.message,
+              err?.message ?? "Unknown error",
           }
         );
       } finally {
@@ -640,7 +640,7 @@ useEffect(() => {
           "Password update failed",
           {
             description:
-              err.message,
+              err?.message ?? "Unknown error",
           }
         );
       } finally {

@@ -128,7 +128,7 @@ export default function Settings() {
         description: "Your preferences have been updated.",
       });
     } catch (err: any) {
-      toast.error("Save failed", { description: err.message });
+      toast.error("Save failed", { description: err?.message ?? "Unknown error" });
     } finally {
       setBusy(false);
     }
@@ -217,7 +217,7 @@ export default function Settings() {
         description: `${planPriceIn(plan, code, locale)} / month`,
       });
     } catch (err: any) {
-      toast.error("Couldn't change plan", { description: err.message });
+      toast.error("Couldn't change plan", { description: err?.message ?? "Unknown error" });
     } finally {
       setBusy(false);
     }
@@ -237,7 +237,7 @@ export default function Settings() {
         description: "You can re-activate anytime.",
       });
     } catch (err: any) {
-      toast.error("Couldn't cancel", { description: err.message });
+      toast.error("Couldn't cancel", { description: err?.message ?? "Unknown error" });
     } finally {
       setBusy(false);
     }

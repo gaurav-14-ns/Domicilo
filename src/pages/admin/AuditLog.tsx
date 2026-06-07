@@ -35,7 +35,7 @@ export default function AdminAuditLog() {
       .order("created_at", { ascending: false })
       .limit(200);
     if (err) {
-      setError(err.message);
+      setError(err?.message ?? "Failed to load audit log");
     } else {
       setLogs((data ?? []) as AuditEntry[]);
     }

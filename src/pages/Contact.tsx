@@ -39,7 +39,7 @@ export default function Contact() {
     });
     setBusy(false);
     if (error) {
-      toast.error("Couldn't send", { description: error.message });
+      toast.error("Couldn't send", { description: error?.message ?? "Unknown error" });
       return;
     }
     toast.success("Message sent", { description: "We'll get back to you within one business day." });

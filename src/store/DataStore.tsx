@@ -286,7 +286,7 @@ const mountedRef =
     } catch (e) {
       console.error("Maintenance task failed:", e);
     }
-  }, [user, role]);
+  }, [user?.id, role]);
 
   // -------------------------------------------------------------------------
   // Fetch everything (scoped by RLS automatically).
@@ -732,7 +732,7 @@ const mountedRef =
       }
     }
   }, [
-    user,
+    user?.id,
   ]);
 
   // Early fetch: settings + tenant_profile as soon as user is available
@@ -753,7 +753,7 @@ const mountedRef =
       }));
     })();
     return () => { cancelled = true; };
-  }, [user]);
+  }, [user?.id]);
 
   // First load: wait for both user and role, then fetch ONCE per role
   useEffect(() => {
@@ -776,7 +776,7 @@ const mountedRef =
     lastFetchedUserIdRef.current = user.id;
     setLoading(true);
     fetchAll();
-  }, [user, role, fetchAll]);
+  }, [user?.id, role, fetchAll]);
 
   // Safety timeout: show error after 30 s of loading
   const loadingTimeoutRef =
@@ -816,7 +816,7 @@ const mountedRef =
     runMaintenance();
     const interval = setInterval(runMaintenance, 30 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [user, role, runMaintenance]);
+  }, [user?.id, role, runMaintenance]);
 
   // Realtime: refetch on any owned/assigned data change so cross-portal edits sync.
   useEffect(() => {
@@ -921,7 +921,7 @@ const mountedRef =
       channel
     );
   };
-}, [user, fetchAll]);
+}, [user?.id, fetchAll]);
 
   // Bootstrap settings: detect currency from browser ONLY for brand-new accounts
   // that have never explicitly saved settings. Once the user picks a currency
@@ -1021,7 +1021,7 @@ const mountedRef =
   } catch (error: any) {
     toast.error(error?.message ?? "Failed to add property.");
   }
-}, [user, refresh]);
+}, [user?.id, refresh]);
 
 const updateProperty = useCallback(async (id: string, patch: Partial<Property>) => {
   try {
@@ -1054,7 +1054,7 @@ const updateProperty = useCallback(async (id: string, patch: Partial<Property>) 
   } catch (error: any) {
     toast.error(error?.message ?? "Failed to update property.");
   }
-}, [user, refresh]);
+}, [user?.id, refresh]);
 
 const removeProperty = useCallback(async (id: string) => {
   try {
@@ -1081,7 +1081,7 @@ const removeProperty = useCallback(async (id: string) => {
   } catch (error: any) {
     toast.error(error?.message ?? "Failed to remove property.");
   }
-}, [user, refresh]);
+}, [user?.id, refresh]);
 
   const addTenant = useCallback(async (t: AddTenantInput) => {
   if (!user) {
@@ -1182,7 +1182,7 @@ const removeProperty = useCallback(async (id: string) => {
       err?.message ?? "Failed to create tenant."
     );
   }
-}, [user, refresh]);
+}, [user?.id, refresh]);
 
   const updateTenant =
   useCallback(
@@ -1304,7 +1304,7 @@ const removeProperty = useCallback(async (id: string) => {
         throw error;
       }
     },
-    [user, refresh]
+    [user?.id, refresh]
   );
 
   const setTenantStatus =
@@ -1351,7 +1351,7 @@ const removeProperty = useCallback(async (id: string) => {
         throw error;
       }
     },
-    [user, refresh]
+    [user?.id, refresh]
   );
 
   const moveOutTenant =
@@ -1398,7 +1398,7 @@ const removeProperty = useCallback(async (id: string) => {
         throw error;
       }
     },
-    [user, refresh]
+    [user?.id, refresh]
   );
 
   const removeTenant =
@@ -1442,7 +1442,7 @@ const removeProperty = useCallback(async (id: string) => {
         throw error;
       }
     },
-    [user, refresh]
+    [user?.id, refresh]
   );
 
   const addTransaction = useCallback(async (t: AddTransactionInput) => {
@@ -1703,7 +1703,7 @@ const removeProperty = useCallback(async (id: string) => {
       await refresh();
 
     },
-    [user, refresh]
+    [user?.id, refresh]
   );
 
   const removeTransaction =
@@ -1772,7 +1772,7 @@ const removeProperty = useCallback(async (id: string) => {
       await refresh();
 
     },
-    [user, refresh]
+    [user?.id, refresh]
   );
 
   const updateAdminOrgs = useCallback(async (updater: Updater<AdminOrg[]>) => {
@@ -1822,7 +1822,7 @@ const removeProperty = useCallback(async (id: string) => {
       .upsert(dbPatch, { onConflict: "user_id" });
     if (error) throw error;
     setData((d) => ({ ...d, settings: next }));
-  }, [user, data.settings]);
+  }, [user?.id, data.settings]);
 
   const updateTenantProfile = useCallback(async (patch: Partial<TenantProfile>) => {
     if (!user) return;
@@ -1833,7 +1833,7 @@ const removeProperty = useCallback(async (id: string) => {
     const { error } = await supabase.from("tenant_profiles").upsert(dbPatch);
     if (error) throw error;
     setData((d) => ({ ...d, tenantProfile: { ...d.tenantProfile, ...patch } }));
-  }, [user]);
+  }, [user?.id]);
 
   const resetAll =
   useCallback(() => {

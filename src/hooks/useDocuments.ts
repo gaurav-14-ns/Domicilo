@@ -32,7 +32,7 @@ export function useDocuments() {
     }
     setDocs((rows ?? []) as Document[]);
     setLoading(false);
-  }, [user]);
+  }, [user?.id]);
 
   useEffect(() => {
     fetchDocs();
@@ -71,7 +71,7 @@ export function useDocuments() {
       toast.success("Document uploaded");
       await fetchDocs();
     },
-    [user, fetchDocs],
+    [user?.id, fetchDocs],
   );
 
   const removeDoc = useCallback(

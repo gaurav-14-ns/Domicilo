@@ -66,7 +66,7 @@ export function UpgradePlaceholderDialog({ plan, planLabel, trigger, onActivated
       setOpen(false);
       onActivated?.();
     } catch (err: any) {
-      toast.error("Action failed", { description: err.message });
+      toast.error("Action failed", { description: err?.message ?? "Unknown error" });
     } finally {
       setBusy(false);
     }

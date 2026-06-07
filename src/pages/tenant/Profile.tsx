@@ -94,7 +94,7 @@ export default function Profile() {
       if (tenant) await updateTenant(tenant.id, { phone: form.phone });
       toast.success("Profile updated");
     } catch (err: any) {
-      toast.error("Update failed", { description: err.message });
+      toast.error("Update failed", { description: err?.message ?? "Unknown error" });
     } finally {
       setBusy(false);
     }

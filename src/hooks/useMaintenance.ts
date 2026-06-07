@@ -44,7 +44,7 @@ export function useMaintenance() {
     }
     setRequests((rows ?? []) as MaintenanceRequest[]);
     setLoading(false);
-  }, [user, data.tenants]);
+  }, [user?.id, data.tenants]);
 
   useEffect(() => {
     fetchRequests();
@@ -76,7 +76,7 @@ export function useMaintenance() {
       toast.success("Maintenance request created");
       await fetchRequests();
     },
-    [user, fetchRequests, data.tenants],
+    [user?.id, fetchRequests, data.tenants],
   );
 
   const updateStatus = useCallback(

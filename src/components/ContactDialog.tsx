@@ -68,7 +68,7 @@ export function ContactDialog({ variant, trigger, context }: Props) {
     });
     setBusy(false);
     if (error) {
-      toast.error("Couldn't send", { description: error.message });
+      toast.error("Couldn't send", { description: error?.message ?? "Unknown error" });
       return;
     }
     toast.success(copy.success, {
