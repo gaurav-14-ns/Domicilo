@@ -136,7 +136,7 @@ export function useSubscription() {
       console.error("Unexpected subscription error:", error);
       return null;
     }
-  }, [user]);
+  }, [user?.id]);
 
   const fetchSubscription = useCallback(async () => {
     if (!user?.id || role !== "owner") {
@@ -158,7 +158,7 @@ export function useSubscription() {
     } finally {
       setLoading(false);
     }
-  }, [user, role, ensureOwnerSubscription]);
+  }, [user?.id, role, ensureOwnerSubscription]);
 
   useEffect(() => {
     let isMounted = true;
@@ -266,7 +266,7 @@ export function useSubscription() {
         );
       }
     };
-  }, [fetchSubscription, user, role]);
+  }, [fetchSubscription, user?.id, role]);
 
   const changePlan = useCallback(
     async (plan: PlanId) => {
@@ -321,7 +321,7 @@ export function useSubscription() {
         console.error("Change plan failed:", error);
       }
     },
-    [user, fetchSubscription]
+    [user?.id, fetchSubscription]
   );
 
   const cancel = useCallback(async () => {
@@ -366,7 +366,7 @@ export function useSubscription() {
     } catch (error) {
       console.error("Subscription cancel failed:", error);
     }
-  }, [user, fetchSubscription]);
+  }, [user?.id, fetchSubscription]);
 
   const effectiveStatus = sub
     ? deriveStatus(sub, now)
