@@ -65,18 +65,8 @@ export default function OwnerOverview() {
       : [];
 
   const transactions =
-    useMemo(
-      () =>
-        Array.isArray(
-          data
-            ?.transactions
-        )
-          ? data
-              .transactions
-          : [],
-      [data
-        ?.transactions]
-    );
+    data?.transactions ??
+    [];
 
   const activeTenants =
     tenants.filter(

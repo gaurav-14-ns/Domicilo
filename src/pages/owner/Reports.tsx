@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Download, Lock, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,7 +29,7 @@ export default function Reports() {
 
   const { canUseAdvancedReports, planLabel } = usePlanLimits();
 
-  const { properties, tenants, transactions } = data;
+  const { properties = [], tenants = [], transactions = [] } = data ?? {};
 
   const [propertyFilter, setPropertyFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -339,7 +340,7 @@ export default function Reports() {
               <div className="space-y-3">
                 {properties.map((p) => {
                   const pct = totalRevenue
-                    ? (p.revenue / totalRevenue) * 100
+                    ? ((p.revenue ?? 0) / totalRevenue) * 100
                     : 0;
 
                   return (
@@ -348,7 +349,7 @@ export default function Reports() {
                         <span>{p.name}</span>
 
                         <span className="text-muted-foreground">
-                          {fmt(p.revenue)}
+                          {fmt(p.revenue ?? 0)}
                         </span>
                       </div>
 
@@ -422,7 +423,7 @@ export default function Reports() {
 
           <Button
             variant="hero"
-            onClick={() => {}}
+            onClick={() => toast.info("Upgrade options coming soon")}
           >
             <Sparkles className="h-4 w-4" />
             Upgrade plan

@@ -19,9 +19,10 @@ export function FloatingActionMenu() {
   const dragRef = useRef({ startX: 0, threshold: 0 });
   const menuRef = useRef<HTMLDivElement>(null);
   const touchStartedInside = useRef(false);
+  const fabBtnRef = useRef<HTMLButtonElement>(null);
 
-  const isDashboard = loc.pathname.startsWith("/owner") || loc.pathname.startsWith("/tenant") || loc.pathname.startsWith("/admin");
-  if (isDashboard) return null;
+  const animatingRef = useRef(animating);
+  animatingRef.current = animating;
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     dragRef.current.startX = e.clientX;
@@ -41,27 +42,24 @@ export function FloatingActionMenu() {
   }, []);
 
   const closeMenu = useCallback(() => {
-    if (animating === "leaving") return;
+    if (animatingRef.current === "leaving") return;
     setAnimating("leaving");
     setTimeout(() => {
       setOpen(false);
       setAnimating("idle");
     }, 450);
-  }, [animating]);
+  }, []);
 
   const handleNav = useCallback((href: string) => {
     closeMenu();
     setTimeout(() => nav(href), 100);
   }, [nav, closeMenu]);
 
-  // Lock body scroll when menu is open
+  // Save/restore body overflow
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => { document.body.style.overflow = ""; };
+    const original = document.body.style.overflow;
+    document.body.style.overflow = open ? "hidden" : original;
+    return () => { document.body.style.overflow = original; };
   }, [open]);
 
   // Track if touch started inside menu
@@ -90,14 +88,16 @@ export function FloatingActionMenu() {
     if (!open) return;
     const onPointerDown = (e: PointerEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        const fabBtn = document.querySelector("[data-fab-toggle]");
-        if (fabBtn?.contains(e.target as Node)) return;
+        if (fabBtnRef.current?.contains(e.target as Node)) return;
         closeMenu();
       }
     };
     document.addEventListener("pointerdown", onPointerDown);
     return () => document.removeEventListener("pointerdown", onPointerDown);
   }, [open, closeMenu]);
+
+  const isDashboard = loc.pathname.startsWith("/owner") || loc.pathname.startsWith("/tenant") || loc.pathname.startsWith("/admin");
+  if (isDashboard) return null;
 
   return (
     <>
@@ -199,6 +199,7 @@ export function FloatingActionMenu() {
 
         <button
           type="button"
+          ref={fabBtnRef}
           data-fab-toggle
           onPointerDown={handlePointerDown}
           onPointerUp={handlePointerUp}

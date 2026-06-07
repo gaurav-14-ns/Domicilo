@@ -8,7 +8,7 @@ export default function TenantMaintenance() {
   const { user } = useAuth();
   const { data } = useDataStore();
   const { requests, loading, create } = useMaintenance();
-  const tenant = data.tenants.find(
+  const tenant = (data?.tenants ?? []).find(
     (t) => user?.email && t.email.toLowerCase() === user.email.toLowerCase(),
   );
 

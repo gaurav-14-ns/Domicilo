@@ -779,7 +779,7 @@ export default function Properties() {
                         size="icon"
                         onClick={() =>
                           openEdit(
-                            p.id
+                            p?.id
                           )
                         }
                         aria-label="Edit"
@@ -820,7 +820,7 @@ export default function Properties() {
                             <AlertDialogAction
                               onClick={() =>
                                 remove(
-                                  p.id,
+                                  p?.id,
                                   p?.name ||
                                     "Property"
                                 )

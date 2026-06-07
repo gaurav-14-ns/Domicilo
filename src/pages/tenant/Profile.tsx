@@ -33,12 +33,13 @@ export default function Profile() {
   const tenant = useCurrentTenant(data.tenants, user?.email);
   const [busy, setBusy] = useState(false);
 
-  const initialPhone = (tenant?.phone ?? data.tenantProfile.phone ?? "")
+  const profile = data?.tenantProfile ?? {};
+  const initialPhone = (tenant?.phone ?? profile.phone ?? "")
     .replace(/\D/g, "")
     .slice(0, 10);
   const initialEmergency = useMemo(
-    () => parseEmergency(data.tenantProfile.emergency ?? ""),
-    [data.tenantProfile.emergency],
+    () => parseEmergency(profile.emergency ?? ""),
+    [profile.emergency],
   );
 
   const [form, setForm] = useState({
@@ -48,13 +49,13 @@ export default function Profile() {
   });
 
   useEffect(() => {
-    const parsed = parseEmergency(data.tenantProfile.emergency ?? "");
+    const parsed = parseEmergency(profile.emergency ?? "");
     setForm({
-      phone: (tenant?.phone || data.tenantProfile.phone || "").replace(/\D/g, "").slice(0, 10),
+      phone: (tenant?.phone || profile.phone || "").replace(/\D/g, "").slice(0, 10),
       emergencyName: parsed.name,
       emergencyPhone: parsed.phone,
     });
-  }, [tenant?.id, tenant?.phone, data.tenantProfile.phone, data.tenantProfile.emergency]);
+  }, [tenant?.id, tenant?.phone, profile.phone, profile.emergency]);
 
   const phoneError =
     form.phone === "" ? "" : form.phone.length !== 10 ? "Phone must be exactly 10 digits" : "";

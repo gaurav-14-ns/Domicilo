@@ -57,12 +57,12 @@ export default function Dues() {
 
   const outstanding =
     useTenantDues(
-      data.transactions,
+      data?.transactions ?? [],
       tenant?.id
     );
 
   const tenantTransactions =
-  data.transactions.filter(
+  (data?.transactions ?? []).filter(
     (t) =>
       t.tenantId === tenant?.id
   );

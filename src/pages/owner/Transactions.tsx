@@ -50,7 +50,7 @@ const PAGE_SIZE = 25;
 
 export default function Transactions() {
   const { data, addTransaction, updateTransaction, removeTransaction } = useDataStore();
-  const { transactions, tenants, properties } = data;
+  const { transactions = [], tenants = [], properties = [] } = data ?? {};
   const { fmt, symbol, code } = useCurrency();
 
   const [q, setQ] = useState("");
@@ -109,12 +109,13 @@ export default function Transactions() {
     }
     const finalAmount = form.type === "Refund" ? -Math.abs(amount) : amount;
     if (editId) {
+      const t = tenants?.find((x) => x.id === form.tenantId);
       updateTransaction(editId, {
         date: form.date, tenantId: form.tenantId || undefined,
         type: form.type, amount: finalAmount, status: form.status, note: form.note,
-        tenant: tenants.find((x) => x.id === form.tenantId)?.name,
-        propertyId: tenants.find((x) => x.id === form.tenantId)?.propertyId,
-        property: tenants.find((x) => x.id === form.tenantId)?.property,
+        tenant: t?.name,
+        propertyId: t?.propertyId,
+        property: t?.property,
       });
       toast.success("Transaction updated");
     } else {

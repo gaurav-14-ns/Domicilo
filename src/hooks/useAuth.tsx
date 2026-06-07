@@ -86,6 +86,9 @@ export const AuthProvider = ({
   const [loading, setLoading] =
     useState(!cachedUser);
 
+  const [bootstrapKey, setBootstrapKey] =
+    useState(0);
+
   const safeSetLoading = (
     value: boolean
   ) => {
@@ -536,14 +539,13 @@ if (suspended) {
 
       listener.subscription.unsubscribe();
     };
-  }, [fetchRole]);
+  }, [fetchRole, bootstrapKey]);
 
-  // Re-bootstrap when coming back online (e.g. tab switch, network resume)
+  // Re-bootstrap when coming back online while still loading
   useEffect(() => {
     if (online && !lastOnlineRef.current && loading) {
       lastOnlineRef.current = true;
-      const t = setTimeout(() => window.location.reload(), 500);
-      return () => clearTimeout(t);
+      setBootstrapKey(k => k + 1);
     }
     lastOnlineRef.current = online;
   }, [online, loading]);

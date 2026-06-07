@@ -9,9 +9,9 @@ export default function TenantOverview() {
   const { user } = useAuth();
   const { data } = useDataStore();
   const { code: ownerCode, locale: ownerLocale } = useCurrency();
-  const tenant = useCurrentTenant(data.tenants, user?.email);
-  const txs = useTenantTransactions(data.transactions, tenant?.id);
-  const outstanding = useTenantDues(data.transactions, tenant?.id);
+  const tenant = useCurrentTenant(data?.tenants ?? [], user?.email);
+  const txs = useTenantTransactions(data?.transactions ?? [], tenant?.id);
+  const outstanding = useTenantDues(data?.transactions ?? [], tenant?.id);
   const lastPayment = [...txs].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).find((t) => t.status === "completed");
   
   // Use tenant's currency if available, fallback to owner's

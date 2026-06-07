@@ -10,7 +10,10 @@ export function PageTransition({ children }: Props) {
   const [display, setDisplay] = useState<ReactNode>(children);
   const [stage, setStage] = useState<"enter" | "done">("done");
   const childrenRef = useRef(children);
-  childrenRef.current = children;
+
+  useEffect(() => {
+    childrenRef.current = children;
+  });
 
   useEffect(() => {
     setStage("enter");
@@ -20,10 +23,6 @@ export function PageTransition({ children }: Props) {
     }, 50);
     return () => clearTimeout(timer);
   }, [location.pathname]);
-
-  useEffect(() => {
-    setDisplay(children);
-  }, [children]);
 
   return (
     <div

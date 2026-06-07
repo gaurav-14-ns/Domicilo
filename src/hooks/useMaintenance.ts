@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useDataStore } from "@/store/DataStore";
@@ -10,16 +10,22 @@ export function useMaintenance() {
   const { data } = useDataStore();
   const [requests, setRequests] = useState<MaintenanceRequest[]>([]);
   const [loading, setLoading] = useState(false);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => { mountedRef.current = false; };
+  }, []);
 
   const fetchRequests = useCallback(async () => {
     if (!user) return;
     setLoading(true);
 
-    const isTenant = data.tenants.some(
+    const currentTenants = data.tenants ?? [];
+    const isTenant = currentTenants.some(
       (t) => user.email && t.email.toLowerCase() === user.email.toLowerCase(),
     );
     const tenant = isTenant
-      ? data.tenants.find((t) => user.email && t.email.toLowerCase() === user.email.toLowerCase())
+      ? currentTenants.find((t) => user.email && t.email.toLowerCase() === user.email.toLowerCase())
       : null;
 
     let query = supabase.from("maintenance_requests").select("*");
@@ -29,9 +35,12 @@ export function useMaintenance() {
 
     const { data: rows, error } = await query.order("created_at", { ascending: false });
 
+    if (!mountedRef.current) return;
     if (error) {
       console.error("Failed to fetch maintenance requests:", error);
       toast.error("Failed to load maintenance requests");
+      setLoading(false);
+      return;
     }
     setRequests((rows ?? []) as MaintenanceRequest[]);
     setLoading(false);
@@ -50,9 +59,8 @@ export function useMaintenance() {
     ) => {
       if (!user) throw new Error("Not authenticated");
 
-      // When a tenant creates a request, use the property owner's user_id as owner_id,
-      // so the owner can see it via RLS. The tenant's record stores who the owner is.
-      const tenant = data.tenants.find(
+      const currentTenants = data.tenants ?? [];
+      const tenant = currentTenants.find(
         (t) => user.email && t.email.toLowerCase() === user.email.toLowerCase(),
       );
       const ownerId = tenant?.ownerId || user.id;
@@ -66,7 +74,7 @@ export function useMaintenance() {
       });
       if (error) throw error;
       toast.success("Maintenance request created");
-      fetchRequests();
+      await fetchRequests();
     },
     [user, fetchRequests, data.tenants],
   );

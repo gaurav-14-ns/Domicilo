@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useDataStore } from "@/store/DataStore";
@@ -10,6 +10,11 @@ export function useDocuments() {
   const { data } = useDataStore();
   const [docs, setDocs] = useState<Document[]>([]);
   const [loading, setLoading] = useState(false);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => { mountedRef.current = false; };
+  }, []);
 
   const fetchDocs = useCallback(async () => {
     if (!user) return;
@@ -18,9 +23,12 @@ export function useDocuments() {
       .from("documents")
       .select("*")
       .order("created_at", { ascending: false });
+    if (!mountedRef.current) return;
     if (error) {
       console.error("Failed to fetch documents:", error);
       toast.error("Failed to load documents");
+      setLoading(false);
+      return;
     }
     setDocs((rows ?? []) as Document[]);
     setLoading(false);
@@ -61,7 +69,7 @@ export function useDocuments() {
       }
 
       toast.success("Document uploaded");
-      fetchDocs();
+      await fetchDocs();
     },
     [user, fetchDocs],
   );

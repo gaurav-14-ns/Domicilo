@@ -212,6 +212,8 @@ const mountedRef =
   useRef(false);
   const lastFetchedRoleRef =
   useRef<AppRole | null>(null);
+  const lastFetchedUserIdRef =
+  useRef<string | null>(null);
   
   const realtimeRefreshTimeout =
   useRef<
@@ -231,7 +233,6 @@ const mountedRef =
       // 1. Fetch raw data needed for maintenance
       const { data: tenants } = await supabase.from("tenants").select("*").eq("owner_id", user.id).order("created_at", { ascending: true });
       const { data: txs } = await supabase.from("transactions").select("*").eq("owner_id", user.id).order("date", { ascending: false });
-      const { data: properties } = await supabase.from("properties").select("*").eq("owner_id", user.id).order("created_at", { ascending: true });
       if (!tenants || !txs) return;
 
       // 2. Auto-generate rent
@@ -764,12 +765,13 @@ const mountedRef =
       setLoading(true);
       return;
     }
-    // Re-fetch if role changed since last fetch (e.g. fallback "tenant" then resolved "owner")
-    if (fetchedRef.current && lastFetchedRoleRef.current === role) {
+    // Re-fetch if user or role changed since last fetch
+    if (fetchedRef.current && lastFetchedRoleRef.current === role && lastFetchedUserIdRef.current === user.id) {
       return;
     }
     fetchedRef.current = true;
     lastFetchedRoleRef.current = role;
+    lastFetchedUserIdRef.current = user.id;
     setLoading(true);
     fetchAll();
   }, [user, role, fetchAll]);
@@ -1015,7 +1017,7 @@ const mountedRef =
 
     await refresh();
   } catch (error: any) {
-    toast.error(error.message || "Failed to add property.");
+    toast.error(error?.message ?? "Failed to add property.");
   }
 }, [user, refresh]);
 
@@ -1048,7 +1050,7 @@ const updateProperty = useCallback(async (id: string, patch: Partial<Property>) 
 
     await refresh();
   } catch (error: any) {
-    toast.error(error.message || "Failed to update property.");
+    toast.error(error?.message ?? "Failed to update property.");
   }
 }, [user, refresh]);
 
@@ -1075,7 +1077,7 @@ const removeProperty = useCallback(async (id: string) => {
 
     await refresh();
   } catch (error: any) {
-    toast.error(error.message || "Failed to remove property.");
+    toast.error(error?.message ?? "Failed to remove property.");
   }
 }, [user, refresh]);
 
@@ -1175,7 +1177,7 @@ const removeProperty = useCallback(async (id: string) => {
 
   } catch (err: any) {
     toast.error(
-      err.message || "Failed to create tenant."
+      err?.message ?? "Failed to create tenant."
     );
   }
 }, [user, refresh]);
@@ -1541,7 +1543,7 @@ const removeProperty = useCallback(async (id: string) => {
     await refresh();
 
   } catch (error: any) {
-    toast.error(error?.message || "Failed to add transaction.");
+    toast.error(error?.message ?? "Failed to add transaction.");
   }
 
 }, [
