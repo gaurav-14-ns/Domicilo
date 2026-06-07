@@ -9,12 +9,12 @@ export default function About() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-1 pt-24 pb-16">
-        <div className="container max-w-4xl space-y-12">
+        <div className="container max-w-4xl space-y-12 animate-page-enter">
           <header className="text-center space-y-4">
             <div className="inline-flex items-center justify-center h-14 w-14 rounded-full bg-primary/10 text-primary mb-2">
               <Crown className="h-7 w-7" />
             </div>
-            <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight">About Domicilo</h1>
+            <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight text-gradient">About Domicilo</h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto font-alt">
               We are building the royal operating system that modern Indian property managers actually deserve —
               calm, fast, and beautifully designed.
@@ -38,7 +38,7 @@ export default function About() {
 
           <section className="rounded-2xl border border-border/60 bg-gradient-card p-8 md:p-10 text-center space-y-4 shadow-elegant">
             <div className="divider-royal w-20 mx-auto" />
-            <h2 className="font-display text-2xl font-semibold tracking-tight">Our royal mission</h2>
+            <h2 className="font-display text-2xl font-semibold tracking-tight text-gradient">Our royal mission</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto font-alt">
               Property management has been stuck in spreadsheets and clunky software for decades.
               Domicilo gives Indian operators a single source of truth — properties, tenants, billing, and

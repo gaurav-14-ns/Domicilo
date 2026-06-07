@@ -91,16 +91,21 @@ function SkylineCanvas({ containerRef }: { containerRef: React.RefObject<HTMLDiv
 
     const isDark = () => document.documentElement.classList.contains("dark");
 
+    const seededRandom = (seed: number) => {
+      const s = Math.sin(seed * 9301 + 49297) * 49297;
+      return s - Math.floor(s);
+    };
+
     const drawBuilding = (x: number, w: number, h: number, color: string) => {
       ctx.fillStyle = color;
       ctx.fillRect(x, canvas.height - h, w, h);
-      // Windows
+      // Windows — deterministic pattern per building (no flickering)
       ctx.fillStyle = isDark() ? "rgba(255,215,0,0.15)" : "rgba(26,26,78,0.12)";
       const cols = Math.max(1, Math.floor(w / 18));
       const rows = Math.max(1, Math.floor(h / 20));
       for (let r = 0; r < rows && r < 12; r++) {
         for (let c = 0; c < cols && c < 6; c++) {
-          if (Math.random() > 0.3) {
+          if (seededRandom(x * 1000 + r * 7 + c * 13) > 0.3) {
             ctx.fillRect(x + 4 + c * 16, canvas.height - h + 6 + r * 18, 8, 10);
           }
         }
@@ -233,11 +238,11 @@ function SkylineCanvas({ containerRef }: { containerRef: React.RefObject<HTMLDiv
       drawQutub(spacing * 2.3, baseY, silhouetteColor);
       drawIndiaGate(spacing * 3.3, baseY, silhouetteColor);
 
-      // Generic buildings to fill gaps
+      // Generic buildings to fill gaps (deterministic sizes per index)
       for (let i = 0; i < 8; i++) {
         const bx = spacing * 0.1 + i * (canvas.width / 8);
-        const bw = 20 + Math.random() * 30;
-        const bh = 40 + Math.random() * 70;
+        const bw = 20 + seededRandom(i * 7 + 1) * 30;
+        const bh = 40 + seededRandom(i * 13 + 3) * 70;
         if (i === 4 || i === 6) continue; // skip where landmarks are
         drawBuilding(bx, bw, bh, silhouetteColor);
       }

@@ -186,8 +186,8 @@ export default function BrowseProperties() {
               <Crown className="h-3.5 w-3.5 text-amber-400" />
               Find Your Home
             </div>
-            <h1 className="font-display text-4xl md:text-6xl font-bold text-balance">
-              Browse <span className="text-gold-shimmer">Properties</span>
+            <h1 className="font-display text-4xl md:text-6xl font-bold text-balance text-premium-shimmer">
+              Browse Properties
             </h1>
             <p className="mt-4 text-primary-foreground/80 text-lg max-w-2xl mx-auto font-alt">
               Discover premium rental properties across India. Your next home awaits.

@@ -6,8 +6,8 @@ export default function Privacy() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-1 pt-24 pb-16">
-        <div className="container max-w-3xl prose prose-neutral dark:prose-invert">
-          <h1 className="text-4xl font-display font-bold mb-4">Privacy Policy</h1>
+        <div className="container max-w-3xl prose prose-neutral dark:prose-invert animate-page-enter">
+          <h1 className="text-4xl font-display font-bold mb-4 text-gradient">Privacy Policy</h1>
           <p className="text-sm text-muted-foreground">Last updated: April 2026</p>
 
           <h2 className="font-display font-semibold text-xl mt-8">1. Information we collect</h2>

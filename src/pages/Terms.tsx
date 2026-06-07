@@ -6,8 +6,8 @@ export default function Terms() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-1 pt-24 pb-16">
-        <div className="container max-w-3xl">
-          <h1 className="text-4xl font-display font-bold mb-2">Terms of Service</h1>
+        <div className="container max-w-3xl animate-page-enter">
+          <h1 className="text-4xl font-display font-bold mb-2 text-gradient">Terms of Service</h1>
           <p className="text-sm text-muted-foreground mb-8">Last updated: April 2026</p>
 
           <div className="space-y-6 text-muted-foreground">

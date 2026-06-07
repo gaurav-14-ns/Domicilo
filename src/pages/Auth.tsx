@@ -68,6 +68,17 @@ export default function Auth() {
     setForgotBusy,
   ] = useState(false);
 
+  // Safety: reset busy after 15 seconds to prevent stuck loading
+  const safeSetBusy = (v: boolean) => {
+    setBusy(v);
+    if (v) setTimeout(() => setBusy(false), 15000);
+  };
+
+  const safeSetForgotBusy = (v: boolean) => {
+    setForgotBusy(v);
+    if (v) setTimeout(() => setForgotBusy(false), 15000);
+  };
+
   const [
     forgotMode,
     setForgotMode,
@@ -239,7 +250,7 @@ useEffect(() => {
     ) => {
       e.preventDefault();
 
-      setBusy(true);
+      safeSetBusy(true);
 
       try {
         if (
@@ -400,7 +411,7 @@ useEffect(() => {
           }
         );
       } finally {
-        setBusy(false);
+        safeSetBusy(false);
       }
     };
 
@@ -412,7 +423,7 @@ useEffect(() => {
     ) => {
       e.preventDefault();
 
-      setBusy(true);
+      safeSetBusy(true);
 
       try {
         const normalizedEmail =
@@ -454,7 +465,7 @@ useEffect(() => {
           }
         );
       } finally {
-        setBusy(false);
+        safeSetBusy(false);
       }
     };
 
@@ -466,9 +477,7 @@ useEffect(() => {
     ) => {
       e.preventDefault();
 
-      setForgotBusy(
-        true
-      );
+      safeSetForgotBusy(true);
 
       try {
         const normalizedEmail =
@@ -520,9 +529,7 @@ useEffect(() => {
           }
         );
       } finally {
-        setForgotBusy(
-          false
-        );
+        safeSetForgotBusy(false);
       }
     };
 
@@ -592,7 +599,7 @@ useEffect(() => {
       }
 
       try {
-        setBusy(true);
+        safeSetBusy(true);
 
         const {
           error,
@@ -628,13 +635,13 @@ useEffect(() => {
           }
         );
       } finally {
-        setBusy(false);
+        safeSetBusy(false);
       }
     }}
     className="space-y-4"
   >
     <div className="space-y-1">
-      <h2 className="text-xl font-semibold">
+      <h2 className="text-xl font-semibold text-gradient">
         Reset password
       </h2>
 
@@ -726,7 +733,7 @@ useEffect(() => {
   >
 
     <div className="space-y-1">
-      <h2 className="text-xl font-semibold">
+      <h2 className="text-xl font-semibold text-gradient">
         Forgot password
       </h2>
 

@@ -16,6 +16,10 @@ import {
 } from "@/components/ui/input";
 
 import {
+  Badge,
+} from "@/components/ui/badge";
+
+import {
   Label,
 } from "@/components/ui/label";
 
@@ -26,6 +30,8 @@ import {
   Pencil,
   Search,
   Lock,
+  X,
+  Check,
 } from "lucide-react";
 
 import {
@@ -77,6 +83,8 @@ interface FormState {
   propertyType: string;
   available: boolean;
 }
+
+const COMMON_AMENITIES = ["WiFi", "Parking", "AC", "Gym", "Pool", "Power Backup", "Security", "Lift", "Garden", "CCTV", "Gas Pipeline", "Rainwater Harvesting"];
 
 const empty: FormState = {
   name: "",
@@ -588,8 +596,70 @@ export default function Properties() {
                     </div>
                   </div>
                   <div className="space-y-2 mt-3">
-                    <Label>Amenities (comma-separated)</Label>
-                    <Input value={form.amenities} onChange={(e) => setForm({ ...form, amenities: e.target.value })} placeholder="WiFi, Parking, AC, Gym" />
+                    <Label>Amenities</Label>
+                    <p className="text-[10px] text-muted-foreground">Click to select or type custom amenities.</p>
+                    <div className="flex flex-wrap gap-1.5 mt-1">
+                      {(() => {
+                        const current = form.amenities.split(",").map((a) => a.trim()).filter(Boolean);
+                        return COMMON_AMENITIES.map((a) => {
+                          const active = current.includes(a);
+                          return (
+                            <Badge
+                              key={a}
+                              variant={active ? "default" : "outline"}
+                              className="cursor-pointer transition-smooth select-none gap-1"
+                              onClick={() => {
+                                const prev = form.amenities.split(",").map((x) => x.trim()).filter(Boolean);
+                                const next = active ? prev.filter((x) => x !== a) : [...prev, a];
+                                setForm({ ...form, amenities: next.join(", ") });
+                              }}
+                            >
+                              {active && <Check className="h-3 w-3" />}
+                              {a}
+                            </Badge>
+                          );
+                        });
+                      })()}
+                    </div>
+                    <div className="flex gap-2 mt-2">
+                      <Input
+                        id="custom-amenity-input"
+                        placeholder="Add custom amenity…"
+                        className="text-sm h-8"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            const val = (e.target as HTMLInputElement).value.trim();
+                            if (!val) return;
+                            const prev = form.amenities.split(",").map((x) => x.trim()).filter(Boolean);
+                            if (!prev.includes(val)) {
+                              setForm({ ...form, amenities: [...prev, val].join(", ") });
+                            }
+                            (e.target as HTMLInputElement).value = "";
+                          }
+                        }}
+                      />
+                    </div>
+                    {form.amenities && (
+                      <div className="flex flex-wrap gap-1.5 mt-1">
+                        {form.amenities.split(",").map((a) => a.trim()).filter(Boolean).map((a) => {
+                          if (COMMON_AMENITIES.includes(a)) return null;
+                          return (
+                            <Badge key={a} variant="secondary" className="gap-1 text-[10px]">
+                              {a}
+                              <X
+                                className="h-2.5 w-2.5 cursor-pointer hover:text-destructive"
+                                onClick={() => {
+                                  const prev = form.amenities.split(",").map((x) => x.trim()).filter(Boolean);
+                                  const next = prev.filter((x) => x !== a);
+                                  setForm({ ...form, amenities: next.join(", ") });
+                                }}
+                              />
+                            </Badge>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                   <div className="space-y-2 mt-3">
                     <Label>Description</Label>

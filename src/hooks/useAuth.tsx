@@ -337,11 +337,26 @@ if (suspended) {
             true
           );
 
+          // Safety: force loading to false after 10s
+          // Prevents infinite loading when tab returns from background
+          // and session recovery hangs
+          const safetyTimeout =
+            setTimeout(
+              () => {
+                safeSetLoading(
+                  false
+                );
+              },
+              10000
+            );
+
           const {
             data,
             error,
           } =
             await supabase.auth.getSession();
+
+          clearTimeout(safetyTimeout);
 
           if (error) {
             console.error(
@@ -350,35 +365,31 @@ if (suspended) {
             );
           }
 
+          // If no session and no ongoing sign-in, stop loading immediately
+          if (!data.session) {
+            safeSetSession(null);
+            safeSetUser(null);
+            safeSetRole(null);
+            safeSetLoading(false);
+            return;
+          }
+
           safeSetSession(
             data.session
           );
 
           safeSetUser(
-            data.session
-              ?.user ??
-              null
+            data.session?.user ?? null
           );
 
-          if (
-            data.session
-              ?.user
-          ) {
-            try {
-              await fetchRole(
-                data
-                  .session
-                  .user
-              );
-            } catch (error) {
-              console.error(
-                "Role fetch in bootstrap failed:",
-                error
-              );
-            }
-          } else {
-            safeSetRole(
-              null
+          try {
+            await fetchRole(
+              data.session.user
+            );
+          } catch (error) {
+            console.error(
+              "Role fetch in bootstrap failed:",
+              error
             );
           }
         } catch (error) {

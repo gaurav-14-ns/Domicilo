@@ -50,9 +50,9 @@ export default function Contact() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-1 pt-24 pb-16">
-        <div className="container max-w-5xl grid md:grid-cols-2 gap-10">
+        <div className="container max-w-5xl grid md:grid-cols-2 gap-10 animate-page-enter">
           <div className="space-y-6">
-            <h1 className="text-4xl md:text-5xl font-display font-bold">Get in touch</h1>
+            <h1 className="text-4xl md:text-5xl font-display font-bold text-gradient">Get in touch</h1>
             <p className="text-muted-foreground text-lg">
               We typically reply within one business day. Tell us a bit about your portfolio
               and what you're trying to solve.
