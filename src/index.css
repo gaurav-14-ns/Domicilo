@@ -60,54 +60,56 @@
   }
 
   .dark {
-    /* Liquid Glass — Apple-inspired deep translucency */
-    --background: 260 40% 5% / 0.75;
-    --foreground: 40 70% 88%;
+    /* Deep dark base — rich moody background + rainbow accents */
+    --background: 260 25% 3%;
+    --foreground: 45 80% 88%;
 
-    --card: 260 35% 9% / 0.35;
-    --card-foreground: 40 60% 85%;
+    --card: 260 25% 5% / 0.55;
+    --card-foreground: 45 70% 85%;
 
-    --popover: 260 35% 9% / 0.45;
-    --popover-foreground: 40 60% 85%;
+    --popover: 260 25% 6% / 0.65;
+    --popover-foreground: 45 70% 85%;
 
     --primary: 42 80% 55%;
     --primary-foreground: 260 40% 5%;
     --primary-glow: 42 80% 65%;
     --primary-deep: 42 70% 35%;
 
-    --secondary: 260 30% 14%;
-    --secondary-foreground: 40 50% 82%;
+    --secondary: 260 20% 8%;
+    --secondary-foreground: 45 50% 82%;
 
-    --muted: 260 25% 10%;
-    --muted-foreground: 40 20% 50%;
+    --muted: 260 18% 5%;
+    --muted-foreground: 45 20% 55%;
 
-    --accent: 42 50% 16%;
-    --accent-foreground: 40 65% 78%;
+    --accent: 260 15% 12%;
+    --accent-foreground: 45 65% 78%;
 
     --destructive: 0 65% 50%;
-    --destructive-foreground: 40 60% 88%;
+    --destructive-foreground: 45 60% 88%;
 
-    --border: 260 25% 14%;
-    --input: 260 25% 14%;
+    --border: 260 25% 10%;
+    --input: 260 25% 10%;
     --ring: 42 80% 55%;
 
     --gradient-primary: linear-gradient(135deg, hsl(42 80% 55%), hsl(42 75% 65%));
-    --gradient-hero: radial-gradient(ellipse 90% 55% at 50% -8%, hsl(42 80% 55% / 0.1) 0%, transparent 65%),
-                    linear-gradient(180deg, hsl(260 40% 3%), hsl(260 35% 2%) 60%, hsl(260 40% 1%));
-    --gradient-card: linear-gradient(180deg, hsl(260 35% 10% / 0.5), hsl(260 30% 7% / 0.35));
-    --gradient-text: linear-gradient(135deg, hsl(42 80% 55%), hsl(42 75% 70%));
+    --gradient-hero: radial-gradient(ellipse 90% 55% at 50% -8%, hsl(42 80% 55% / 0.12) 0%, transparent 65%),
+                    radial-gradient(ellipse 60% 35% at 25% 60%, hsl(175 70% 50% / 0.06) 0%, transparent 55%),
+                    radial-gradient(ellipse 50% 30% at 75% 40%, hsl(270 70% 60% / 0.05) 0%, transparent 50%),
+                    linear-gradient(180deg, hsl(260 25% 2%), hsl(260 20% 1%) 60%, hsl(260 25% 0%));
+    --gradient-card: linear-gradient(180deg, hsl(260 25% 7% / 0.5), hsl(260 20% 4% / 0.3));
+    --gradient-text: linear-gradient(135deg, hsl(42 80% 55%), hsl(175 70% 50%), hsl(270 70% 60%));
 
-    --shadow-md: 0 8px 28px -6px hsl(0 0% 0% / 0.5);
-    --shadow-lg: 0 20px 60px -12px hsl(0 0% 0% / 0.6);
-    --shadow-glow: 0 0 50px hsl(42 80% 55% / 0.08);
+    --shadow-md: 0 8px 28px -6px hsl(0 0% 0% / 0.6);
+    --shadow-lg: 0 20px 60px -12px hsl(0 0% 0% / 0.7);
+    --shadow-glow: 0 0 50px hsl(42 80% 55% / 0.1);
 
-    --sidebar-background: 260 35% 7% / 0.35;
-    --sidebar-foreground: 40 50% 78%;
+    --sidebar-background: 260 25% 5% / 0.6;
+    --sidebar-foreground: 45 50% 78%;
     --sidebar-primary: 42 80% 55%;
     --sidebar-primary-foreground: 260 40% 5%;
-    --sidebar-accent: 260 25% 14% / 0.4;
-    --sidebar-accent-foreground: 40 60% 82%;
-    --sidebar-border: 260 25% 14% / 0.15;
+    --sidebar-accent: 260 20% 10% / 0.5;
+    --sidebar-accent-foreground: 45 60% 82%;
+    --sidebar-border: 260 25% 12% / 0.2;
     --sidebar-ring: 42 80% 55%;
   }
 }
@@ -188,8 +190,8 @@
     animation: shimmer 4s ease-in-out infinite;
   }
   .dark .text-shimmer {
-    background: linear-gradient(135deg, hsl(40 70% 80%), hsl(42 80% 60%), hsl(40 70% 80%));
-    background-size: 200% 100%;
+    background: linear-gradient(135deg, hsl(42 80% 60%), hsl(175 70% 55%), hsl(270 70% 65%), hsl(340 75% 65%), hsl(42 80% 60%));
+    background-size: 300% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -625,7 +627,7 @@
     animation: shimmer 5s ease-in-out infinite;
   }
   .dark .text-premium-shimmer {
-    background: linear-gradient(135deg, hsl(42 80% 55%) 0%, hsl(42 85% 68%) 25%, hsl(42 90% 80%) 50%, hsl(42 85% 68%) 75%, hsl(42 80% 55%) 100%);
+    background: linear-gradient(135deg, hsl(42 80% 55%) 0%, hsl(175 70% 50%) 25%, hsl(270 70% 60%) 50%, hsl(340 75% 60%) 75%, hsl(42 80% 55%) 100%);
     background-size: 300% 100%;
     -webkit-background-clip: text;
     background-clip: text;
@@ -931,10 +933,12 @@
   position: absolute;
   inset: -50%;
   background:
-    radial-gradient(ellipse 40% 30% at 25% 30%, hsl(260 60% 30% / 0.12) 0%, transparent 60%),
-    radial-gradient(ellipse 35% 25% at 70% 60%, hsl(42 80% 40% / 0.08) 0%, transparent 55%),
-    radial-gradient(ellipse 30% 35% at 50% 80%, hsl(300 50% 25% / 0.06) 0%, transparent 50%),
-    radial-gradient(ellipse 25% 20% at 10% 70%, hsl(200 60% 30% / 0.05) 0%, transparent 50%);
+    radial-gradient(ellipse 40% 30% at 25% 30%, hsl(260 60% 30% / 0.14) 0%, transparent 60%),
+    radial-gradient(ellipse 35% 25% at 70% 60%, hsl(42 80% 40% / 0.1) 0%, transparent 55%),
+    radial-gradient(ellipse 30% 35% at 50% 80%, hsl(300 50% 25% / 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse 25% 20% at 10% 70%, hsl(200 60% 30% / 0.07) 0%, transparent 50%),
+    radial-gradient(ellipse 20% 15% at 85% 20%, hsl(175 70% 35% / 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 25% 20% at 40% 45%, hsl(340 75% 35% / 0.05) 0%, transparent 50%);
   animation: nebula-drift 40s ease-in-out infinite alternate;
 }
 
@@ -1155,7 +1159,7 @@
   border: 1px solid hsl(42 80% 55% / 0.2);
 }
 .dark .badge-colorful {
-  background: linear-gradient(135deg, hsl(42 80% 55% / 0.18), hsl(42 80% 55% / 0.08));
+  background: linear-gradient(135deg, hsl(42 80% 55% / 0.18), hsl(175 70% 50% / 0.12), hsl(270 70% 60% / 0.1));
   color: hsl(42 80% 70%);
   border-color: hsl(42 80% 55% / 0.15);
 }
