@@ -1566,7 +1566,7 @@ const removeProperty = useCallback(async (id: string) => {
       id: string,
       patch: Partial<Transaction>
     ) => {
-
+      try {
       /*
         Fetch existing row first
         to protect completed
@@ -1706,7 +1706,9 @@ const removeProperty = useCallback(async (id: string) => {
       }
 
       await refresh();
-
+      } catch (error: any) {
+        toast.error(error?.message ?? "Failed to update transaction.");
+      }
     },
     [user?.id, refresh]
   );
@@ -1716,7 +1718,7 @@ const removeProperty = useCallback(async (id: string) => {
     async (
       id: string
     ) => {
-
+      try {
       /*
         Protect settled
         financial history.
@@ -1775,7 +1777,9 @@ const removeProperty = useCallback(async (id: string) => {
       }
 
       await refresh();
-
+      } catch (error: any) {
+        toast.error(error?.message ?? "Failed to remove transaction.");
+      }
     },
     [user?.id, refresh]
   );
@@ -1805,12 +1809,10 @@ const removeProperty = useCallback(async (id: string) => {
   }, [data.adminOrgs, refresh]);
 
   const updateSettings = useCallback(async (patch: Partial<Settings>) => {
+    try {
     if (!user) return;
     const current = data.settings;
     const next: Settings = { ...current, ...patch };
-    // Always send currency + locale so a brand-new row created by upsert
-    // never ends up with NULL/default values that would override the
-    // owner's saved choice on the next login.
     const dbPatch: any = {
       user_id: user.id,
       currency_code: next.currencyCode,
@@ -1826,9 +1828,13 @@ const removeProperty = useCallback(async (id: string) => {
       .upsert(dbPatch, { onConflict: "user_id" });
     if (error) throw error;
     setData((d) => ({ ...d, settings: next }));
+    } catch (error: any) {
+      toast.error(error?.message ?? "Failed to update settings.");
+    }
   }, [user?.id, data.settings]);
 
   const updateTenantProfile = useCallback(async (patch: Partial<TenantProfile>) => {
+    try {
     if (!user) return;
     const dbPatch: any = { user_id: user.id };
     if (patch.phone !== undefined) dbPatch.phone = patch.phone;
@@ -1837,6 +1843,9 @@ const removeProperty = useCallback(async (id: string) => {
     const { error } = await supabase.from("tenant_profiles").upsert(dbPatch);
     if (error) throw error;
     setData((d) => ({ ...d, tenantProfile: { ...d.tenantProfile, ...patch } }));
+    } catch (error: any) {
+      toast.error(error?.message ?? "Failed to update profile.");
+    }
   }, [user?.id]);
 
   const resetAll =

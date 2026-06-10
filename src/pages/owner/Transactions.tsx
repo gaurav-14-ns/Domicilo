@@ -101,16 +101,17 @@ export default function Transactions() {
     setOpen(true);
   };
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const amount = Number(form.amount);
     if (Number.isNaN(amount)) {
       toast.error("Invalid amount"); return;
     }
     const finalAmount = form.type === "Refund" ? -Math.abs(amount) : amount;
+    try {
     if (editId) {
       const t = tenants?.find((x) => x.id === form.tenantId);
-      updateTransaction(editId, {
+      await updateTransaction(editId, {
         date: form.date, tenantId: form.tenantId || undefined,
         type: form.type, amount: finalAmount, status: form.status, note: form.note,
         tenant: t?.name,
@@ -119,7 +120,7 @@ export default function Transactions() {
       });
       toast.success("Transaction updated");
     } else {
-      addTransaction({
+      await addTransaction({
         date: form.date, tenantId: form.tenantId || undefined,
         type: form.type, amount: finalAmount, status: form.status, note: form.note,
         tenant: tenants.find((x) => x.id === form.tenantId)?.name ?? "",
@@ -127,11 +128,18 @@ export default function Transactions() {
       toast.success("Transaction added");
     }
     setOpen(false); setForm(emptyForm); setEditId(null);
+    } catch (error: any) {
+      toast.error(error?.message ?? "Failed to save transaction.");
+    }
   };
 
-  const remove = (id: string) => {
-    removeTransaction(id);
-    toast.success("Transaction deleted");
+  const remove = async (id: string) => {
+    try {
+      await removeTransaction(id);
+      toast.success("Transaction deleted");
+    } catch (error: any) {
+      toast.error(error?.message ?? "Failed to delete transaction.");
+    }
   };
 
   const exportCsv = () => {

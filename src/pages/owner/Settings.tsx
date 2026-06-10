@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useDataStore } from "@/store/DataStore";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -98,17 +98,28 @@ export default function Settings() {
     });
   }, [data.settings, user?.email]);
 
+  const planNoticeTimer = useRef<ReturnType<typeof setInterval>>();
   useEffect(() => {
-    if (!planNotice) return;
-    const timer = setInterval(() => {
-      setPlanNotice((prev) => {
-        if (!prev) return null;
-        if (prev.seconds <= 1) return null;
-        return { ...prev, seconds: prev.seconds - 1 };
-      });
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [planNotice]);
+    if (planNotice && !planNoticeTimer.current) {
+      planNoticeTimer.current = setInterval(() => {
+        setPlanNotice((prev) => {
+          if (!prev) return null;
+          if (prev.seconds <= 1) return null;
+          return { ...prev, seconds: prev.seconds - 1 };
+        });
+      }, 1000);
+    }
+    if (!planNotice && planNoticeTimer.current) {
+      clearInterval(planNoticeTimer.current);
+      planNoticeTimer.current = undefined;
+    }
+    return () => {
+      if (planNoticeTimer.current) {
+        clearInterval(planNoticeTimer.current);
+        planNoticeTimer.current = undefined;
+      }
+    };
+  }, [!!planNotice]);
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();

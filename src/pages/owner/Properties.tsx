@@ -231,7 +231,7 @@ export default function Properties() {
     setOpen(true);
   };
 
-  const submit = (
+  const submit = async (
     e: React.FormEvent
   ) => {
     e.preventDefault();
@@ -292,7 +292,7 @@ export default function Properties() {
       setSaving(true);
 
       if (editId) {
-        updateProperty(
+        await updateProperty(
           editId,
           {
             name,
@@ -319,7 +319,7 @@ export default function Properties() {
           }
         );
       } else {
-        addProperty({
+        await addProperty({
           name,
           address,
           units,
