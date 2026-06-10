@@ -293,9 +293,16 @@ useEffect(() => {
 
   // -------------------------------------------------------------------------
   // Fetch everything (scoped by RLS automatically).
+  // Guarantees at most one in-flight fetch at any time.
   // -------------------------------------------------------------------------
  const fetchAll =
   useCallback(async () => {
+    // Dedup: if a fetch is already in progress, return the same promise.
+    if (reconcileRef.current) {
+      return reconcileRef.current;
+    }
+
+    const doFetch = async () => {
     if (!user) {
       if (
         mountedRef.current
@@ -734,6 +741,13 @@ useEffect(() => {
         );
       }
     }
+    };
+
+    const promise = doFetch();
+    reconcileRef.current = promise.finally(() => {
+      reconcileRef.current = null;
+    });
+    return promise;
   }, [
     user?.id,
     user?.email,
@@ -970,27 +984,10 @@ useEffect(() => {
   const refresh =
   useCallback(
     async () => {
-      if (
-        reconcileRef.current
-      ) {
-        return reconcileRef.current;
-      }
       fetchedRef.current = false;
-      const promise =
-        fetchAll();
-
-      reconcileRef.current =
-        promise.finally(
-          () => {
-            reconcileRef.current =
-              null;
-            fetchedRef.current = true;
-          }
-        );
-
-      return (
-        reconcileRef.current
-      );
+      return fetchAll().finally(() => {
+        fetchedRef.current = true;
+      });
     },
     [fetchAll]
   );
