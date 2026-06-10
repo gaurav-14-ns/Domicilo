@@ -23,6 +23,9 @@ import { ErrorState } from "@/components/states/ErrorState";
 
 import { WifiOff, RefreshCw } from "lucide-react";
 
+// Module-level flag that survives component remounts (unlike useRef).
+let globalHasResolved = false;
+
 function useOnlineStatus() {
   const [online, setOnline] = useState(navigator.onLine);
 
@@ -61,7 +64,7 @@ export const ProtectedRoute = ({
 
   const online = useOnlineStatus();
 
-  const hasResolvedOnce = useRef(false);
+  const hasResolvedOnce = useRef(globalHasResolved);
 
   const [
     roleTimeoutReached,
@@ -69,6 +72,8 @@ export const ProtectedRoute = ({
   ] = useState(false);
 
   const [retryCount, setRetryCount] = useState(0);
+
+  const reloadCountRef = useRef(0);
 
   const waitingForRole =
     !!user &&
@@ -79,6 +84,7 @@ export const ProtectedRoute = ({
   useEffect(() => {
     setRoleTimeoutReached(false);
     setRetryCount(0);
+    reloadCountRef.current = 0;
   }, [user?.id]);
 
   // Only start the 10s timeout when actually waiting for role.
@@ -98,9 +104,12 @@ export const ProtectedRoute = ({
       );
   }, [waitingForRole, retryCount]);
 
-  // Auto-retry when still stuck after timeout (role never resolved)
+  // Auto-retry when still stuck after timeout (role never resolved).
+  // Limited to 3 reloads to prevent infinite loop.
   useEffect(() => {
     if (online && roleTimeoutReached && role === null) {
+      if (reloadCountRef.current >= 3) return;
+      reloadCountRef.current++;
       const t = setTimeout(() => {
         window.location.reload();
       }, 2000);
@@ -117,7 +126,7 @@ export const ProtectedRoute = ({
 
   if (!online && (loading || waitingForRole)) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="min-h-screen flex items-center justify-center p-6 bg-background/40 backdrop-blur-3xl">
         <div className="text-center max-w-sm">
           <div className="inline-flex items-center justify-center h-14 w-14 rounded-full bg-destructive/10 text-destructive mb-4">
             <WifiOff className="h-7 w-7" />
@@ -144,7 +153,7 @@ export const ProtectedRoute = ({
     (loading || waitingForRole)
   ) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="min-h-screen flex items-center justify-center p-6 bg-background/40 backdrop-blur-3xl">
         <LoadingState title="Verifying access..." />
         <div className="absolute bottom-8 text-center">
           {roleTimeoutReached ? (
@@ -203,7 +212,7 @@ export const ProtectedRoute = ({
     );
 
     return (
-      <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="min-h-screen flex items-center justify-center p-6 bg-background/40 backdrop-blur-3xl">
         <ErrorState
           title="Unable to verify your account"
           description={
@@ -218,5 +227,6 @@ export const ProtectedRoute = ({
   }
 
   hasResolvedOnce.current = true;
+  globalHasResolved = true;
   return <>{children}</>;
 };

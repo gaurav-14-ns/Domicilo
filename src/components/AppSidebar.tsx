@@ -66,7 +66,7 @@ export function AppSidebar({ role }: { role: AppRole }) {
   };
 
   return (
-    <Sidebar collapsible="icon" className="backdrop-blur-2xl border-r border-white/[0.03]">
+    <Sidebar collapsible="icon" className="bg-sidebar/50 backdrop-blur-3xl border-r border-white/[0.03]">
       <SidebarHeader>
         <NavLink
           to="/"

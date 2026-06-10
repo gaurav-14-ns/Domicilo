@@ -73,8 +73,8 @@ function DashboardContent({
       <SafeSection name="AppSidebar" fallback={null}>
         <AppSidebar role={role} />
       </SafeSection>
-      <div className="flex flex-col flex-1 min-w-0 bg-sidebar/30 backdrop-blur-2xl">
-        <header className="h-14 flex items-center justify-between border-b border-border/40 px-3 md:px-6 bg-background/50 backdrop-blur-xl sticky top-0 z-30 shrink-0">
+      <div className="flex flex-col flex-1 min-w-0 bg-background/40 backdrop-blur-3xl">
+        <header className="h-14 flex items-center justify-between border-b border-white/[0.04] px-3 md:px-6 bg-background/60 backdrop-blur-3xl sticky top-0 z-30 shrink-0">
           <div className="flex items-center gap-2 min-w-0">
             <SidebarTrigger />
 

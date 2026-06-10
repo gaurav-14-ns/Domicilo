@@ -89,11 +89,22 @@ export const AuthProvider = ({
   const [bootstrapKey, setBootstrapKey] =
     useState(0);
 
+  // Loading ref-count: tracks concurrent loading operations
+  // so bootstrap and onAuthStateChange don't race.
+  const loadingCountRef = useRef(0);
+
   const safeSetLoading = (
     value: boolean
   ) => {
-    if (mountedRef.current) {
-      setLoading(value);
+    if (!mountedRef.current) return;
+    if (value) {
+      loadingCountRef.current++;
+      setLoading(true);
+    } else {
+      loadingCountRef.current = Math.max(0, loadingCountRef.current - 1);
+      if (loadingCountRef.current === 0) {
+        setLoading(false);
+      }
     }
   };
 
@@ -348,11 +359,12 @@ if (suspended) {
           } catch {} // ignore quota errors
         } catch (error: any) {
           if (error?.message === "SUSPENDED") {
-            safeSetLoading(true);
+            try { localStorage.removeItem("domicilo_user"); localStorage.removeItem("domicilo_role"); } catch {}
             await supabase.auth.signOut();
             safeSetRole(null);
             safeSetUser(null);
             safeSetSession(null);
+            safeSetLoading(false);
             window.location.href = "/auth";
             toast.error("Your account has been suspended.");
             return;
