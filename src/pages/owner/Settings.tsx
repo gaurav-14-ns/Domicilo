@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from "react";
-import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useDataStore } from "@/store/DataStore";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -48,7 +47,6 @@ const PLAN_LABEL: Record<PlanId, string> = {
 export default function Settings() {
   const { user } = useAuth();
   const { data, updateSettings } = useDataStore();
-  const { theme, setTheme } = useTheme();
   const { fmt, code, locale } = useCurrency();
   const {
     subscription,
@@ -85,12 +83,9 @@ export default function Settings() {
     ownerEmail: data.settings.ownerEmail || user?.email || "",
     emailNotifications: data.settings.emailNotifications,
     smsNotifications: data.settings.smsNotifications,
-    theme: data.settings.theme,
     currencyCode: data.settings.currencyCode,
     locale: data.settings.locale,
   });
-
-  const themeDirty = useRef(false);
 
   useEffect(() => {
     setForm({
@@ -98,11 +93,9 @@ export default function Settings() {
       ownerEmail: data.settings.ownerEmail || user?.email || "",
       emailNotifications: data.settings.emailNotifications,
       smsNotifications: data.settings.smsNotifications,
-      theme: data.settings.theme,
       currencyCode: data.settings.currencyCode,
       locale: data.settings.locale,
     });
-    themeDirty.current = false;
   }, [data.settings, user?.email]);
 
   useEffect(() => {
@@ -122,8 +115,6 @@ export default function Settings() {
     setBusy(true);
     try {
       await updateSettings(form);
-      if (themeDirty.current && form.theme !== theme) setTheme(form.theme);
-      themeDirty.current = false;
       toast.success("Settings saved", {
         description: "Your preferences have been updated.",
       });
@@ -465,24 +456,7 @@ export default function Settings() {
             <p className="text-[11px] text-muted-foreground">Used everywhere amounts are shown.</p>
           </div>
 
-          <div className="space-y-2">
-            <Label>Theme preference</Label>
-            <Select
-              value={form.theme}
-              onValueChange={(v) => {
-                themeDirty.current = true;
-                setForm({ ...form, theme: v as any });
-              }}
-            >
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="light">Light</SelectItem>
-                <SelectItem value="dark">Dark</SelectItem>
-                <SelectItem value="system">System</SelectItem>
-              </SelectContent>
-            </Select>
-            <p className="text-[11px] text-muted-foreground">Use the toggle in the header for one-off switches.</p>
-          </div>
+
         </div>
 
         <div className="flex items-center justify-between rounded-lg border border-border p-4 opacity-70">

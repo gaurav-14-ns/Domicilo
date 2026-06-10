@@ -86,7 +86,6 @@ export type Settings = {
   ownerEmail: string;
   emailNotifications: boolean;
   smsNotifications: boolean;
-  theme: "light" | "dark" | "system";
   currencyCode: CurrencyCode;
   locale: string;
 };

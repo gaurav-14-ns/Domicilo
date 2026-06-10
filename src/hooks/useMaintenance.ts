@@ -21,20 +21,15 @@ export function useMaintenance() {
     setLoading(true);
 
     const currentTenants = data.tenants ?? [];
-    const isTenant = currentTenants.some(
+    const tenant = currentTenants.find(
       (t) => user.email && t.email.toLowerCase() === user.email.toLowerCase(),
     );
-    const tenant = isTenant
-      ? currentTenants.find((t) => user.email && t.email.toLowerCase() === user.email.toLowerCase())
-      : null;
 
     let query = supabase.from("maintenance_requests").select("*");
-    if (tenant) {
-      query = query.eq("tenant_id", tenant.id);
-    }
-
     if (role === "owner") {
       query = query.eq("owner_id", user.id);
+    } else if (tenant) {
+      query = query.eq("tenant_id", tenant.id);
     }
     const { data: rows, error } = await query.order("created_at", { ascending: false });
 
@@ -62,11 +57,25 @@ export function useMaintenance() {
     ) => {
       if (!user) throw new Error("Not authenticated");
 
+      // Resolve ownerId: try local store first, then fallback to DB
+      let ownerId: string | undefined;
       const currentTenants = data.tenants ?? [];
-      const tenant = currentTenants.find(
+      const localTenant = currentTenants.find(
         (t) => user.email && t.email.toLowerCase() === user.email.toLowerCase(),
       );
-      const ownerId = tenant?.ownerId || user.id;
+      if (localTenant?.ownerId) {
+        ownerId = localTenant.ownerId;
+      } else {
+        const { data: dbTenant } = await supabase
+          .from("tenants")
+          .select("owner_id")
+          .ilike("email", user.email)
+          .maybeSingle();
+        if (dbTenant?.owner_id) {
+          ownerId = dbTenant.owner_id;
+        }
+      }
+      if (!ownerId) throw new Error("Could not determine property owner. Please try again.");
 
       const { error } = await supabase.from("maintenance_requests").insert({
         owner_id: ownerId,

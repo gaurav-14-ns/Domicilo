@@ -356,10 +356,10 @@ if (suspended) {
           try {
             localStorage.setItem("domicilo_user", JSON.stringify(u));
             localStorage.setItem("domicilo_role", resolvedRole);
-          } catch {} // ignore quota errors
+          } catch { /* ignore quota errors */ }
         } catch (error: any) {
           if (error?.message === "SUSPENDED") {
-            try { localStorage.removeItem("domicilo_user"); localStorage.removeItem("domicilo_role"); } catch {}
+            try { localStorage.removeItem("domicilo_user"); localStorage.removeItem("domicilo_role"); } catch { /* ignore */ }
             await supabase.auth.signOut();
             safeSetRole(null);
             safeSetUser(null);
@@ -425,7 +425,7 @@ if (suspended) {
             safeSetUser(null);
             safeSetRole(null);
             safeSetLoading(false);
-            try { localStorage.removeItem("domicilo_user"); localStorage.removeItem("domicilo_role"); } catch {}
+            try { localStorage.removeItem("domicilo_user"); localStorage.removeItem("domicilo_role"); } catch { /* ignore */ }
             return;
           }
 
@@ -584,7 +584,7 @@ if (suspended) {
           safeSetSession(
             null
           );
-          try { localStorage.removeItem("domicilo_user"); localStorage.removeItem("domicilo_role"); } catch {}
+          try { localStorage.removeItem("domicilo_user"); localStorage.removeItem("domicilo_role"); } catch { /* ignore */ }
         }
       },
       []

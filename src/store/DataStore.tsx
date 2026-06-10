@@ -20,7 +20,6 @@ const defaultSettings: Settings = {
   ownerEmail: "",
   emailNotifications: true,
   smsNotifications: false,
-  theme: "system",
   currencyCode: "INR",
   locale: "en-IN",
 };
@@ -120,7 +119,6 @@ const mapSettings = (r: any | null): Settings => {
     ownerEmail: r.contact_email ?? "",
     emailNotifications: !!r.email_notifications,
     smsNotifications: !!r.sms_notifications,
-    theme: (r.theme ?? "system") as Settings["theme"],
     currencyCode: (r.currency_code ?? "INR") as CurrencyCode,
     locale: r.locale ?? "en-IN",
   };
@@ -832,6 +830,9 @@ useEffect(() => {
 
   const queueRefresh =
     () => {
+      // Skip if a refresh is already running
+      if (reconcileRef.current) return;
+
       if (
         realtimeRefreshTimeout.current
       ) {
@@ -842,8 +843,9 @@ useEffect(() => {
 
       realtimeRefreshTimeout.current =
         setTimeout(() => {
+          if (reconcileRef.current) return;
           void fetchAll();
-        }, 350);
+        }, 2000);
     };
 
   const channel =
@@ -974,7 +976,6 @@ useEffect(() => {
         return reconcileRef.current;
       }
       fetchedRef.current = false;
-
       const promise =
         fetchAll();
 
@@ -983,6 +984,7 @@ useEffect(() => {
           () => {
             reconcileRef.current =
               null;
+            fetchedRef.current = true;
           }
         );
 
@@ -1822,7 +1824,6 @@ const removeProperty = useCallback(async (id: string) => {
     if (patch.ownerEmail !== undefined) dbPatch.contact_email = patch.ownerEmail;
     if (patch.emailNotifications !== undefined) dbPatch.email_notifications = patch.emailNotifications;
     if (patch.smsNotifications !== undefined) dbPatch.sms_notifications = patch.smsNotifications;
-    if (patch.theme !== undefined) dbPatch.theme = patch.theme;
     const { error } = await supabase
       .from("app_settings")
       .upsert(dbPatch, { onConflict: "user_id" });
