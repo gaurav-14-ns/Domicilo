@@ -98,6 +98,7 @@ export default function BrowseProperties() {
 
   // Fetch listings
   useEffect(() => {
+    let cancelled = false;
     setLoading(true);
     let query = supabase
       .from("properties")
@@ -111,6 +112,7 @@ export default function BrowseProperties() {
     if (minBed > 0) query = query.gte("bedrooms", minBed);
 
     query.order("created_at", { ascending: false }).then(({ data, error }) => {
+      if (cancelled) return;
       if (error) {
         console.error("Failed to fetch properties:", error);
         setLoading(false);
@@ -144,9 +146,11 @@ export default function BrowseProperties() {
       }
       setLoading(false);
     }).catch((err) => {
+      if (cancelled) return;
       console.error("Failed to fetch properties:", err);
       setLoading(false);
     });
+    return () => { cancelled = true; };
   }, [selectedState, selectedCity, selectedType, maxPrice, minBed, selectedAmenities, q]);
 
   const toggleAmenity = (a: string) => {

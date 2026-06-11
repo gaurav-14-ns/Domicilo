@@ -55,6 +55,7 @@ export const AuthProvider = ({
   const mountedRef = useRef(true);
   const online = useOnlineStatus();
   const lastOnlineRef = useRef(online);
+  const ensuringRef = useRef<string | null>(null);
 
   const cachedUser = (() => {
     try {
@@ -137,6 +138,15 @@ export const AuthProvider = ({
       async (
         u: User
       ): Promise<AppRole> => {
+        // Dedup: prevent concurrent ensureUserRecords for the same user
+        if (ensuringRef.current === u.id) {
+          // Wait for the in-flight call and return its result
+          const start = Date.now();
+          while (ensuringRef.current === u.id && Date.now() - start < 15000) {
+            await new Promise(r => setTimeout(r, 50));
+          }
+        }
+        ensuringRef.current = u.id;
         try {
           const [roleResult, profileResult] =
             await Promise.all([
@@ -337,6 +347,8 @@ if (suspended) {
           );
 
           return "tenant";
+        } finally {
+          ensuringRef.current = null;
         }
       },
       []
