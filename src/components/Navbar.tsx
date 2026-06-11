@@ -32,7 +32,7 @@ export const Navbar = () => {
       );
 
     if (el) {
-      const offset = 90;
+      const offset = parseInt(getComputedStyle(document.documentElement).scrollPaddingTop) || 80;
 
       const top =
         el.getBoundingClientRect()
