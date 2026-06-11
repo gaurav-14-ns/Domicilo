@@ -1,4 +1,8 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+
+import {
+  ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+} from "recharts";
 
 import { useDataStore } from "@/store/DataStore";
 
@@ -22,13 +26,13 @@ const KpiCard = ({
   value,
   delta,
 }: any) => (
-  <div className="rounded-xl border border-border bg-gradient-card p-5">
+  <div className="rounded-xl border border-border bg-gradient-card p-5 transition-smooth hover:-translate-y-1 hover:border-primary/30 hover:shadow-elegant">
     <div className="flex items-center justify-between">
       <div className="text-xs uppercase tracking-wider text-muted-foreground">
         {label}
       </div>
 
-      <Icon className="h-4 w-4 text-primary" />
+      <Icon className="h-4 w-4 text-primary transition-smooth group-hover:scale-110" />
     </div>
 
     <div className="mt-2 text-2xl md:text-3xl font-bold font-display text-gold">
@@ -235,24 +239,37 @@ const overdueDues =
       return months;
     }, [transactions]);
 
-  const trendMax =
-    Math.max(
-      1,
-      ...trend.map(
-        (m) =>
-          Number(
-            m?.total ?? 0
-          )
-      )
-    );
+  const [rangeMonths, setRangeMonths] = useState(6);
 
-  const hasTrendData =
-    trend.some(
-      (m) =>
-        Number(
-          m?.total ?? 0
-        ) > 0
-    );
+  const tenantsById = useMemo(
+    () => new Map((tenants as any[]).map((t: any) => [t.id, t])),
+    [tenants]
+  );
+
+  const propertiesById = useMemo(
+    () => new Map((properties as any[]).map((p: any) => [p.id, p])),
+    [properties]
+  );
+
+  const filteredTrend = useMemo(() => {
+    const now = new Date();
+    const cutoff = new Date(now.getFullYear(), now.getMonth() - rangeMonths + 1, 1);
+    return trend.filter((m) => {
+      const [y, mo] = m.key.split("-").map(Number);
+      const d = new Date(y, mo - 1, 1);
+      return d >= cutoff;
+    });
+  }, [trend, rangeMonths]);
+
+  const trendMax = Math.max(1, ...filteredTrend.map((m) => Number(m?.total ?? 0)));
+
+  const hasTrendData = filteredTrend.some((m) => Number(m?.total ?? 0) > 0);
+
+  const rangeOptions = [
+    { value: 3, label: "3m" },
+    { value: 6, label: "6m" },
+    { value: 12, label: "12m" },
+  ];
 
   return (
     <div className="space-y-6">
@@ -293,76 +310,94 @@ const overdueDues =
         />
 
         <KpiCard
-  icon={
-    AlertCircle
-  }
-  label="Pending dues"
-  value={fmt(
-    pendingDues
-  )}
-  delta="Fresh unpaid"
-/>
+          icon={AlertCircle}
+          label="Pending dues"
+          value={fmt(pendingDues)}
+          delta="Fresh unpaid"
+        />
 
-<KpiCard
-  icon={
-    AlertCircle
-  }
-  label="Overdue dues"
-  value={fmt(
-    overdueDues
-  )}
-  delta="Needs attention"
-/>
+        <KpiCard
+          icon={AlertCircle}
+          label="Overdue dues"
+          value={fmt(overdueDues)}
+          delta="Needs attention"
+        />
       </div>
 
       <div className="grid lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 rounded-xl border border-border bg-gradient-card p-5">
-          <div className="text-sm font-semibold mb-4 text-gradient">
-            Revenue · last 6 months
-          </div>
+        {/* Revenue chart */}
+        <div className="lg:col-span-2 rounded-xl border border-border bg-gradient-card p-5 transition-smooth hover:-translate-y-1 hover:border-primary/30 hover:shadow-elegant">
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <div className="text-sm font-semibold text-gradient">
+              Revenue
+            </div>
+
+            <div className="flex rounded-md border border-border overflow-hidden">
+                {rangeOptions.map((o) => (
+                  <button
+                    key={o.value}
+                    onClick={() => setRangeMonths(o.value)}
+                    className={`px-2.5 py-1 text-xs font-medium transition-smooth ${
+                      rangeMonths === o.value
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-card text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {o.label}
+                  </button>
+                ))}
+              </div>
+            </div>
 
           {hasTrendData ? (
-            <div className="flex items-end gap-2 h-48">
-              {trend.map(
-                (m) => (
-                  <div
-                    key={m.key}
-                    className="flex-1 flex flex-col items-center gap-1"
-                  >
-                    <div
-                      className="w-full rounded-t-md bg-gradient-primary"
-                      style={{
-                        height: `${
-                          (Number(
-                            m.total
-                          ) /
-                            trendMax) *
-                          100
-                        }%`,
-                        minHeight: 2,
-                      }}
-                      title={fmt(
-                        Number(
-                          m.total
-                        )
-                      )}
-                    />
-
-                    <div className="text-[10px] text-muted-foreground">
-                      {m.label.slice(
-                        0,
-                        3
-                      )}
-                    </div>
-                  </div>
-                )
-              )}
+            <div className="h-52">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={filteredTrend}>
+                  <defs>
+                    <linearGradient id="revenueBar" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="hsl(280 85% 55%)" stopOpacity={0.9} />
+                      <stop offset="100%" stopColor="hsl(280 85% 55%)" stopOpacity={0.3} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(270 20% 15%)" />
+                  <XAxis
+                    dataKey="label"
+                    tick={{ fontSize: 11, fill: "hsl(270 10% 60%)" }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    tick={{ fontSize: 11, fill: "hsl(270 10% 60%)" }}
+                    axisLine={false}
+                    tickLine={false}
+                    tickFormatter={(v: number) => fmtCompact(v)}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "hsl(270 35% 6%)",
+                      border: "1px solid hsl(280 85% 55% / 0.3)",
+                      borderRadius: 8,
+                      fontSize: 12,
+                    }}
+                    formatter={(value: number) => [fmt(value), "Revenue"]}
+                  />
+                  <Bar dataKey="total" fill="url(#revenueBar)" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                  <Line
+                    type="monotone"
+                    dataKey="total"
+                    stroke="hsl(330 90% 60%)"
+                    strokeWidth={2}
+                    dot={{ fill: "hsl(330 90% 60%)", r: 3 }}
+                    activeDot={{ r: 5 }}
+                  />
+                </ComposedChart>
+              </ResponsiveContainer>
             </div>
           ) : (
-            <div className="h-48 grid place-items-center text-center">
+            <div className="h-52 grid place-items-center text-center">
               <div>
                 <div className="font-display font-semibold">
-                  Not enough historical data yet.
+                  No revenue data yet.
                 </div>
 
                 <div className="text-xs text-muted-foreground mt-1">
@@ -373,7 +408,8 @@ const overdueDues =
           )}
         </div>
 
-        <div className="rounded-xl border border-border bg-gradient-card p-5">
+        {/* Recent transactions */}
+        <div className="rounded-xl border border-border bg-gradient-card p-5 transition-smooth hover:-translate-y-1 hover:border-primary/30 hover:shadow-elegant">
           <div className="text-sm font-semibold mb-4 text-gradient">
             Recent transactions
           </div>
@@ -384,47 +420,54 @@ const overdueDues =
               No activity yet.
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {transactions
                 .slice(0, 5)
-                .map((t) => (
-                  <div
-                    key={
-                      t?.id
-                    }
-                    className="flex items-center justify-between text-sm gap-3"
-                  >
-                    <span className="text-muted-foreground truncate">
-                      {t?.tenant ||
-                        t?.type ||
-                        "Transaction"}
-                    </span>
-
-                    <span
-                      className={`font-medium whitespace-nowrap ${
-                        Number(
-                          t?.amount ??
-                            0
-                        ) > 0
-                          ? "text-primary"
-                          : "text-destructive"
-                      }`}
+                .map((t) => {
+                  const tenantName = t.tenantId ? (tenantsById.get(t.tenantId) as any)?.name : null;
+                  const propertyName = t.propertyId ? (propertiesById.get(t.propertyId) as any)?.name : null;
+                  return (
+                    <div
+                      key={t.id}
+                      className="flex items-center justify-between gap-2 text-sm py-2 border-b border-border/40 last:border-0"
                     >
-                      {fmt(
-                        Number(
-                          t?.amount ??
-                            0
-                        )
-                      )}
-                    </span>
-                  </div>
-                ))}
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium truncate">
+                          {tenantName || t?.tenant || t?.type || "—"}
+                        </div>
+
+                        <div className="text-[11px] text-muted-foreground truncate">
+                          {propertyName || t?.property || "—"}
+                        </div>
+                      </div>
+
+                      <div className="text-right shrink-0">
+                        <div className={`font-semibold whitespace-nowrap ${
+                          Number(t?.amount ?? 0) > 0
+                            ? "text-primary"
+                            : "text-destructive"
+                        }`}>
+                          {fmt(Number(t?.amount ?? 0))}
+                        </div>
+
+                        <div className="text-[11px] text-muted-foreground">
+                          {t?.date
+                            ? new Date(t.date).toLocaleDateString("en-IN", {
+                                day: "numeric", month: "short",
+                              })
+                            : "—"}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
             </div>
           )}
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-gradient-card p-5">
+      {/* Properties snapshot */}
+      <div className="rounded-xl border border-border bg-gradient-card p-5 transition-smooth hover:-translate-y-1 hover:border-primary/30 hover:shadow-elegant">
         <div className="text-sm font-semibold mb-4 text-gradient">
           Properties snapshot
         </div>
@@ -440,7 +483,7 @@ const overdueDues =
               (p) => (
                 <div
                   key={p?.id}
-                  className="rounded-lg border border-border p-4"
+                  className="rounded-lg border border-border p-4 transition-smooth hover:-translate-y-1 hover:border-primary/30 hover:shadow-elegant"
                 >
                   <div className="font-display font-semibold truncate">
                     {p?.name ||

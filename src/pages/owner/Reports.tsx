@@ -309,7 +309,7 @@ export default function Reports() {
         ].map((k) => (
           <div
             key={k.l}
-            className="rounded-xl border border-border bg-gradient-card p-5"
+            className="rounded-xl border border-border bg-gradient-card p-5 transition-smooth hover:-translate-y-1 hover:border-primary/30 hover:shadow-elegant"
           >
             <div className="text-xs uppercase text-muted-foreground">
               {k.l}
@@ -327,7 +327,7 @@ export default function Reports() {
         <div className="grid lg:grid-cols-2 gap-4">
 
           {/* REVENUE */}
-          <div className="rounded-xl border border-border bg-gradient-card p-5">
+          <div className="rounded-xl border border-border bg-gradient-card p-5 transition-smooth hover:-translate-y-1 hover:border-primary/30 hover:shadow-elegant">
             <div className="text-sm font-semibold mb-4">
               Revenue by property
             </div>
@@ -369,7 +369,7 @@ export default function Reports() {
           </div>
 
           {/* TREND */}
-          <div className="rounded-xl border border-border bg-gradient-card p-5">
+          <div className="rounded-xl border border-border bg-gradient-card p-5 transition-smooth hover:-translate-y-1 hover:border-primary/30 hover:shadow-elegant">
             <div className="text-sm font-semibold mb-4">
               Monthly revenue · last 6 months
             </div>
@@ -432,7 +432,7 @@ export default function Reports() {
       )}
 
       {/* OCCUPANCY */}
-      <div className="rounded-xl border border-border bg-gradient-card p-5">
+      <div className="rounded-xl border border-border bg-gradient-card p-5 transition-smooth hover:-translate-y-1 hover:border-primary/30 hover:shadow-elegant">
 
         <div className="text-sm font-semibold mb-4">
           Property-wise occupancy

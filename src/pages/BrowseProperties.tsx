@@ -226,7 +226,7 @@ export default function BrowseProperties() {
 
         {/* Filter panel */}
         {showFilters && (
-          <AnimatedSection className="rounded-xl border border-border bg-gradient-card p-6 mb-8">
+          <AnimatedSection className="rounded-xl border border-border bg-gradient-card p-6 mb-8 transition-smooth hover:-translate-y-1 hover:border-primary/30 hover:shadow-elegant">
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {/* State */}
               <div className="space-y-2">

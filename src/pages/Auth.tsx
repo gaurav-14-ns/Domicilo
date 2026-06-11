@@ -606,7 +606,7 @@ useEffect(() => {
 
 )}
 
-        <div className="rounded-2xl border border-border/60 bg-gradient-card p-6 shadow-elegant backdrop-blur-xl">
+        <div className="rounded-2xl border border-border/60 bg-gradient-card p-6 shadow-elegant backdrop-blur-xl transition-smooth hover:-translate-y-1 hover:border-primary/30 hover:shadow-elegant">
 
           {recoveryMode ? (
   <form

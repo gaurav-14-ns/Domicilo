@@ -302,7 +302,7 @@ useEffect(() => {
       return reconcileRef.current;
     }
 
-    const doFetch = async () => {
+    const doFetch = async (retried = false) => {
     if (!user) {
       if (
         mountedRef.current
@@ -588,13 +588,10 @@ useEffect(() => {
       // Detect silent auth failure (session expired, JWT invalid)
       const authErr = results.find((r: any) => r?.error?.status === 401 || r?.error?.status === 403);
       if (authErr) {
-        // Try to refresh once; if that fails too, throw
+        if (retried) throw new Error("Session expired");
         const { error: refreshErr } = await supabase.auth.refreshSession();
-        if (refreshErr) {
-          throw new Error("Session expired");
-        }
-        // Refresh succeeded — retry is handled upstream by state change
-        throw new Error("Session refreshed, retrying");
+        if (refreshErr) throw new Error("Session expired");
+        return doFetch(true);
       }
 
       const [

@@ -471,7 +471,7 @@ export default function AdminOverview() {
         </p>
       </div>
 
-      <div className="rounded-2xl border border-border bg-card/40 backdrop-blur-sm p-4 md:p-5 space-y-4">
+      <div className="rounded-2xl border border-border bg-card/40 backdrop-blur-sm p-4 md:p-5 space-y-4 transition-smooth hover:-translate-y-1 hover:border-primary/30 hover:shadow-elegant">
         <div className="text-sm font-medium">
           Filters
         </div>

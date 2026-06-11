@@ -397,11 +397,20 @@ if (suspended) {
     mountedRef.current = true;
 
     // Periodic session heartbeat: pings Supabase every 5 min
-    // Prevents silent session expiry from leaving stale auth state
+    // Prevents silent session expiry from leaving stale auth state.
+    // Only clears auth on definitive 401/403 errors — transient network
+    // failures (e.g. tab backgrounded briefly) won't log the user out.
     const heartbeat = setInterval(async () => {
       if (!mountedRef.current) return;
-      const { data: { session: s }, error } = await supabase.auth.getUser();
-      if (error || !s) {
+      const { data: { user: u }, error } = await supabase.auth.getUser();
+      if (error) {
+        if (error?.status === 401 || error?.status === 403) {
+          try { localStorage.removeItem("domicilo_user"); localStorage.removeItem("domicilo_role"); } catch { /* ignore */ }
+          safeSetSession(null); safeSetUser(null); safeSetRole(null); safeSetLoading(false);
+        }
+        return;
+      }
+      if (!u) {
         try { localStorage.removeItem("domicilo_user"); localStorage.removeItem("domicilo_role"); } catch { /* ignore */ }
         safeSetSession(null); safeSetUser(null); safeSetRole(null); safeSetLoading(false);
       }

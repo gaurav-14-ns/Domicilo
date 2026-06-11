@@ -36,7 +36,7 @@ export default function About() {
             ))}
           </section>
 
-          <section className="rounded-2xl border border-border/60 bg-gradient-card p-8 md:p-10 text-center space-y-4 shadow-elegant">
+          <section className="rounded-2xl border border-border/60 bg-gradient-card p-8 md:p-10 text-center space-y-4 shadow-elegant transition-smooth hover:-translate-y-1 hover:border-primary/30 hover:shadow-elegant">
             <div className="divider-royal w-20 mx-auto" />
             <h2 className="font-display text-2xl font-semibold tracking-tight text-gradient">Our royal mission</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto font-alt">

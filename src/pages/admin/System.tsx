@@ -123,7 +123,7 @@ export default function System() {
 
       <div className="grid gap-4 md:grid-cols-3">
 
-        <div className="rounded-xl border border-border bg-gradient-card p-5">
+        <div className="rounded-xl border border-border bg-gradient-card p-5 transition-smooth hover:-translate-y-1 hover:border-primary/30 hover:shadow-elegant">
 
           <div className="text-sm text-muted-foreground">
             Authentication
@@ -135,7 +135,7 @@ export default function System() {
 
         </div>
 
-        <div className="rounded-xl border border-border bg-gradient-card p-5">
+        <div className="rounded-xl border border-border bg-gradient-card p-5 transition-smooth hover:-translate-y-1 hover:border-primary/30 hover:shadow-elegant">
 
           <div className="text-sm text-muted-foreground">
             Admin Access
@@ -147,7 +147,7 @@ export default function System() {
 
         </div>
 
-        <div className="rounded-xl border border-border bg-gradient-card p-5">
+        <div className="rounded-xl border border-border bg-gradient-card p-5 transition-smooth hover:-translate-y-1 hover:border-primary/30 hover:shadow-elegant">
 
           <div className="text-sm text-muted-foreground">
             Password Policy

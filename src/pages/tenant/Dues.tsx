@@ -166,7 +166,7 @@ const lastPayment =
       </h1>
       <div className="grid gap-4 md:grid-cols-4">
 
-  <div className="rounded-xl border border-border bg-gradient-card p-4">
+  <div className="rounded-xl border border-border bg-gradient-card p-4 transition-smooth hover:-translate-y-1 hover:border-primary/30 hover:shadow-elegant">
     <div className="flex items-center justify-between">
       <div className="text-sm text-muted-foreground">
         Outstanding
@@ -190,7 +190,7 @@ const lastPayment =
     </div>
   </div>
 
-  <div className="rounded-xl border border-border bg-gradient-card p-4">
+  <div className="rounded-xl border border-border bg-gradient-card p-4 transition-smooth hover:-translate-y-1 hover:border-primary/30 hover:shadow-elegant">
     <div className="flex items-center justify-between">
       <div className="text-sm text-muted-foreground">
         Pending
@@ -208,7 +208,7 @@ const lastPayment =
     </div>
   </div>
 
-  <div className="rounded-xl border border-border bg-gradient-card p-4">
+  <div className="rounded-xl border border-border bg-gradient-card p-4 transition-smooth hover:-translate-y-1 hover:border-primary/30 hover:shadow-elegant">
     <div className="flex items-center justify-between">
       <div className="text-sm text-muted-foreground">
         Overdue
@@ -226,7 +226,7 @@ const lastPayment =
     </div>
   </div>
 
-  <div className="rounded-xl border border-border bg-gradient-card p-4">
+  <div className="rounded-xl border border-border bg-gradient-card p-4 transition-smooth hover:-translate-y-1 hover:border-primary/30 hover:shadow-elegant">
     <div className="flex items-center justify-between">
       <div className="text-sm text-muted-foreground">
         Paid This Month
@@ -251,7 +251,7 @@ const lastPayment =
   </div>
 
 </div>
-      <div className="rounded-xl border border-border bg-gradient-card p-6">
+      <div className="rounded-xl border border-border bg-gradient-card p-6 transition-smooth hover:-translate-y-1 hover:border-primary/30 hover:shadow-elegant">
 
         <div className="text-sm text-muted-foreground">
           Total outstanding
