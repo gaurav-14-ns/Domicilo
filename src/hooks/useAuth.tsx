@@ -384,6 +384,17 @@ if (suspended) {
   useEffect(() => {
     mountedRef.current = true;
 
+    // Periodic session heartbeat: pings Supabase every 5 min
+    // Prevents silent session expiry from leaving stale auth state
+    const heartbeat = setInterval(async () => {
+      if (!mountedRef.current) return;
+      const { data: { session: s }, error } = await supabase.auth.getUser();
+      if (error || !s) {
+        try { localStorage.removeItem("domicilo_user"); localStorage.removeItem("domicilo_role"); } catch { /* ignore */ }
+        safeSetSession(null); safeSetUser(null); safeSetRole(null); safeSetLoading(false);
+      }
+    }, 300_000);
+
     const bootstrap =
       async () => {
         try {
@@ -523,6 +534,7 @@ if (suspended) {
               safeSetRole(
                 null
               );
+              try { localStorage.removeItem("domicilo_user"); localStorage.removeItem("domicilo_role"); } catch { /* ignore */ }
             }
           } catch (error) {
             console.error(
@@ -549,6 +561,7 @@ if (suspended) {
       mountedRef.current =
         false;
 
+      clearInterval(heartbeat);
       listener.subscription.unsubscribe();
     };
   }, [fetchRole, bootstrapKey]);

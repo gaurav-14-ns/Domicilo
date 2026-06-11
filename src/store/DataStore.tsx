@@ -574,6 +574,29 @@ useEffect(() => {
           );
       }
 
+      const results =
+        await Promise.all([
+          propertiesPromise,
+          tenantsPromise,
+          txsPromise,
+          commonSettings,
+          commonProfile,
+          orgsPromise,
+          subPromise,
+        ]);
+
+      // Detect silent auth failure (session expired, JWT invalid)
+      const authErr = results.find((r: any) => r?.error?.status === 401 || r?.error?.status === 403);
+      if (authErr) {
+        // Try to refresh once; if that fails too, throw
+        const { error: refreshErr } = await supabase.auth.refreshSession();
+        if (refreshErr) {
+          throw new Error("Session expired");
+        }
+        // Refresh succeeded — retry is handled upstream by state change
+        throw new Error("Session refreshed, retrying");
+      }
+
       const [
         {
           data: properties,
@@ -596,16 +619,7 @@ useEffect(() => {
         {
           data: subRow,
         },
-      ] =
-        await Promise.all([
-          propertiesPromise,
-          tenantsPromise,
-          txsPromise,
-          commonSettings,
-          commonProfile,
-          orgsPromise,
-          subPromise,
-        ]);
+      ] = results;
 
       const txRows =
         txs ?? [];
@@ -715,6 +729,19 @@ useEffect(() => {
         "DataStore fetch failed:",
         error
       );
+
+      // Session expired — redirect to login
+      if (error?.message === "Session expired") {
+        try { localStorage.removeItem("domicilo_user"); localStorage.removeItem("domicilo_role"); } catch { /* ignore */ }
+        await supabase.auth.signOut().catch(() => {});
+        if (mountedRef.current) {
+          setData(initialData);
+          setError(null);
+          setLoading(false);
+        }
+        window.location.href = "/auth";
+        return;
+      }
 
       if (
         mountedRef.current
