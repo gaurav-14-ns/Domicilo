@@ -3,8 +3,6 @@ import {
 } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useDataStore } from "@/store/DataStore";
-import { useCurrency } from "@/hooks/useCurrency";
-
 import {
   formatMoney,
 } from "@/lib/currency";
@@ -21,6 +19,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge }
 from "@/components/ui/badge";
+import { LoadingState }
+from "@/components/states/LoadingState";
+import { ErrorState }
+from "@/components/states/ErrorState";
 
 import { TransactionRow }
 from "@/components/finance/TransactionRow";
@@ -41,17 +43,14 @@ export default function Dues() {
 
   const {
     data,
+    loading,
+    error,
     refresh,
   } = useDataStore();
 
-  const {
-    code,
-    locale,
-  } = useCurrency();
-
   const tenant =
     useCurrentTenant(
-      data.tenants,
+      data?.tenants ?? [],
       user?.email
     );
 
@@ -140,16 +139,6 @@ const lastPayment =
     >
   );
 
-  const primaryCurrency =
-    pending[0]?.currencyCode ??
-    tenant?.currencyCode ??
-    code;
-
-  const primaryLocale =
-    pending[0]?.locale ??
-    tenant?.locale ??
-    locale;
-
   const [open, setOpen] =
     useState(false);
 
@@ -157,6 +146,9 @@ const lastPayment =
   showCompleted,
   setShowCompleted,
 ] = useState(false);
+
+  if (error) return <ErrorState title="Failed to load dues" description={error} onRetry={refresh} />;
+  if (loading) return <LoadingState title="Loading dues..." />;
 
   return (
     <div className="space-y-6 w-full">
@@ -178,9 +170,7 @@ const lastPayment =
     <div className="text-2xl font-bold font-display mt-3">
       {
         formatMoney(
-          outstanding,
-          primaryCurrency,
-          primaryLocale
+          outstanding
         )
       }
     </div>
@@ -260,9 +250,7 @@ const lastPayment =
         <div className="text-4xl font-bold font-display mt-2">
           {
             formatMoney(
-              outstanding,
-              primaryCurrency,
-              primaryLocale
+              outstanding
             )
           }
         </div>
@@ -306,9 +294,7 @@ const lastPayment =
             >
               Pay now · {
                 formatMoney(
-                  outstanding,
-                  primaryCurrency,
-                  primaryLocale
+                  outstanding
                 )
               }
             </Button>
@@ -398,8 +384,6 @@ const lastPayment =
             <TransactionRow
               key={t.id}
               transaction={t}
-              currency={primaryCurrency}
-              locale={primaryLocale}
             />
 
           ))
@@ -451,8 +435,6 @@ const lastPayment =
             <TransactionRow
               key={t.id}
               transaction={t}
-              currency={primaryCurrency}
-              locale={primaryLocale}
             />
 
           ))
@@ -562,8 +544,6 @@ const lastPayment =
             <TransactionRow
               key={t.id}
               transaction={t}
-              currency={primaryCurrency}
-              locale={primaryLocale}
             />
 
           ))

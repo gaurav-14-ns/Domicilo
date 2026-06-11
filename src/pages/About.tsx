@@ -24,7 +24,7 @@ export default function About() {
           <section className="grid md:grid-cols-2 gap-6">
             {[
               { icon: Building2, t: "Built for Indian portfolios", d: "From a single building to thousands of doors, the same elegant workflow scales with you." },
-              { icon: Globe, t: "India-first, global-ready", d: "Local currency, locale-aware formatting, and clear language for every region." },
+              { icon: Globe, t: "India-first", d: "Indian Rupee (₹) formatting built in by default — no setup, no configuration." },
               { icon: ShieldCheck, t: "Security first", d: "Row-level security, encrypted at rest, and strict role-based access for every royal account." },
               { icon: Crown, t: "Premium by default", d: "No ads, no upsells, no fluff. Just the royal tools that move your business forward." },
             ].map((c) => (

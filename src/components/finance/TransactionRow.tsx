@@ -14,17 +14,11 @@ import type {
 interface Props {
   transaction: Transaction;
 
-  currency: string;
-
-  locale: string;
-
   compact?: boolean;
 }
 
 export function TransactionRow({
   transaction: t,
-  currency,
-  locale,
   compact = false,
 }: Props) {
 
@@ -105,11 +99,7 @@ export function TransactionRow({
 
             {
               formatMoney(
-                t.amount,
-                t.currencyCode ??
-                  currency,
-                t.locale ??
-                  locale
+                t.amount
               )
             }
 

@@ -22,6 +22,8 @@ import { Download, Search, Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { todayISO } from "@/lib/format";
 import { useCurrency } from "@/hooks/useCurrency";
+import { LoadingState } from "@/components/states/LoadingState";
+import { ErrorState } from "@/components/states/ErrorState";
 
 import {
   formatMoney,
@@ -49,7 +51,7 @@ const emptyForm: FormState = {
 const PAGE_SIZE = 25;
 
 export default function Transactions() {
-  const { data, addTransaction, updateTransaction, removeTransaction } = useDataStore();
+  const { data, loading, error, refresh, addTransaction, updateTransaction, removeTransaction } = useDataStore();
   const { transactions = [], tenants = [], properties = [] } = data ?? {};
   const { fmt, symbol, code } = useCurrency();
 
@@ -62,6 +64,9 @@ export default function Transactions() {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [page, setPage] = useState(0);
+
+  if (error) return <ErrorState title="Failed to load transactions" description={error} onRetry={refresh} />;
+  if (loading) return <LoadingState title="Loading transactions..." />;
 
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
@@ -172,7 +177,7 @@ export default function Transactions() {
             <DialogContent>
               <DialogHeader><DialogTitle>{editId ? "Edit transaction" : "New transaction"}</DialogTitle></DialogHeader>
               <form onSubmit={submit} className="space-y-3">
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-2"><Label>Date</Label><Input type="date" required value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} /></div>
                   <div className="space-y-2">
                     <Label>Type</Label>
@@ -191,7 +196,7 @@ export default function Transactions() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-2"><Label>Amount ({symbol})</Label><Input type="number" required value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} /></div>
                   <div className="space-y-2">
                     <Label>Status</Label>
@@ -251,9 +256,8 @@ export default function Transactions() {
           <div className="text-sm text-muted-foreground">Try clearing filters or add a manual entry.</div>
         </div>
       ) : (
-        <div className="rounded-xl border border-border bg-gradient-card overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+        <div className="rounded-xl border border-border bg-gradient-card overflow-x-auto">
+          <table className="w-full text-sm">
               <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
                 <tr>
                   <th className="text-left p-3">Date</th>
@@ -272,7 +276,7 @@ export default function Transactions() {
                     <td className="p-3 font-medium">{t.tenant || "—"}</td>
                     <td className="p-3 text-muted-foreground hidden md:table-cell">{t.property ?? "—"}</td>
                     <td className="p-3">{t.type}{t.auto && <span className="ml-2 text-[10px] uppercase text-muted-foreground">auto</span>}</td>
-                    <td className={`p-3 font-medium ${t.amount < 0 ? "text-destructive" : ""}`}>{formatMoney(t.amount,t.currencyCode ?? code, t.locale)}</td>
+                    <td className={`p-3 font-medium ${t.amount < 0 ? "text-destructive" : ""}`}>{formatMoney(t.amount)}</td>
                     <td className="p-3">
   <Badge
   variant="outline"
@@ -308,7 +312,6 @@ export default function Transactions() {
                 ))}
               </tbody>
             </table>
-          </div>
           {totalPages > 1 && (
             <div className="flex items-center justify-between p-3 border-t border-border">
               <span className="text-xs text-muted-foreground">

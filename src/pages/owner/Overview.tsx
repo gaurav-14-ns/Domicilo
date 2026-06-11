@@ -8,6 +8,9 @@ import { useDataStore } from "@/store/DataStore";
 
 import { useCurrency } from "@/hooks/useCurrency";
 
+import { LoadingState } from "@/components/states/LoadingState";
+import { ErrorState } from "@/components/states/ErrorState";
+
 import {
   monthKey,
   prettyMonth,
@@ -46,7 +49,7 @@ const KpiCard = ({
 );
 
 export default function OwnerOverview() {
-  const { data } =
+  const { data, loading, error, refresh } =
     useDataStore();
 
   const {
@@ -270,6 +273,9 @@ const overdueDues =
     { value: 6, label: "6m" },
     { value: 12, label: "12m" },
   ];
+
+  if (error) return <ErrorState title="Failed to load overview" description={error} onRetry={refresh} />;
+  if (loading) return <LoadingState title="Loading overview..." />;
 
   return (
     <div className="space-y-6">

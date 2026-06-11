@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Textarea } from "@/components/ui/textarea";
 import { Search, MapPin, Bed, Bath, Home, SlidersHorizontal, X, IndianRupee, Building2, CheckCircle2, Phone, Mail, Crown, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { AnimatedSection, AnimatedStagger } from "@/components/AnimatedSection";
+import { ErrorState } from "@/components/states/ErrorState";
 import { toast } from "sonner";
 
 const AMENITIES = ["WiFi", "Parking", "AC", "Gym", "Pool", "Power Backup", "Security", "Lift"];
@@ -33,6 +34,8 @@ type Listing = {
 export default function BrowseProperties() {
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   // Filters
   const [q, setQ] = useState("");
@@ -115,9 +118,11 @@ export default function BrowseProperties() {
       if (cancelled) return;
       if (error) {
         console.error("Failed to fetch properties:", error);
+        setFetchError(error.message);
         setLoading(false);
         return;
       }
+      setFetchError(null);
       if (data) {
         let results = data.map((r: any) => ({
           id: r.id, ownerId: r.owner_id, name: r.name, address: r.address ?? "", city: r.city ?? "", state: r.state ?? "", pincode: r.pincode ?? "",
@@ -148,10 +153,11 @@ export default function BrowseProperties() {
     }).catch((err) => {
       if (cancelled) return;
       console.error("Failed to fetch properties:", err);
+      setFetchError(err?.message ?? "Failed to fetch properties");
       setLoading(false);
     });
     return () => { cancelled = true; };
-  }, [selectedState, selectedCity, selectedType, maxPrice, minBed, selectedAmenities, q]);
+  }, [selectedState, selectedCity, selectedType, maxPrice, minBed, selectedAmenities, q, retryCount]);
 
   const toggleAmenity = (a: string) => {
     setSelectedAmenities((prev) => prev.includes(a) ? prev.filter((x) => x !== a) : [...prev, a]);
@@ -203,7 +209,7 @@ export default function BrowseProperties() {
       <div className="container py-8">
         {/* Search bar */}
         <div className="flex gap-3 items-center mb-6 flex-wrap">
-          <div className="relative flex-1 min-w-[240px]">
+          <div className="relative flex-1 min-w-[180px] sm:min-w-[240px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search by name, city, or address..."
@@ -337,6 +343,8 @@ export default function BrowseProperties() {
               </div>
             ))}
           </div>
+        ) : fetchError ? (
+          <ErrorState title="Failed to load properties" description={fetchError} onRetry={() => { setFetchError(null); setRetryCount((c) => c + 1); }} />
         ) : listings.length === 0 ? (
           <div className="text-center py-20">
             <Home className="h-12 w-12 mx-auto text-muted-foreground/40 mb-4" />
@@ -471,7 +479,7 @@ export default function BrowseProperties() {
                 </DialogHeader>
 
                 {/* Quick stats */}
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="rounded-lg bg-primary/5 border border-primary/10 p-3 text-center">
                     <IndianRupee className="h-4 w-4 mx-auto text-primary mb-1" />
                     <div className="text-lg font-bold font-num text-primary">{selectedListing.priceMonthly > 0 ? `₹${selectedListing.priceMonthly.toLocaleString("en-IN")}` : "—"}</div>

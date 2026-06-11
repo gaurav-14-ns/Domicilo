@@ -16,6 +16,8 @@ import {
 import { useDataStore } from "@/store/DataStore";
 import { useCurrency } from "@/hooks/useCurrency";
 import { usePlanLimits } from "@/hooks/usePlanLimits";
+import { LoadingState } from "@/components/states/LoadingState";
+import { ErrorState } from "@/components/states/ErrorState";
 
 import {
   downloadCSV,
@@ -24,7 +26,7 @@ import {
 } from "@/lib/format";
 
 export default function Reports() {
-  const { data } = useDataStore();
+  const { data, loading, error, refresh } = useDataStore();
   const { fmt } = useCurrency();
 
   const { canUseAdvancedReports, planLabel } = usePlanLimits();
@@ -157,6 +159,9 @@ export default function Reports() {
     1,
     ...trend.map((m) => m.total)
   );
+
+  if (error) return <ErrorState title="Failed to load reports" description={error} onRetry={refresh} />;
+  if (loading) return <LoadingState title="Loading reports..." />;
 
   return (
     <div className="space-y-6">

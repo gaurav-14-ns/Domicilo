@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { LoadingState } from "@/components/states/LoadingState";
+import { ErrorState } from "@/components/states/ErrorState";
 
 // Stored in tenant_profiles.emergency as a single text column for backwards
 // compatibility: "Name · 9876543210". Parse leniently when loading.
@@ -29,8 +31,8 @@ function parseEmergency(raw: string): { name: string; phone: string } {
 
 export default function Profile() {
   const { user } = useAuth();
-  const { data, updateTenantProfile, updateTenant } = useDataStore();
-  const tenant = useCurrentTenant(data.tenants, user?.email);
+  const { data, loading, error, refresh, updateTenantProfile, updateTenant } = useDataStore();
+  const tenant = useCurrentTenant(data?.tenants ?? [], user?.email);
   const [busy, setBusy] = useState(false);
 
   const profile = data?.tenantProfile ?? {};
@@ -99,6 +101,9 @@ export default function Profile() {
       setBusy(false);
     }
   };
+
+  if (error) return <ErrorState title="Failed to load profile" description={error} onRetry={refresh} />;
+  if (loading) return <LoadingState title="Loading profile..." />;
 
   return (
     <div className="space-y-6 max-w-2xl">

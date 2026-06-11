@@ -46,10 +46,6 @@ import {
   AppRole,
 } from "@/hooks/useAuth";
 
-import {
-  detectCurrencyFromBrowser,
-} from "@/lib/currency";
-
 export default function Auth() {
   const nav =
     useNavigate();
@@ -347,7 +343,7 @@ useEffect(() => {
           }
 
         const detected =
-          detectCurrencyFromBrowser();
+          { code: "INR", locale: "en-IN" };
 
         const {
           error,

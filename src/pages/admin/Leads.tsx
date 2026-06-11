@@ -551,9 +551,8 @@ export default function AdminLeads() {
           description="Try adjusting filters."
         />
       ) : (
-        <div className="rounded-xl border border-border bg-background overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[1000px] text-sm">
+        <div className="rounded-xl border border-border bg-background overflow-x-auto">
+          <table className="w-full min-w-[700px] text-sm">
               <thead className="bg-muted/40 text-xs uppercase text-muted-foreground">
                 <tr>
                   <th className="text-left p-3">
@@ -823,7 +822,6 @@ export default function AdminLeads() {
                 )}
               </tbody>
             </table>
-          </div>
         </div>
       )}
     </div>

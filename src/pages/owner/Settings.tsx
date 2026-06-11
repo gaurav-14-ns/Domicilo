@@ -3,6 +3,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useDataStore } from "@/store/DataStore";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useCurrency } from "@/hooks/useCurrency";
+import { LoadingState } from "@/components/states/LoadingState";
+import { ErrorState } from "@/components/states/ErrorState";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,12 +31,6 @@ import {
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Sparkles, AlertTriangle, CheckCircle2, Eye, EyeOff } from "lucide-react";
-import {
-  SUPPORTED_CURRENCIES,
-  localeForCurrency,
-  type CurrencyCode,
-  planPriceIn,
-} from "@/lib/currency";
 import type { PlanId } from "@/lib/currency";
 import { UpgradePlaceholderDialog } from "@/components/UpgradePlaceholderDialog";
 
@@ -46,8 +42,8 @@ const PLAN_LABEL: Record<PlanId, string> = {
 
 export default function Settings() {
   const { user } = useAuth();
-  const { data, updateSettings } = useDataStore();
-  const { fmt, code, locale } = useCurrency();
+  const { data, loading, error, refresh: refreshData, updateSettings } = useDataStore();
+  const { fmt, locale } = useCurrency();
   const {
     subscription,
     loading: subscriptionLoading,
@@ -83,7 +79,6 @@ export default function Settings() {
     ownerEmail: data.settings.ownerEmail || user?.email || "",
     emailNotifications: data.settings.emailNotifications,
     smsNotifications: data.settings.smsNotifications,
-    currencyCode: data.settings.currencyCode,
     locale: data.settings.locale,
   });
 
@@ -93,7 +88,6 @@ export default function Settings() {
       ownerEmail: data.settings.ownerEmail || user?.email || "",
       emailNotifications: data.settings.emailNotifications,
       smsNotifications: data.settings.smsNotifications,
-      currencyCode: data.settings.currencyCode,
       locale: data.settings.locale,
     });
   }, [data.settings, user?.email]);
@@ -251,6 +245,9 @@ export default function Settings() {
       : s === "trial"
       ? "bg-yellow-500/15 text-yellow-600 dark:text-yellow-400"
       : "bg-destructive/15 text-destructive";
+
+  if (error) return <ErrorState title="Failed to load settings" description={error} onRetry={refreshData} />;
+  if (loading) return <LoadingState title="Loading settings..." />;
 
   return (
     <div className="space-y-6 max-w-3xl">
@@ -451,20 +448,10 @@ export default function Settings() {
         <div className="grid sm:grid-cols-2 gap-3">
           <div className="space-y-2">
             <Label>Currency</Label>
-            <Select
-              value={form.currencyCode}
-              onValueChange={(v) =>
-                setForm({ ...form, currencyCode: v as CurrencyCode, locale: localeForCurrency(v as CurrencyCode) })
-              }
-            >
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {SUPPORTED_CURRENCIES.map((c) => (
-                  <SelectItem key={c.code} value={c.code}>{c.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <p className="text-[11px] text-muted-foreground">Used everywhere amounts are shown.</p>
+            <div className="rounded-md border border-border bg-card px-3 py-2 text-sm text-muted-foreground">
+              Indian Rupee (₹)
+            </div>
+            <p className="text-[11px] text-muted-foreground">Always INR — no need to change.</p>
           </div>
 
 

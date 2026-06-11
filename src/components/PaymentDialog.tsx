@@ -26,13 +26,9 @@ import {
   Loader2,
 } from "lucide-react";
 
-import {
-  formatMoney,
-} from "@/lib/currency";
+import { formatMoney } from "@/lib/currency";
 
 import { uuid } from "@/lib/utils";
-
-import { useCurrency } from "@/hooks/useCurrency";
 
 import { supabase } from "@/integrations/supabase/client";
 
@@ -99,11 +95,6 @@ export function PaymentDialog({
   onPaid,
 }: Props) {
 
-  const {
-    code,
-    locale,
-  } = useCurrency();
-
   const [method, setMethod] =
     useState<Method>("upi");
 
@@ -115,17 +106,9 @@ export function PaymentDialog({
       null
     );
 
-  /*
-    Prefer immutable
-    transaction currency.
-  */
-  const primaryCurrency =
-    pending[0]?.currencyCode ??
-    code;
-
   const primaryLocale =
     pending[0]?.locale ??
-    locale;
+    "en-IN";
 
   const total =
     useMemo(() => {
@@ -278,9 +261,7 @@ toast.success(
         {
           description:
             `${formatMoney(
-              total,
-              primaryCurrency,
-              primaryLocale
+              total
             )} via ${method.toUpperCase()}`,
         }
       );
@@ -336,9 +317,7 @@ toast.success(
               <p className="text-sm text-muted-foreground mt-1">
                 {
                   formatMoney(
-                    total,
-                    primaryCurrency,
-                    primaryLocale
+                    total
                   )
                 }
                 {" · "}
@@ -417,9 +396,7 @@ toast.success(
                 <div className="text-3xl font-bold font-display mt-1">
                   {
                     formatMoney(
-                      total,
-                      primaryCurrency,
-                      primaryLocale
+                      total
                     )
                   }
                 </div>
@@ -514,9 +491,7 @@ toast.success(
                         Pay{" "}
                         {
                           formatMoney(
-                            total,
-                            primaryCurrency,
-                            primaryLocale
+                            total
                           )
                         }
                       </>

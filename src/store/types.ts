@@ -1,14 +1,11 @@
-import type { CurrencyCode } from "@/lib/currency";
-
 export type Property = {
   id: string;
   ownerId: string;
   name: string;
   address: string;
   units: number;
-  occupied: number; // derived
-  revenue: number;  // derived
-  // public listing fields
+  occupied: number;
+  revenue: number;
   city: string;
   state: string;
   priceMonthly: number;
@@ -28,18 +25,17 @@ export type Tenant = {
   id: string;
   name: string;
   room: string;
-  property: string;        // property name snapshot (derived from join)
+  property: string;
   ownerId?: string;
   propertyId?: string;
   rent: number;
   deposit: number;
   email: string;
   phone: string;
-  startDate: string;       // yyyy-mm-dd
+  startDate: string;
   status: TenantStatus;
-  currencyCode?: CurrencyCode;
   locale?: string;
-  joined: string;         // legacy alias for startDate
+  joined: string;
 };
 
 export type TransactionStatus =
@@ -55,14 +51,13 @@ export type TransactionType =
 
 export type Transaction = {
   id: string;
-  date: string;            // yyyy-mm-dd
-  tenant: string;          // tenant name snapshot
+  date: string;
+  tenant: string;
   tenantId?: string;
   propertyId?: string;
   property?: string;
   type: TransactionType | string;
   amount: number;
-  currencyCode?: CurrencyCode;
   locale?: string;
   status: TransactionStatus;
   note?: string;
@@ -86,7 +81,6 @@ export type Settings = {
   ownerEmail: string;
   emailNotifications: boolean;
   smsNotifications: boolean;
-  currencyCode: CurrencyCode;
   locale: string;
 };
 
@@ -102,7 +96,6 @@ export type SubscriptionInfo = {
   status: string;
   trialEnd: string | null;
   amount: number;
-  currencyCode: string;
 } | null;
 
 export type AppData = {

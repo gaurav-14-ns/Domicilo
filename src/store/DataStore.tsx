@@ -6,7 +6,7 @@ import { useAuth, type AppRole } from "@/hooks/useAuth";
 import type {
   AppData, Property, Tenant, Transaction, AdminOrg, Settings, TenantProfile,
 } from "./types";
-import { detectCurrencyFromBrowser, type CurrencyCode } from "@/lib/currency";
+// (currency removed — always INR)
 import { monthKey, monthsBetween, todayISO } from "@/lib/format";
 import { toast } from "sonner";
 import { uuid } from "@/lib/utils";
@@ -20,7 +20,6 @@ const defaultSettings: Settings = {
   ownerEmail: "",
   emailNotifications: true,
   smsNotifications: false,
-  currencyCode: "INR",
   locale: "en-IN",
 };
 
@@ -79,8 +78,6 @@ const mapTenant = (r: any, propertiesById: Map<string, any>): Tenant => ({
   phone: r.phone ?? "",
   startDate: r.start_date,
   status: r.status,
-  currencyCode:
-  r.currency_code,
   locale:
   r.locale,
   joined: r.start_date,
@@ -99,8 +96,6 @@ const mapTx = (r: any, tenantsById: Map<string, any>, propertiesById: Map<string
     property: p?.name,
     type: r.type,
     amount: Number(r.amount) || 0,
-    currencyCode:
-    r.currency_code,
     locale:
     r.locale,
     status: r.status,
@@ -119,7 +114,6 @@ const mapSettings = (r: any | null): Settings => {
     ownerEmail: r.contact_email ?? "",
     emailNotifications: !!r.email_notifications,
     smsNotifications: !!r.sms_notifications,
-    currencyCode: (r.currency_code ?? "INR") as CurrencyCode,
     locale: r.locale ?? "en-IN",
   };
 };
@@ -263,7 +257,7 @@ useEffect(() => {
             date: `${m}-01`,
             type: "Rent",
             amount: t.rent,
-            currency_code: t.currency_code ?? "INR",
+            currency_code: "INR",
             locale: t.locale ?? "en-IN",
             status: m === current ? "pending" : "completed",
             auto: true,
@@ -714,7 +708,6 @@ useEffect(() => {
                   status: subRow.status,
                   trialEnd: subRow.trial_end ?? null,
                   amount: Number(subRow.amount) || 0,
-                  currencyCode: subRow.currency_code || "INR",
                 }
               : null,
         });
@@ -970,41 +963,7 @@ useEffect(() => {
   };
 }, [user?.id, fetchAll]);
 
-  // Bootstrap settings: detect currency from browser ONLY for brand-new accounts
-  // that have never explicitly saved settings. Once the user picks a currency
-  // (or any other setting is saved), `updated_at` advances past `created_at`
-  // and we never overwrite their choice on subsequent logins.
-  useEffect(() => {
-    if (!user) return;
-    let cancelled = false;
-    (async () => {
-      const { data: row } = await supabase
-        .from("app_settings")
-        .select("currency_code, locale, created_at, updated_at")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      if (cancelled || !row) return;
-      const created = new Date(row.created_at).getTime();
-      const updated = new Date(row.updated_at).getTime();
-      const neverEdited = Math.abs(updated - created) < 5000; // within 5s of signup
-      if (!neverEdited) return;
-      const detected = detectCurrencyFromBrowser();
-      if (row.currency_code === "INR" && row.locale === "en-IN" && detected.code !== "INR") {
-        await supabase
-          .from("app_settings")
-          .update({ currency_code: detected.code, locale: detected.locale })
-          .eq("user_id", user.id);
-        if (!cancelled) {
-          setData((d) => ({
-            ...d,
-            settings: { ...d.settings, currencyCode: detected.code, locale: detected.locale },
-          }));
-        }
-      }
-    })();
-    return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+  // (bootstrap currency detection removed — always INR)
 
   const refresh =
   useCallback(
@@ -1138,10 +1097,7 @@ const removeProperty = useCallback(async (id: string) => {
       error: settingsError,
     } = await supabase
       .from("app_settings")
-      .select(`
-        currency_code,
-        locale
-      `)
+      .select(`locale`)
       .eq(
         "user_id",
         user.id
@@ -1192,9 +1148,7 @@ const removeProperty = useCallback(async (id: string) => {
           t.status ??
           "active",
 
-        currency_code:
-          ownerSettings?.currency_code ??
-          "INR",
+        currency_code: "INR",
 
         locale:
           ownerSettings?.locale ??
@@ -1483,14 +1437,7 @@ const removeProperty = useCallback(async (id: string) => {
 
   try {
 
-  let currencyCode = data.settings.currencyCode;
-
   let locale = data.settings.locale;
-
-  /*
-    Prefer tenant financial snapshot
-    over current owner settings.
-  */
 
   if (t.tenantId) {
 
@@ -1499,10 +1446,7 @@ const removeProperty = useCallback(async (id: string) => {
       error: tenantError,
     } = await supabase
       .from("tenants")
-      .select(`
-        currency_code,
-        locale
-      `)
+      .select(`locale`)
       .eq(
         "id",
         t.tenantId
@@ -1515,11 +1459,6 @@ const removeProperty = useCallback(async (id: string) => {
 
     if (tenantError) {
       throw tenantError;
-    }
-
-    if (tenantRow?.currency_code) {
-      currencyCode =
-        tenantRow.currency_code;
     }
 
     if (tenantRow?.locale) {
@@ -1554,8 +1493,7 @@ const removeProperty = useCallback(async (id: string) => {
         amount:
           t.amount,
 
-        currency_code:
-          currencyCode,
+        currency_code: "INR",
 
         locale:
           locale,
@@ -1581,7 +1519,6 @@ const removeProperty = useCallback(async (id: string) => {
 }, [
   user?.id,
   refresh,
-  data.settings.currencyCode,
   data.settings.locale,
 ]);
 
@@ -1840,7 +1777,6 @@ const removeProperty = useCallback(async (id: string) => {
     const next: Settings = { ...current, ...patch };
     const dbPatch: any = {
       user_id: user.id,
-      currency_code: next.currencyCode,
       locale: next.locale,
     };
     if (patch.displayName !== undefined) dbPatch.display_name = patch.displayName;

@@ -12,8 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, ShieldCheck, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 import { useSubscription } from "@/hooks/useSubscription";
-import { useCurrency } from "@/hooks/useCurrency";
-import { planPriceIn, type PlanId } from "@/lib/currency";
+import { PLAN_PRICES_INR, formatMoney, type PlanId } from "@/lib/currency";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -28,7 +27,6 @@ export function UpgradePlaceholderDialog({ plan, planLabel, trigger, onActivated
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const { changePlan } = useSubscription();
-  const { code, locale } = useCurrency();
   const { user } = useAuth();
 
   const activate = async () => {
@@ -84,7 +82,7 @@ export function UpgradePlaceholderDialog({ plan, planLabel, trigger, onActivated
           <DialogDescription>
             {plan === "scale"
               ? "Custom pricing based on your needs. Our team will contact you to finalize the plan."
-              : `${planPriceIn(plan, code, locale)} / month. Payment processing is rolling out soon — meanwhile you can activate the plan for testing and exploring premium features.`}
+              : `${formatMoney(PLAN_PRICES_INR[plan])} / month. Payment processing is rolling out soon — meanwhile you can activate the plan for testing and exploring premium features.`}
           </DialogDescription>
         </DialogHeader>
 

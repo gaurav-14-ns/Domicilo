@@ -1,23 +1,22 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useDataStore } from "@/store/DataStore";
-import { useCurrency } from "@/hooks/useCurrency";
 import { useCurrentTenant, useTenantDues, useTenantTransactions } from "@/hooks/useTenantData";
 import { formatMoney } from "@/lib/currency";
 import { Wallet, Receipt, CalendarCheck } from "lucide-react";
+import { LoadingState } from "@/components/states/LoadingState";
+import { ErrorState } from "@/components/states/ErrorState";
 
 export default function TenantOverview() {
   const { user } = useAuth();
-  const { data } = useDataStore();
-  const { code: ownerCode, locale: ownerLocale } = useCurrency();
+  const { data, loading, error, refresh } = useDataStore();
   const tenant = useCurrentTenant(data?.tenants ?? [], user?.email);
   const txs = useTenantTransactions(data?.transactions ?? [], tenant?.id);
   const outstanding = useTenantDues(data?.transactions ?? [], tenant?.id);
   const lastPayment = [...txs].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).find((t) => t.status === "completed");
-  
-  // Use tenant's currency if available, fallback to owner's
-  const tenantCurrency = tenant?.currencyCode ?? ownerCode;
-  const tenantLocale = tenant?.locale ?? ownerLocale;
-  const fmt = (amount: number) => formatMoney(amount, tenantCurrency, tenantLocale);
+  const fmt = (amount: number) => formatMoney(amount);
+
+  if (error) return <ErrorState title="Failed to load overview" description={error} onRetry={refresh} />;
+  if (loading) return <LoadingState title="Loading overview..." />;
 
   return (
     <div className="space-y-6">
@@ -53,11 +52,7 @@ export default function TenantOverview() {
               <div key={t.id} className="flex justify-between border-t border-border pt-2">
                 <span className="text-muted-foreground">{t.date} · {t.type}</span>
                 <span className="font-medium">
-                  {formatMoney(
-                    t.amount,
-                    t.currencyCode ?? tenantCurrency,
-                    t.locale ?? tenantLocale
-                  )}
+                  {formatMoney(t.amount)}
                 </span>
               </div>
             ))}

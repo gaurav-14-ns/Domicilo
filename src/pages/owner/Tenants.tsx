@@ -10,6 +10,9 @@ import {
   useDataStore,
 } from "@/store/DataStore";
 
+import { LoadingState } from "@/components/states/LoadingState";
+import { ErrorState } from "@/components/states/ErrorState";
+
 import {
   Button,
 } from "@/components/ui/button";
@@ -129,12 +132,18 @@ export default function Tenants() {
   const { user } = useAuth();
   const {
     data,
+    loading,
+    error,
+    refresh,
     addTenant,
     updateTenant,
     removeTenant,
     setTenantStatus,
     moveOutTenant,
   } = useDataStore();
+
+  if (error) return <ErrorState title="Failed to load tenants" description={error} onRetry={refresh} />;
+  if (loading) return <LoadingState title="Loading tenants..." />;
 
   const tenants = useMemo(
     () =>
@@ -816,7 +825,7 @@ const {
                 }
                 className="space-y-3"
               >
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-2">
                     <Label>
                       Full name
@@ -912,7 +921,7 @@ const {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-2">
                     <Label>
                       Property
@@ -986,7 +995,7 @@ const {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-2">
                     <Label>
                       Rent (
@@ -1051,7 +1060,7 @@ const {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-2">
                     <Label>
                       Start date
@@ -1297,9 +1306,8 @@ URL.revokeObjectURL(url);
           </div>
         </div>
       ) : (
-        <div className="rounded-xl border border-border bg-gradient-card overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[900px] text-sm">
+        <div className="rounded-xl border border-border bg-gradient-card overflow-x-auto">
+          <table className="w-full min-w-[700px] text-sm">
               <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
                 <tr>
                   <th className="text-left p-3">
@@ -1509,7 +1517,6 @@ URL.revokeObjectURL(url);
                 )}
               </tbody>
             </table>
-          </div>
           {totalPages > 1 && (
             <div className="flex items-center justify-between p-3 border-t border-border">
               <span className="text-xs text-muted-foreground">

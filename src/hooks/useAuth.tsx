@@ -200,13 +200,7 @@ const fullName =
 const suspended =
   profileData?.suspended === true;
 
-const currency =
-  meta.currency_code ||
-  "INR";
-
-const locale =
-  meta.locale ||
-  "en-IN";
+const locale = "en-IN";
 
 if (suspended) {
   throw new Error("SUSPENDED");
@@ -266,8 +260,6 @@ if (suspended) {
                   contact_email:
                     u.email ??
                     "",
-                  currency_code:
-                    currency,
                   locale,
                 },
                 {
@@ -321,7 +313,7 @@ if (suspended) {
                       trial_end:
                         new Date(Date.now() + 14 * 86400_000).toISOString(),
                       amount: 999,
-                      currency_code: currency,
+                      currency_code: "INR",
                     });
                 }
               })()

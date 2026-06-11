@@ -2,8 +2,7 @@ import { Check, Crown, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ContactDialog } from "./ContactDialog";
-import { useCurrency } from "@/hooks/useCurrency";
-import { planPriceIn } from "@/lib/currency";
+import { PLAN_PRICES_INR, formatMoney } from "@/lib/currency";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { UpgradePlaceholderDialog } from "./UpgradePlaceholderDialog";
@@ -55,7 +54,6 @@ const tiers: Tier[] = [
 
 export const Pricing = () => {
   const nav = useNavigate();
-  const { code, locale } = useCurrency();
   const { user, role } = useAuth();
   const { subscription } = useSubscription();
 
@@ -84,7 +82,7 @@ export const Pricing = () => {
           </div>
           <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight">Royal plans, honest pricing.</h2>
           <p className="mt-4 text-muted-foreground text-lg font-alt">
-            Start your 14-day royal trial. Upgrade when your portfolio demands it. Prices localised to your region.
+            Start your 14-day royal trial. Upgrade when your portfolio demands it. All prices in Indian Rupees (₹).
           </p>
         </AnimatedSection>
         <AnimatedStagger
@@ -93,7 +91,7 @@ export const Pricing = () => {
           staggerMs={120}
         >
           {tiers.map((t) => {
-            const price = planPriceIn(t.id, code, locale);
+            const price = t.id === "scale" ? "Custom" : formatMoney(PLAN_PRICES_INR[t.id]);
             const isCustom = t.id === "scale";
             const current = isCurrent(t.id);
             const btnLabel = current ? "Current plan" : t.cta;

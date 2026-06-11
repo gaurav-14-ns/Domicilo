@@ -7,6 +7,9 @@ import {
   useDataStore,
 } from "@/store/DataStore";
 
+import { LoadingState } from "@/components/states/LoadingState";
+import { ErrorState } from "@/components/states/ErrorState";
+
 import {
   Button,
 } from "@/components/ui/button";
@@ -106,10 +109,16 @@ const empty: FormState = {
 export default function Properties() {
   const {
     data,
+    loading,
+    error,
+    refresh,
     addProperty,
     updateProperty,
     removeProperty,
   } = useDataStore();
+
+  if (error) return <ErrorState title="Failed to load properties" description={error} onRetry={refresh} />;
+  if (loading) return <LoadingState title="Loading properties..." />;
 
   const list = useMemo(
     () =>
@@ -513,7 +522,7 @@ export default function Properties() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-2">
                     <Label>
                       Total units
@@ -563,7 +572,7 @@ export default function Properties() {
 
                 <div className="border-t border-border/40 pt-4">
                   <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3 font-display">Listing Details</p>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-2">
                       <Label>City</Label>
                       <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} placeholder="e.g. Mumbai" />
@@ -844,7 +853,7 @@ export default function Properties() {
                       "No address"}
                   </div>
 
-                  <div className="mt-4 grid grid-cols-3 gap-2 text-xs">
+                  <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
                     <div className="rounded-md bg-muted/40 p-2">
                       <div className="text-muted-foreground">
                         Units

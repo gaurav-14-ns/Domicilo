@@ -6,8 +6,6 @@ import {
 
 import { useAuth } from "@/hooks/useAuth";
 import { useDataStore } from "@/store/DataStore";
-import { useCurrency } from "@/hooks/useCurrency";
-
 import {
   useCurrentTenant,
   useTenantTransactions,
@@ -21,6 +19,11 @@ from "@/components/ui/button";
 
 import { Input }
 from "@/components/ui/input";
+
+import { LoadingState }
+from "@/components/states/LoadingState";
+import { ErrorState }
+from "@/components/states/ErrorState";
 
 import {
   Download,
@@ -36,23 +39,18 @@ export default function TenantTransactions() {
   const { user } =
     useAuth();
 
-  const { data } =
+  const { data, loading, error, refresh } =
     useDataStore();
-
-  const {
-    code,
-    locale,
-  } = useCurrency();
 
   const tenant =
     useCurrentTenant(
-      data.tenants,
+      data?.tenants ?? [],
       user?.email
     );
 
   const txs =
     useTenantTransactions(
-      data.transactions,
+      data?.transactions ?? [],
       tenant?.id
     );
 
@@ -167,6 +165,9 @@ export default function TenantTransactions() {
           t.note ?? "",
       })
     );
+
+  if (error) return <ErrorState title="Failed to load transactions" description={error} onRetry={refresh} />;
+  if (loading) return <LoadingState title="Loading transactions..." />;
 
   return (
 
@@ -356,14 +357,6 @@ export default function TenantTransactions() {
                   <TransactionRow
                     key={t.id}
                     transaction={t}
-                    currency={
-                      tenant?.currencyCode ??
-                      code
-                    }
-                    locale={
-                      tenant?.locale ??
-                      locale
-                    }
                   />
 
                 ))

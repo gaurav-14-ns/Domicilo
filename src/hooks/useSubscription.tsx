@@ -18,7 +18,6 @@ export interface Subscription {
   trialEnd: string | null;
   currentPeriodEnd: string | null;
   amount: number;
-  currencyCode: string;
   cancelledAt: string | null;
 }
 
@@ -30,7 +29,6 @@ const map = (r: any): Subscription => ({
   trialEnd: r.trial_end,
   currentPeriodEnd: r.current_period_end,
   amount: Number(r.amount) || 0,
-  currencyCode: r.currency_code || "INR",
   cancelledAt: r.cancelled_at,
 });
 
