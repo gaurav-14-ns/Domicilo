@@ -819,6 +819,7 @@ useEffect(() => {
     fetchedRef.current = true;
     lastFetchedRoleRef.current = role;
     lastFetchedUserIdRef.current = user.id;
+    reconcileRef.current = null;
     setLoading(true);
     fetchAll();
   }, [user?.id, role, fetchAll]);

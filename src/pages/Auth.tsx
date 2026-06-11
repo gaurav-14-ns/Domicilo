@@ -69,15 +69,30 @@ export default function Auth() {
   ] = useState(false);
 
   // Safety: reset busy after 15 seconds to prevent stuck loading
+  const busyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const forgotBusyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const safeSetBusy = (v: boolean) => {
     setBusy(v);
-    if (v) setTimeout(() => setBusy(false), 15000);
+    if (v) {
+      if (busyTimerRef.current) clearTimeout(busyTimerRef.current);
+      busyTimerRef.current = setTimeout(() => setBusy(false), 15000);
+    }
   };
 
   const safeSetForgotBusy = (v: boolean) => {
     setForgotBusy(v);
-    if (v) setTimeout(() => setForgotBusy(false), 15000);
+    if (v) {
+      if (forgotBusyTimerRef.current) clearTimeout(forgotBusyTimerRef.current);
+      forgotBusyTimerRef.current = setTimeout(() => setForgotBusy(false), 15000);
+    }
   };
+
+  useEffect(() => {
+    return () => {
+      if (busyTimerRef.current) clearTimeout(busyTimerRef.current);
+      if (forgotBusyTimerRef.current) clearTimeout(forgotBusyTimerRef.current);
+    };
+  }, []);
 
   const [
     forgotMode,
@@ -225,6 +240,7 @@ useEffect(() => {
   // check admin availability
 
   useEffect(() => {
+    let cancelled = false;
     (async () => {
       const {
         data,
@@ -234,12 +250,13 @@ useEffect(() => {
           "admin_exists"
         );
 
-      if (!error) {
+      if (!cancelled && !error) {
         setAdminAvailable(
           !data
         );
       }
     })();
+    return () => { cancelled = true; };
   }, []);
 
   // SIGNUP
