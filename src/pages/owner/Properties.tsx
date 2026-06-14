@@ -117,9 +117,6 @@ export default function Properties() {
     removeProperty,
   } = useDataStore();
 
-  if (error) return <ErrorState title="Failed to load properties" description={error} onRetry={refresh} />;
-  if (loading) return <LoadingState title="Loading properties..." />;
-
   const list = useMemo(
     () =>
       Array.isArray(
@@ -182,6 +179,9 @@ export default function Properties() {
             .includes(s)
       );
     }, [list, q]);
+
+  if (error) return <ErrorState title="Failed to load properties" description={error} onRetry={refresh} />;
+  if (loading) return <LoadingState title="Loading properties..." />;
 
   const openCreate =
     () => {

@@ -142,9 +142,6 @@ export default function Tenants() {
     moveOutTenant,
   } = useDataStore();
 
-  if (error) return <ErrorState title="Failed to load tenants" description={error} onRetry={refresh} />;
-  if (loading) return <LoadingState title="Loading tenants..." />;
-
   const tenants = useMemo(
     () =>
       Array.isArray(
@@ -290,6 +287,9 @@ const [
   const paginated = filtered.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
   const resetPage = () => setPage(0);
   useEffect(() => { resetPage(); }, [q, propertyFilter, statusFilter]);
+
+  if (error) return <ErrorState title="Failed to load tenants" description={error} onRetry={refresh} />;
+  if (loading) return <LoadingState title="Loading tenants..." />;
 
   const openCreate =
     () => {

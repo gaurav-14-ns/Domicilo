@@ -65,9 +65,6 @@ export default function Transactions() {
   const [to, setTo] = useState("");
   const [page, setPage] = useState(0);
 
-  if (error) return <ErrorState title="Failed to load transactions" description={error} onRetry={refresh} />;
-  if (loading) return <LoadingState title="Loading transactions..." />;
-
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
@@ -90,6 +87,9 @@ export default function Transactions() {
       return true;
     });
   }, [transactions, q, propertyFilter, statusFilter, typeFilter, minAmount, maxAmount, from, to]);
+
+  if (error) return <ErrorState title="Failed to load transactions" description={error} onRetry={refresh} />;
+  if (loading) return <LoadingState title="Loading transactions..." />;
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages - 1);
