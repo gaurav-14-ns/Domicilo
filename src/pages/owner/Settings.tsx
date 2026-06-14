@@ -32,6 +32,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Sparkles, AlertTriangle, CheckCircle2, Eye, EyeOff } from "lucide-react";
 import type { PlanId } from "@/lib/currency";
+import { PLAN_PRICES_INR, formatMoney } from "@/lib/currency";
 import { UpgradePlaceholderDialog } from "@/components/UpgradePlaceholderDialog";
 
 const PLAN_LABEL: Record<PlanId, string> = {
@@ -43,7 +44,7 @@ const PLAN_LABEL: Record<PlanId, string> = {
 export default function Settings() {
   const { user } = useAuth();
   const { data, loading, error, refresh: refreshData, updateSettings } = useDataStore();
-  const { fmt, locale } = useCurrency();
+  const { fmt } = useCurrency();
   const {
     subscription,
     loading: subscriptionLoading,
@@ -210,7 +211,7 @@ export default function Settings() {
         seconds: 10,
       });
       toast.success(`Switched to ${PLAN_LABEL[plan]}`, {
-        description: `${planPriceIn(plan, code, locale)} / month`,
+        description: `${plan === "scale" ? "Custom" : formatMoney(PLAN_PRICES_INR[plan])} / month`,
       });
     } catch (err: any) {
       toast.error("Couldn't change plan", { description: err?.message ?? "Unknown error" });
@@ -359,7 +360,7 @@ export default function Settings() {
                     {active && <CheckCircle2 className="h-4 w-4 text-primary" />}
                   </div>
                   <div className="text-2xl font-bold mt-1">
-                    {planPriceIn(p, code, locale)}
+                    {p === "scale" ? "Custom" : formatMoney(PLAN_PRICES_INR[p])}
                     {p !== "scale" && <span className="text-xs font-normal text-muted-foreground">/mo</span>}
                   </div>
                   <div className="text-[11px] text-muted-foreground mt-1">
@@ -385,7 +386,7 @@ export default function Settings() {
                   >
                     <div className="font-display font-semibold">{PLAN_LABEL[p]}</div>
                     <div className="text-2xl font-bold mt-1">
-                      {planPriceIn(p, code, locale)}
+                      {formatMoney(PLAN_PRICES_INR[p])}
                       <span className="text-xs font-normal text-muted-foreground">/mo</span>
                     </div>
                     <div className="text-[11px] text-muted-foreground mt-1">Up to 25 tenants · 1 property</div>
