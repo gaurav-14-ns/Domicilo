@@ -192,6 +192,8 @@ export function DataStoreProvider({ children }: { children: ReactNode }) {
   useRef<Promise<void> | null>(
     null
   );
+  const fetchGenRef =
+  useRef(0);
 
 const mountedRef =
   useRef(true);
@@ -296,6 +298,7 @@ useEffect(() => {
       return reconcileRef.current;
     }
 
+    const gen = ++fetchGenRef.current;
     const doFetch = async (retried = false) => {
     if (!user) {
       if (
@@ -643,6 +646,9 @@ useEffect(() => {
             t,
           ])
         );
+
+      // Guard: discard if a newer fetch started
+      if (gen !== fetchGenRef.current) return;
 
       if (
         mountedRef.current

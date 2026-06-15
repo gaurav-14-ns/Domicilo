@@ -56,6 +56,7 @@ export const AuthProvider = ({
   const online = useOnlineStatus();
   const lastOnlineRef = useRef(online);
   const ensuringRef = useRef<string | null>(null);
+  const activeUserIdRef = useRef<string | null>(null);
 
   const cachedUser = (() => {
     try {
@@ -122,6 +123,7 @@ export const AuthProvider = ({
   ) => {
     if (mountedRef.current) {
       setUser(value);
+      activeUserIdRef.current = value?.id ?? null;
     }
   };
 
@@ -296,10 +298,10 @@ if (suspended) {
                   },
                   {
                   onConflict:
-                    "user_id",
-                  }
-                )
-            );
+                    "user_id, role",
+                }
+              )
+          );
           }
 
           if (nextRole === "owner") {
@@ -362,6 +364,8 @@ if (suspended) {
             await ensureUserRecords(
               u
             );
+          // Guard: user might have changed while we were fetching
+          if (activeUserIdRef.current !== u.id) return;
           safeSetRole(
             resolvedRole
           );

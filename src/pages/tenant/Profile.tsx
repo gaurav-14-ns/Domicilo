@@ -261,10 +261,10 @@ export default function Profile() {
                         <span>{ownerInfo.contact_email}</span>
                       </div>
                     )}
-                    {ownerInfo.contact_phone && (
+                    {ownerInfo.company_name && (
                       <div className="flex items-center gap-2">
-                        <Phone className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                        <span>{ownerInfo.contact_phone}</span>
+                        <Building2 className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                        <span>{ownerInfo.company_name}</span>
                       </div>
                     )}
                   </div>

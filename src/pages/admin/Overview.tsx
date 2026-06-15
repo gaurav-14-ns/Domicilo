@@ -29,7 +29,7 @@ interface Metrics {
 
 export default function AdminOverview() {
   const [loading, setLoading] = useState(true);
-  const mountedRef = useRef(true);
+  const mountedRef = useRef(false);
 
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");

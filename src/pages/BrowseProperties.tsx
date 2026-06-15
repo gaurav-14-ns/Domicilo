@@ -58,6 +58,8 @@ export default function BrowseProperties() {
   const [enquiryMessage, setEnquiryMessage] = useState("");
   const [sendingEnquiry, setSendingEnquiry] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const mountedRef = useRef(true);
+  useEffect(() => { mountedRef.current = true; return () => { mountedRef.current = false; }; }, []);
 
   // Fetch owner contact info when detail dialog opens
   useEffect(() => {
@@ -587,6 +589,7 @@ export default function BrowseProperties() {
                 setSendingEnquiry(true);
                 try {
                   const { data: { user } } = await supabase.auth.getUser();
+                  if (!mountedRef.current) return;
                   const { error } = await supabase.from("leads").insert({
                     name: selectedListing.name,
                     email: user?.email ?? "anonymous@browse.enquiry",
@@ -594,13 +597,15 @@ export default function BrowseProperties() {
                     source: "browse_enquiry",
                   });
                   if (error) throw error;
+                  if (!mountedRef.current) return;
                   toast.success("Enquiry sent! The owner will contact you shortly.");
                   setEnquiryOpen(false);
                   setEnquiryMessage("");
                 } catch (e: any) {
+                  if (!mountedRef.current) return;
                   toast.error(e?.message ?? "Failed to send enquiry. Try again.");
                 } finally {
-                  setSendingEnquiry(false);
+                  if (mountedRef.current) setSendingEnquiry(false);
                 }
               }} disabled={sendingEnquiry || !enquiryMessage.trim()} className="font-alt text-xs">
                 {sendingEnquiry ? <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Sending...</> : "Send Enquiry"}

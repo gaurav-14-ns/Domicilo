@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 
@@ -31,7 +31,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 
 import { EmptyState } from "@/components/states/EmptyState";
@@ -62,6 +61,9 @@ type Lead = {
 };
 
 export default function AdminLeads() {
+  const mountedRef = useRef(true);
+  useEffect(() => { mountedRef.current = true; return () => { mountedRef.current = false; }; }, []);
+
   const [rows, setRows] =
     useState<Lead[]>([]);
 
@@ -121,28 +123,31 @@ export default function AdminLeads() {
         throw error;
       }
 
-      setRows(
-        (data ??
-          []) as Lead[]
-      );
+      if (mountedRef.current) {
+        setRows(
+          (data ??
+            []) as Lead[]
+        );
+      }
     } catch (error: any) {
       console.error(
         "Failed loading leads:",
         error
       );
 
-      setError(
-        error?.message ??
-          "Failed loading leads"
-      );
-
-      setRows([]);
+      if (mountedRef.current) {
+        setError(
+          error?.message ??
+            "Failed loading leads"
+        );
+        setRows([]);
+      }
 
       toast.error(
         "Failed loading leads"
       );
     } finally {
-      setLoading(false);
+      if (mountedRef.current) setLoading(false);
     }
   };
 
@@ -186,7 +191,7 @@ export default function AdminLeads() {
             "Failed updating lead"
         );
       } finally {
-        setBusy(null);
+        if (mountedRef.current) setBusy(null);
       }
     };
 

@@ -23,8 +23,7 @@ import { ErrorState } from "@/components/states/ErrorState";
 
 import { WifiOff, RefreshCw } from "lucide-react";
 
-// Module-level flag that survives component remounts (unlike useRef).
-let globalHasResolved = false;
+
 
 function useOnlineStatus() {
   const [online, setOnline] = useState(navigator.onLine);
@@ -64,7 +63,8 @@ export const ProtectedRoute = ({
 
   const online = useOnlineStatus();
 
-  const hasResolvedOnce = useRef(globalHasResolved);
+  const hasResolvedOnce = useRef(false);
+  const resolvedUserRef = useRef<string | null>(null);
 
   const [
     roleTimeoutReached,
@@ -85,6 +85,8 @@ export const ProtectedRoute = ({
     setRoleTimeoutReached(false);
     setRetryCount(0);
     reloadCountRef.current = 0;
+    hasResolvedOnce.current = false;
+    resolvedUserRef.current = null;
   }, [user?.id]);
 
   // Only start the 10s timeout when actually waiting for role.
@@ -150,6 +152,7 @@ export const ProtectedRoute = ({
 
   if (
     !hasResolvedOnce.current &&
+    resolvedUserRef.current !== user?.id &&
     (loading || waitingForRole)
   ) {
     return (
@@ -227,6 +230,6 @@ export const ProtectedRoute = ({
   }
 
   hasResolvedOnce.current = true;
-  globalHasResolved = true;
+  if (user) resolvedUserRef.current = user.id;
   return <>{children}</>;
 };

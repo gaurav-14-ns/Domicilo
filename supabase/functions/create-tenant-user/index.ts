@@ -1,12 +1,29 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const SITE_URL = Deno.env.get("SITE_URL") || "https://domicilo.vercel.app";
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Content-Type": "application/json",
+};
 
 serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
+    const SITE_URL = Deno.env.get("SITE_URL") || "https://domicilo.vercel.app";
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!supabaseUrl || !supabaseKey) {
+      return new Response(JSON.stringify({ error: "Supabase not configured" }), { status: 500, headers: corsHeaders });
+    }
+
+    const contentType = req.headers.get("content-type");
+    if (!contentType?.includes("application/json")) {
+      return new Response(JSON.stringify({ error: "Content-Type must be application/json" }), { status: 415, headers: corsHeaders });
+    }
 
     const body =
       await req.json();
@@ -36,6 +53,7 @@ serve(async (req) => {
         }),
         {
           status: 400,
+          headers: corsHeaders,
         }
       );
 
@@ -48,12 +66,8 @@ serve(async (req) => {
 
     const supabase =
       createClient(
-        Deno.env.get(
-          "SUPABASE_URL"
-        )!,
-        Deno.env.get(
-          "SUPABASE_SERVICE_ROLE_KEY"
-        )!
+        supabaseUrl,
+        supabaseKey
       );
 
     // --------------------------------------------------
@@ -75,7 +89,7 @@ serve(async (req) => {
         JSON.stringify({
           error: "Tenant email already exists.",
         }),
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -386,6 +400,7 @@ const {
       }),
       {
         status: 200,
+        headers: corsHeaders,
       }
     );
 
@@ -402,12 +417,12 @@ const {
       JSON.stringify({
 
         error:
-          err?.message ??
-          "Unexpected error",
+          "Tenant creation failed",
 
       }),
       {
         status: 500,
+        headers: corsHeaders,
       }
     );
 
