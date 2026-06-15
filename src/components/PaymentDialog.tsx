@@ -24,6 +24,7 @@ import {
 import {
   CheckCircle2,
   Loader2,
+  Zap,
 } from "lucide-react";
 
 import { formatMoney } from "@/lib/currency";
@@ -31,6 +32,8 @@ import { formatMoney } from "@/lib/currency";
 import { uuid } from "@/lib/utils";
 
 import { supabase } from "@/integrations/supabase/client";
+
+import { payWithRazorpay } from "@/lib/payment";
 
 import { toast } from "sonner";
 
@@ -105,10 +108,6 @@ export function PaymentDialog({
     useState<string | null>(
       null
     );
-
-  const primaryLocale =
-    pending[0]?.locale ??
-    "en-IN";
 
   const total =
     useMemo(() => {
@@ -193,6 +192,21 @@ export function PaymentDialog({
           (p) => p.id
         );
 
+      const isRazorpay = method === "upi" || method === "card" || method === "bank";
+
+      if (isRazorpay) {
+        try {
+          await payWithRazorpay(total);
+        } catch (payErr: any) {
+          if (payErr?.message === "Payment cancelled") {
+            toast.info("Payment cancelled");
+            setBusy(false);
+            return;
+          }
+          throw payErr;
+        }
+      }
+
       /*
         Atomic guard:
         only update rows
@@ -208,7 +222,8 @@ export function PaymentDialog({
     status:
       "completed",
 
-    method,
+    method:
+      isRazorpay ? `razorpay_${method}` : method,
 
     receipt_no:
       receipt,
@@ -262,7 +277,7 @@ toast.success(
           description:
             `${formatMoney(
               total
-            )} via ${method.toUpperCase()}`,
+            )} via ${isRazorpay ? "Razorpay" : method.toUpperCase()}`,
         }
       );
 
@@ -458,8 +473,7 @@ toast.success(
                 </RadioGroup>
 
                 <p className="text-[11px] text-muted-foreground">
-                  Payment provider integration ready —
-                  currently records the payment instantly for demo.
+                  UPI / Card / Bank transfer processed securely via Razorpay. Cash recorded directly.
                 </p>
 
               </div>

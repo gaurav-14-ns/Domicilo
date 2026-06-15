@@ -28,6 +28,7 @@ from "@/components/states/ErrorState";
 import {
   Download,
   Search,
+  Filter,
 } from "lucide-react";
 
 import {
@@ -70,11 +71,33 @@ export default function TenantTransactions() {
   ] = useState("");
 
   const [
+    statusFilter,
+    setStatusFilter,
+  ] = useState<string>("all");
+
+  const [
+    monthFilter,
+    setMonthFilter,
+  ] = useState<string>("");
+
+  const [
     currentPage,
     setCurrentPage,
   ] = useState(1);
 
   const pageSize = 10;
+
+  const years = useMemo(() => {
+    const set = new Set<number>();
+    set.add(new Date().getFullYear());
+    for (const tx of txs) {
+      if (tx.date) {
+        const y = new Date(tx.date).getFullYear();
+        if (!isNaN(y)) set.add(y);
+      }
+    }
+    return Array.from(set).sort();
+  }, [txs]);
 
   const filteredTransactions =
     useMemo(() => {
@@ -97,10 +120,20 @@ export default function TenantTransactions() {
           !toDate ||
           t.date <= toDate;
 
+        const matchesStatus =
+          statusFilter === "all" ||
+          t.status === statusFilter;
+
+        const matchesMonth =
+          !monthFilter ||
+          (t.date && t.date.startsWith(monthFilter));
+
         return (
           matchesSearch &&
           matchesFrom &&
-          matchesTo
+          matchesTo &&
+          matchesStatus &&
+          matchesMonth
         );
 
       });
@@ -110,6 +143,8 @@ export default function TenantTransactions() {
       search,
       fromDate,
       toDate,
+      statusFilter,
+      monthFilter,
     ]);
 
   const totalPages =
@@ -200,8 +235,9 @@ export default function TenantTransactions() {
   className="
     grid
     grid-cols-1
-    md:grid-cols-2
-    xl:grid-cols-4
+    sm:grid-cols-2
+    lg:grid-cols-4
+    xl:grid-cols-6
     gap-3
     flex-1
   "
@@ -245,6 +281,25 @@ export default function TenantTransactions() {
   <div className="space-y-2">
 
     <div className="text-sm font-medium">
+      Status
+    </div>
+
+    <select
+      value={statusFilter}
+      onChange={(e) => setStatusFilter(e.target.value)}
+      className="flex h-10 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+    >
+      <option value="all">All</option>
+      <option value="pending">Pending</option>
+      <option value="completed">Completed</option>
+      <option value="overdue">Overdue</option>
+    </select>
+
+  </div>
+
+  <div className="space-y-2">
+
+    <div className="text-sm font-medium">
       From Date
     </div>
 
@@ -280,6 +335,32 @@ export default function TenantTransactions() {
 
   <div className="space-y-2">
 
+    <div className="text-sm font-medium">
+      Month
+    </div>
+
+    <select
+      value={monthFilter}
+      onChange={(e) => setMonthFilter(e.target.value)}
+      className="flex h-10 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+    >
+      <option value="">All months</option>
+      {years.map((y) =>
+        Array.from({ length: 12 }, (_, i) => {
+          const mk = `${y}-${String(i + 1).padStart(2, "0")}`;
+          return (
+            <option key={mk} value={mk}>
+              {new Date(y, i, 1).toLocaleString("en-IN", { month: "short", year: "numeric" })}
+            </option>
+          );
+        })
+      )}
+    </select>
+
+  </div>
+
+  <div className="space-y-2">
+
     <div className="text-sm font-medium opacity-0">
       Actions
     </div>
@@ -294,6 +375,8 @@ export default function TenantTransactions() {
           setSearch("");
           setFromDate("");
           setToDate("");
+          setStatusFilter("all");
+          setMonthFilter("");
           setCurrentPage(1);
 
         }}

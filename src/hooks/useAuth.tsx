@@ -133,6 +133,15 @@ export const AuthProvider = ({
     }
   };
 
+  function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+    return Promise.race([
+      promise,
+      new Promise<T>((_, reject) =>
+        setTimeout(() => reject(new Error("Operation timed out")), ms)
+      ),
+    ]);
+  }
+
   const ensureUserRecords =
     useCallback(
       async (
@@ -140,7 +149,6 @@ export const AuthProvider = ({
       ): Promise<AppRole> => {
         // Dedup: prevent concurrent ensureUserRecords for the same user
         if (ensuringRef.current === u.id) {
-          // Wait for the in-flight call and return its result
           const start = Date.now();
           while (ensuringRef.current === u.id && Date.now() - start < 15000) {
             await new Promise(r => setTimeout(r, 50));
@@ -149,7 +157,7 @@ export const AuthProvider = ({
         ensuringRef.current = u.id;
         try {
           const [roleResult, profileResult] =
-            await Promise.all([
+            await withTimeout(Promise.all([
               supabase
                 .from("user_roles")
                 .select("role")
@@ -160,7 +168,7 @@ export const AuthProvider = ({
                 .select("full_name, suspended")
                 .eq("id", u.id)
                 .maybeSingle(),
-            ]);
+            ]), 15000);
 
           const {
             data: existing,
@@ -288,7 +296,7 @@ if (suspended) {
                   },
                   {
                   onConflict:
-                    "user_id,role",
+                    "user_id",
                   }
                 )
             );

@@ -316,6 +316,13 @@ useEffect(() => {
       setError(null);
     }
 
+    const fetchTimeout = setTimeout(() => {
+      if (mountedRef.current) {
+        setError("Data fetch timed out. Please try again.");
+        setLoading(false);
+      }
+    }, 25000);
+
     try {
       const currentRole = roleRef.current;
       const isOwner = currentRole === "owner";
@@ -750,6 +757,9 @@ useEffect(() => {
         );
       }
     } finally {
+      clearTimeout(
+        fetchTimeout
+      );
       if (
         mountedRef.current
       ) {
@@ -814,7 +824,7 @@ useEffect(() => {
     fetchAll();
   }, [user?.id, role, fetchAll]);
 
-  // Safety timeout: show error after 30 s of loading
+  // Safety timeout: show error after 15 s of loading
   const loadingTimeoutRef =
     useRef<
       ReturnType<
@@ -828,11 +838,11 @@ useEffect(() => {
         setTimeout(() => {
           if (mountedRef.current) {
             setError(
-              "Taking longer than expected. Please check your connection."
+              "Loading took too long. Please check your connection and try again."
             );
             setLoading(false);
           }
-        }, 30000);
+        }, 15000);
     }
     return () => {
       if (
@@ -1780,7 +1790,6 @@ const removeProperty = useCallback(async (id: string) => {
       locale: next.locale,
     };
     if (patch.displayName !== undefined) dbPatch.display_name = patch.displayName;
-    if (patch.companyName !== undefined) dbPatch.company_name = patch.companyName;
     if (patch.ownerEmail !== undefined) dbPatch.contact_email = patch.ownerEmail;
     if (patch.emailNotifications !== undefined) dbPatch.email_notifications = patch.emailNotifications;
     if (patch.smsNotifications !== undefined) dbPatch.sms_notifications = patch.smsNotifications;

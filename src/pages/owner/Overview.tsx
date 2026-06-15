@@ -58,22 +58,31 @@ export default function OwnerOverview() {
   } = useCurrency();
 
   const properties =
-    Array.isArray(
-      data?.properties
-    )
-      ? data.properties
-      : [];
+    useMemo(() =>
+      Array.isArray(
+        data?.properties
+      )
+        ? data.properties
+        : [],
+    [data?.properties]
+    );
 
   const tenants =
-    Array.isArray(
-      data?.tenants
-    )
-      ? data.tenants
-      : [];
+    useMemo(() =>
+      Array.isArray(
+        data?.tenants
+      )
+        ? data.tenants
+        : [],
+    [data?.tenants]
+    );
 
   const transactions =
-    data?.transactions ??
-    [];
+    useMemo(() =>
+      data?.transactions ??
+      [],
+    [data?.transactions]
+    );
 
   const activeTenants =
     tenants.filter(

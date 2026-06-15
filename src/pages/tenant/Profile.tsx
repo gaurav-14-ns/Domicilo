@@ -6,9 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Building2, User, Mail, Phone, MapPin, Hash, Home, IndianRupee } from "lucide-react";
 import { LoadingState } from "@/components/states/LoadingState";
 import { ErrorState } from "@/components/states/ErrorState";
+import { supabase } from "@/integrations/supabase/client";
+import { formatMoney } from "@/lib/currency";
 
 // Stored in tenant_profiles.emergency as a single text column for backwards
 // compatibility: "Name · 9876543210". Parse leniently when loading.
@@ -34,6 +36,34 @@ export default function Profile() {
   const { data, loading, error, refresh, updateTenantProfile, updateTenant } = useDataStore();
   const tenant = useCurrentTenant(data?.tenants ?? [], user?.email);
   const [busy, setBusy] = useState(false);
+
+  const [propertyInfo, setPropertyInfo] = useState<any>(null);
+  const [ownerInfo, setOwnerInfo] = useState<any>(null);
+  const [extraLoading, setExtraLoading] = useState(false);
+
+  useEffect(() => {
+    if (!tenant?.propertyId && !tenant?.ownerId) return;
+    let cancelled = false;
+    (async () => {
+      setExtraLoading(true);
+      try {
+        const [propRes, ownerRes] = await Promise.all([
+          tenant.propertyId
+            ? supabase.from("properties").select("*").eq("id", tenant.propertyId).single()
+            : Promise.resolve({ data: null, error: null }),
+          tenant.ownerId
+            ? supabase.from("app_settings").select("*").eq("user_id", tenant.ownerId).maybeSingle()
+            : Promise.resolve({ data: null, error: null }),
+        ]);
+        if (cancelled) return;
+        if (propRes.data) setPropertyInfo(propRes.data);
+        if (ownerRes.data) setOwnerInfo(ownerRes.data);
+      } catch { /* ignore */ } finally {
+        if (!cancelled) setExtraLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [tenant?.propertyId, tenant?.ownerId]);
 
   const profile = data?.tenantProfile ?? {};
   const initialPhone = (tenant?.phone ?? profile.phone ?? "")
@@ -166,6 +196,84 @@ export default function Profile() {
           {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
         </Button>
       </form>
+
+      {(propertyInfo || ownerInfo || extraLoading) && (
+        <div className="rounded-xl border border-border bg-gradient-card p-6 space-y-5">
+          <h2 className="text-lg font-display font-semibold text-gradient">Property & Owner</h2>
+
+          {extraLoading ? (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Loading details...
+            </div>
+          ) : (
+            <div className="grid gap-6 sm:grid-cols-2">
+              {propertyInfo && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                    <Building2 className="h-4 w-4" />
+                    Property
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <Home className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                      <span className="font-medium">{propertyInfo.name}</span>
+                    </div>
+                    {propertyInfo.address && (
+                      <div className="flex items-start gap-2">
+                        <MapPin className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
+                        <span>
+                          {[propertyInfo.address, propertyInfo.city, propertyInfo.state, propertyInfo.pincode].filter(Boolean).join(", ")}
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2">
+                      <IndianRupee className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                      <span>{formatMoney(Number(propertyInfo.price_monthly) || 0)} / month</span>
+                    </div>
+                    {propertyInfo.amenities?.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {propertyInfo.amenities.map((a: string) => (
+                          <span key={a} className="text-[11px] bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                            {a}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {ownerInfo && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                    <User className="h-4 w-4" />
+                    Owner
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <User className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                      <span>{ownerInfo.display_name || "Owner"}</span>
+                    </div>
+                    {ownerInfo.contact_email && (
+                      <div className="flex items-center gap-2">
+                        <Mail className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                        <span>{ownerInfo.contact_email}</span>
+                      </div>
+                    )}
+                    {ownerInfo.contact_phone && (
+                      <div className="flex items-center gap-2">
+                        <Phone className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                        <span>{ownerInfo.contact_phone}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

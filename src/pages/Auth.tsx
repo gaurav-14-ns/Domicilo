@@ -416,6 +416,8 @@ useEffect(() => {
           ""
         );
 
+        safeSetBusy(false);
+
       } catch (
         err: any
       ) {
@@ -475,6 +477,8 @@ useEffect(() => {
 
         signinSuccessRef.current =
           true;
+
+        safeSetBusy(false);
 
       } catch (
         err: any

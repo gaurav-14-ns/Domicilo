@@ -1,4 +1,5 @@
 import {
+  useMemo,
   useState,
 } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -9,6 +10,7 @@ import {
 
 import {
   prettyMonth,
+  monthKey,
 } from "@/lib/format";
 
 import {
@@ -34,6 +36,7 @@ import {
   Receipt,
   ChevronDown,
   ChevronUp,
+  Calendar,
 } from "lucide-react";
 
 export default function Dues() {
@@ -85,21 +88,31 @@ const completed =
       t.status === "completed"
   );
 
-const completedThisMonth =
-  completed.filter((t) => {
+const now = new Date();
+const currentMonth = monthKey(now);
+const [viewMode, setViewMode] = useState<"monthly" | "yearly">("monthly");
+const [selectedYear, setSelectedYear] = useState(now.getFullYear());
+const [selectedMonth, setSelectedMonth] = useState(now.getMonth() + 1);
 
-    const now = new Date();
+const periodFilter = useMemo(() => {
+  if (viewMode === "monthly") {
+    const m = String(selectedMonth).padStart(2, "0");
+    return (tx: typeof tenantTransactions[0]) =>
+      tx.date && tx.date.slice(0, 7) === `${selectedYear}-${m}`;
+  } else {
+    return (tx: typeof tenantTransactions[0]) =>
+      tx.date && tx.date.slice(0, 4) === String(selectedYear);
+  }
+}, [viewMode, selectedYear, selectedMonth]);
 
-    const txDate =
-      new Date(t.date);
+const periodKey = viewMode === "monthly"
+  ? `${selectedYear}-${String(selectedMonth).padStart(2, "0")}`
+  : String(selectedYear);
 
-    return (
-      txDate.getMonth() ===
-        now.getMonth() &&
-      txDate.getFullYear() ===
-        now.getFullYear()
-    );
-  });
+const pendingInPeriod = pending.filter(periodFilter);
+const overdueInPeriod = overdue.filter(periodFilter);
+const completedInPeriod = completed.filter(periodFilter);
+const paidInPeriodAmount = completedInPeriod.reduce((s, t) => s + Math.max(0, t.amount), 0);
 
 const lastPayment =
   completed
@@ -109,6 +122,20 @@ const lastPayment =
         new Date(b.date).getTime() -
         new Date(a.date).getTime()
     )[0];
+
+const pendingByType = useMemo(() => {
+  const groups: Record<string, typeof tenantTransactions> = {};
+  for (const tx of pending) {
+    if (!periodFilter(tx)) continue;
+    const t = tx.type || "Other";
+    if (!groups[t]) groups[t] = [];
+    groups[t].push(tx);
+  }
+  return groups;
+}, [pending, periodFilter]);
+
+const typeTotal = (txs: typeof tenantTransactions) =>
+  txs.reduce((s, t) => s + Math.max(0, t.amount), 0);
 
   const groupedTransactions =
   tenantTransactions.reduce(
@@ -121,14 +148,14 @@ const lastPayment =
         return acc;
       }
 
-      const monthKey =
+      const mk =
         tx.date.slice(0, 7);
 
-      if (!acc[monthKey]) {
-        acc[monthKey] = [];
+      if (!acc[mk]) {
+        acc[mk] = [];
       }
 
-      acc[monthKey].push(tx);
+      acc[mk].push(tx);
 
       return acc;
 
@@ -139,8 +166,22 @@ const lastPayment =
     >
   );
 
+  const years = useMemo(() => {
+    const set = new Set<number>();
+    set.add(new Date().getFullYear());
+    for (const tx of tenantTransactions) {
+      if (tx.date) {
+        const y = new Date(tx.date).getFullYear();
+        if (!isNaN(y)) set.add(y);
+      }
+    }
+    return Array.from(set).sort();
+  }, [tenantTransactions]);
+
   const [open, setOpen] =
     useState(false);
+
+  const [payType, setPayType] = useState<string | null>(null);
 
   const [
   showCompleted,
@@ -153,9 +194,66 @@ const lastPayment =
   return (
     <div className="space-y-6 w-full">
 
-      <h1 className="text-2xl md:text-3xl font-display font-bold text-gradient">
-        My dues
-      </h1>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <h1 className="text-2xl md:text-3xl font-display font-bold text-gradient">
+          My dues
+        </h1>
+
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex rounded-lg border border-border overflow-hidden text-sm">
+            <button
+              type="button"
+              onClick={() => setViewMode("monthly")}
+              className={`px-3 py-1.5 transition-colors ${viewMode === "monthly" ? "bg-primary text-primary-foreground" : "bg-transparent text-muted-foreground hover:text-foreground"}`}
+            >
+              Monthly
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("yearly")}
+              className={`px-3 py-1.5 transition-colors ${viewMode === "yearly" ? "bg-primary text-primary-foreground" : "bg-transparent text-muted-foreground hover:text-foreground"}`}
+            >
+              Yearly
+            </button>
+          </div>
+
+          {viewMode === "monthly" ? (
+            <div className="flex items-center gap-1">
+              <select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(Number(e.target.value))}
+                className="rounded-lg border border-border bg-background px-2 py-1.5 text-sm"
+              >
+                {Array.from({ length: 12 }, (_, i) => (
+                  <option key={i + 1} value={i + 1}>
+                    {new Date(2000, i, 1).toLocaleString("en-IN", { month: "short" })}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(Number(e.target.value))}
+                className="rounded-lg border border-border bg-background px-2 py-1.5 text-sm"
+              >
+                {years.map((y) => (
+                  <option key={y} value={y}>{y}</option>
+                ))}
+              </select>
+            </div>
+          ) : (
+            <select
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(Number(e.target.value))}
+              className="rounded-lg border border-border bg-background px-2 py-1.5 text-sm"
+            >
+              {years.map((y) => (
+                <option key={y} value={y}>{y}</option>
+              ))}
+            </select>
+          )}
+        </div>
+      </div>
+
       <div className="grid gap-4 md:grid-cols-4">
 
   <div className="rounded-xl border border-border bg-gradient-card p-4 transition-smooth hover:-translate-y-1 hover:border-primary/30 hover:shadow-elegant">
@@ -176,7 +274,7 @@ const lastPayment =
     </div>
 
     <div className="text-xs text-muted-foreground mt-1">
-      Current unpaid balance
+      Total unpaid balance
     </div>
   </div>
 
@@ -190,11 +288,11 @@ const lastPayment =
     </div>
 
     <div className="text-2xl font-bold font-display mt-3">
-      {pending.length}
+      {pendingInPeriod.length}
     </div>
 
     <div className="text-xs text-muted-foreground mt-1">
-      Awaiting payment
+      In {viewMode === "monthly" ? prettyMonth(periodKey) : periodKey}
     </div>
   </div>
 
@@ -208,35 +306,29 @@ const lastPayment =
     </div>
 
     <div className="text-2xl font-bold font-display mt-3">
-      {overdue.length}
+      {overdueInPeriod.length}
     </div>
 
     <div className="text-xs text-muted-foreground mt-1">
-      Requires attention
+      In {viewMode === "monthly" ? prettyMonth(periodKey) : periodKey}
     </div>
   </div>
 
   <div className="rounded-xl border border-border bg-gradient-card p-4 transition-smooth hover:-translate-y-1 hover:border-primary/30 hover:shadow-elegant">
     <div className="flex items-center justify-between">
       <div className="text-sm text-muted-foreground">
-        Paid This Month
+        Paid
       </div>
 
       <CheckCircle2 className="h-4 w-4 text-green-600" />
     </div>
 
     <div className="text-2xl font-bold font-display mt-3">
-      {completedThisMonth.length}
+      {formatMoney(paidInPeriodAmount)}
     </div>
 
     <div className="text-xs text-muted-foreground mt-1">
-
-      {
-        lastPayment
-          ? `Last paid on ${lastPayment.date}`
-          : "No payments yet"
-      }
-
+      In {viewMode === "monthly" ? prettyMonth(periodKey) : periodKey}
     </div>
   </div>
 
@@ -277,28 +369,27 @@ const lastPayment =
 </div>
 
         {
-          pending.length === 0 ? (
-
+          Object.keys(pendingByType).length > 0 ? (
+            <div className="mt-6 space-y-2">
+              <div className="text-sm font-medium text-muted-foreground">Pay by type</div>
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(pendingByType).map(([type, txs]) => (
+                  <Button
+                    key={type}
+                    variant="hero"
+                    size="sm"
+                    onClick={() => { setPayType(type); setOpen(true); }}
+                  >
+                    {type} · {formatMoney(typeTotal(txs))}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          ) : (
             <div className="mt-6 inline-flex items-center gap-2 text-primary text-sm font-medium">
               <CheckCircle2 className="h-4 w-4" />
               No payment needed
             </div>
-
-          ) : (
-
-            <Button
-              variant="hero"
-              className="mt-6 w-full sm:w-auto"
-              disabled={outstanding <= 0}
-              onClick={() => setOpen(true)}
-            >
-              Pay now · {
-                formatMoney(
-                  outstanding
-                )
-              }
-            </Button>
-
           )
         }
 
@@ -569,10 +660,10 @@ const lastPayment =
 
       <PaymentDialog
         open={open}
-        onOpenChange={setOpen}
-        pending={pending}
+        onOpenChange={(v) => { setOpen(v); if (!v) setPayType(null); }}
+        pending={payType ? (pendingByType[payType] ?? pending) : pending}
         tenantId={tenant?.id}
-        onPaid={refresh}
+        onPaid={() => { setPayType(null); refresh(); }}
       />
 
     </div>

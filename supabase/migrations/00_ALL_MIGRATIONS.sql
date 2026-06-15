@@ -174,10 +174,12 @@ create table if not exists public.transactions (
  date date not null default current_date,
  type text not null default 'Rent',
  amount numeric(14,2) not null default 0,
- status text not null default 'completed' check (status in ('completed','pending','paused','refund')),
+ status text not null default 'completed' check (status in ('completed','pending','paused','refund','overdue')),
  note text,
  auto boolean not null default false,
  month_key text, -- 'YYYY-MM' for rent dedup
+ currency_code text not null default 'INR',
+ locale text not null default 'en-IN',
  created_at timestamptz not null default now(),
  updated_at timestamptz not null default now(),
  unique (tenant_id, type, month_key)
