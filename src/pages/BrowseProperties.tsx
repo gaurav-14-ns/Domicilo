@@ -36,6 +36,7 @@ export default function BrowseProperties() {
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
+  const MAX_RETRIES = 3;
 
   // Filters
   const [q, setQ] = useState("");
@@ -344,7 +345,7 @@ export default function BrowseProperties() {
             ))}
           </div>
         ) : fetchError ? (
-          <ErrorState title="Failed to load properties" description={fetchError} onRetry={() => { setFetchError(null); setRetryCount((c) => c + 1); }} />
+          <ErrorState title="Failed to load properties" description={fetchError + (retryCount >= MAX_RETRIES ? " — Max retries reached." : "")} onRetry={retryCount < MAX_RETRIES ? () => { setFetchError(null); setRetryCount((c) => c + 1); } : undefined} />
         ) : listings.length === 0 ? (
           <div className="text-center py-20">
             <Home className="h-12 w-12 mx-auto text-muted-foreground/40 mb-4" />

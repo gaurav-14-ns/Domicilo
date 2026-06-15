@@ -13,7 +13,7 @@ const LIMITS: Record<PlanId, PlanLimits> = {
   starter: {
     maxProperties: 1,
     maxTenants: 25,
-    advancedReports: true,
+    advancedReports: false,
   },
 
   growth: {

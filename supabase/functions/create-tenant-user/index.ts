@@ -60,16 +60,17 @@ serve(async (req) => {
     // Check existing auth users
     // --------------------------------------------------
 
-    const {
-      data: existingUser,
-      error: usersError,
-    } = await supabase.auth.admin.getUserByEmail(normalizedEmail);
+    const { data: usersData, error: usersError } = await supabase.auth.admin.listUsers();
 
     if (usersError) {
       throw usersError;
     }
 
-    if (existingUser?.user) {
+    const existingUser = usersData?.users?.find(
+      (u) => u.email?.toLowerCase() === normalizedEmail
+    );
+
+    if (existingUser) {
       return new Response(
         JSON.stringify({
           error: "Tenant email already exists.",
