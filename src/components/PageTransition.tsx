@@ -13,7 +13,7 @@ export function PageTransition({ children }: Props) {
 
   useEffect(() => {
     childrenRef.current = children;
-  });
+  }, [children]);
 
   useEffect(() => {
     setStage("enter");

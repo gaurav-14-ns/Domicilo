@@ -749,16 +749,13 @@ useEffect(() => {
       if (
         mountedRef.current
       ) {
-        setError(
-          error?.message ??
-            "Failed loading data"
-        );
+        setError("Failed loading data");
 
         toast.error(
           "Failed loading application data",
           {
             description:
-              error?.message,
+              "Please check your connection and try again.",
           }
         );
       }
@@ -804,6 +801,14 @@ useEffect(() => {
       }));
     })();
     return () => { cancelled = true; };
+  }, [user?.id]);
+
+  // Reset data immediately on sign-out to prevent stale data leak
+  useEffect(() => {
+    if (!user && mountedRef.current) {
+      setData(initialData);
+      setError(null);
+    }
   }, [user?.id]);
 
   // First load: wait for both user and role, then fetch ONCE per role
@@ -1024,7 +1029,7 @@ useEffect(() => {
 
     await refresh();
   } catch (error: any) {
-    toast.error(error?.message ?? "Failed to add property.");
+    toast.error("Failed to add property.");
   }
 }, [user?.id, refresh]);
 
@@ -1057,7 +1062,7 @@ const updateProperty = useCallback(async (id: string, patch: Partial<Property>) 
 
     await refresh();
   } catch (error: any) {
-    toast.error(error?.message ?? "Failed to update property.");
+    toast.error("Failed to update property.");
   }
 }, [user?.id, refresh]);
 
@@ -1084,7 +1089,7 @@ const removeProperty = useCallback(async (id: string) => {
 
     await refresh();
   } catch (error: any) {
-    toast.error(error?.message ?? "Failed to remove property.");
+    toast.error("Failed to remove property.");
   }
 }, [user?.id, refresh]);
 
@@ -1177,10 +1182,8 @@ const removeProperty = useCallback(async (id: string) => {
 
     await refresh();
 
-  } catch (err: any) {
-    toast.error(
-      err?.message ?? "Failed to create tenant."
-    );
+  } catch {
+    toast.error("Failed to create tenant.");
   }
 }, [user?.id, refresh]);
 
@@ -1293,15 +1296,8 @@ const removeProperty = useCallback(async (id: string) => {
         }
 
         await refresh();
-      } catch (
-        error: any
-      ) {
-        toast.error(
-          error?.message ??
-            "Failed updating tenant."
-        );
-
-        throw error;
+      } catch {
+        toast.error("Failed updating tenant.");
       }
     },
     [user?.id, refresh]
@@ -1340,15 +1336,8 @@ const removeProperty = useCallback(async (id: string) => {
         }
 
         await refresh();
-      } catch (
-        error: any
-      ) {
-        toast.error(
-          error?.message ??
-            "Failed updating tenant status."
-        );
-
-        throw error;
+      } catch {
+        toast.error("Failed updating tenant status.");
       }
     },
     [user?.id, refresh]
@@ -1387,15 +1376,8 @@ const removeProperty = useCallback(async (id: string) => {
         }
 
         await refresh();
-      } catch (
-        error: any
-      ) {
-        toast.error(
-          error?.message ??
-            "Failed moving out tenant."
-        );
-
-        throw error;
+      } catch {
+        toast.error("Failed moving out tenant.");
       }
     },
     [user?.id, refresh]
@@ -1431,15 +1413,8 @@ const removeProperty = useCallback(async (id: string) => {
         }
 
         await refresh();
-      } catch (
-        error: any
-      ) {
-        toast.error(
-          error?.message ??
-            "Failed removing tenant."
-        );
-
-        throw error;
+      } catch {
+        toast.error("Failed removing tenant.");
       }
     },
     [user?.id, refresh]
@@ -1453,7 +1428,7 @@ const removeProperty = useCallback(async (id: string) => {
 
   try {
 
-  let locale = data.settings.locale;
+  let locale = settingsRef.current.locale;
 
   if (t.tenantId) {
 
@@ -1522,6 +1497,12 @@ const removeProperty = useCallback(async (id: string) => {
 
         auto:
           !!t.auto,
+
+        method:
+          t.method ?? null,
+
+        receipt_no:
+          t.receiptNo ?? null,
       });
 
     if (insertError) throw insertError;
@@ -1529,7 +1510,7 @@ const removeProperty = useCallback(async (id: string) => {
     await refresh();
 
   } catch (error: any) {
-    toast.error(error?.message ?? "Failed to add transaction.");
+    toast.error("Failed to add transaction.");
   }
 
 }, [
@@ -1671,6 +1652,22 @@ const removeProperty = useCallback(async (id: string) => {
           patch.note;
       }
 
+      if (
+        patch.method !==
+        undefined
+      ) {
+        dbPatch.method =
+          patch.method;
+      }
+
+      if (
+        patch.receiptNo !==
+        undefined
+      ) {
+        dbPatch.receipt_no =
+          patch.receiptNo;
+      }
+
       const {
         error,
       } = await supabase
@@ -1684,8 +1681,8 @@ const removeProperty = useCallback(async (id: string) => {
       }
 
       await refresh();
-      } catch (error: any) {
-        toast.error(error?.message ?? "Failed to update transaction.");
+      } catch {
+        toast.error("Failed to update transaction.");
       }
     },
     [user?.id, refresh]
@@ -1755,17 +1752,17 @@ const removeProperty = useCallback(async (id: string) => {
       }
 
       await refresh();
-      } catch (error: any) {
-        toast.error(error?.message ?? "Failed to remove transaction.");
+      } catch {
+        toast.error("Failed to remove transaction.");
       }
     },
     [user?.id, refresh]
   );
 
   const updateAdminOrgs = useCallback(async (updater: Updater<AdminOrg[]>) => {
-    const next = updater(data.adminOrgs);
+    const next = updater(adminOrgsRef.current);
     const ids = new Set(next.map((o) => o.id));
-    const removedIds = data.adminOrgs.filter((o) => !ids.has(o.id)).map((o) => o.id);
+    const removedIds = adminOrgsRef.current.filter((o) => !ids.has(o.id)).map((o) => o.id);
     try {
       if (removedIds.length) {
         const { error: delErr } = await supabase.from("admin_orgs").delete().in("id", removedIds);
@@ -1780,22 +1777,22 @@ const removeProperty = useCallback(async (id: string) => {
         if (upsertErr) throw upsertErr;
       }
       await refresh();
-    } catch (error: any) {
-      console.error("Admin orgs update failed:", error);
-      toast.error(error?.message ?? "Failed to update organizations.");
+    } catch {
+      toast.error("Failed to update organizations.");
     }
   }, [data.adminOrgs, refresh]);
 
   const updateSettings = useCallback(async (patch: Partial<Settings>) => {
     try {
     if (!user) return;
-    const current = data.settings;
+    const current = settingsRef.current;
     const next: Settings = { ...current, ...patch };
     const dbPatch: any = {
       user_id: user.id,
       locale: next.locale,
     };
     if (patch.displayName !== undefined) dbPatch.display_name = patch.displayName;
+    if (patch.companyName !== undefined) dbPatch.company_name = patch.companyName;
     if (patch.ownerEmail !== undefined) dbPatch.contact_email = patch.ownerEmail;
     if (patch.emailNotifications !== undefined) dbPatch.email_notifications = patch.emailNotifications;
     if (patch.smsNotifications !== undefined) dbPatch.sms_notifications = patch.smsNotifications;
@@ -1804,8 +1801,8 @@ const removeProperty = useCallback(async (id: string) => {
       .upsert(dbPatch, { onConflict: "user_id" });
     if (error) throw error;
     setData((d) => ({ ...d, settings: next }));
-    } catch (error: any) {
-      toast.error(error?.message ?? "Failed to update settings.");
+    } catch {
+      toast.error("Failed to update settings.");
     }
   }, [user?.id, data.settings]);
 
@@ -1816,11 +1813,11 @@ const removeProperty = useCallback(async (id: string) => {
     if (patch.phone !== undefined) dbPatch.phone = patch.phone;
     if (patch.emergency !== undefined) dbPatch.emergency = patch.emergency;
     if (patch.email !== undefined) dbPatch.email = patch.email;
-    const { error } = await supabase.from("tenant_profiles").upsert(dbPatch);
+    const { error } = await supabase.from("tenant_profiles").upsert(dbPatch, { onConflict: "user_id" });
     if (error) throw error;
     setData((d) => ({ ...d, tenantProfile: { ...d.tenantProfile, ...patch } }));
-    } catch (error: any) {
-      toast.error(error?.message ?? "Failed to update profile.");
+    } catch {
+      toast.error("Failed to update profile.");
     }
   }, [user?.id]);
 

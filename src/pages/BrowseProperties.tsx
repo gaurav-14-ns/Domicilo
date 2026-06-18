@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
@@ -370,7 +370,10 @@ export default function BrowseProperties() {
                 <div
                   key={l.id}
                   className="group rounded-xl border border-border/60 bg-gradient-card overflow-hidden hover-lift-premium cursor-pointer transition-all duration-300 hover:border-primary/30"
+                  role="button"
+                  tabIndex={0}
                   onClick={() => setSelectedListing(l)}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSelectedListing(l); } }}
                 >
                   {/* Header image area */}
                   <div className="h-44 bg-gradient-primary/20 relative overflow-hidden">
@@ -378,6 +381,9 @@ export default function BrowseProperties() {
                       <img
                         src={l.images[0]}
                         alt={l.name}
+                        loading="lazy"
+                        width={400}
+                        height={176}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                       />

@@ -206,6 +206,7 @@ export default function System() {
               />
               <button
                 type="button"
+                aria-label={showNewPwd ? "Hide password" : "Show password"}
                 onClick={() => setShowNewPwd(!showNewPwd)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 tabIndex={-1}
@@ -240,6 +241,7 @@ export default function System() {
               />
               <button
                 type="button"
+                aria-label={showConfirmPwd ? "Hide password" : "Show password"}
                 onClick={() => setShowConfirmPwd(!showConfirmPwd)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 tabIndex={-1}

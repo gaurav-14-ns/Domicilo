@@ -59,23 +59,28 @@ export function ContactDialog({ variant, trigger, context }: Props) {
       return;
     }
     setBusy(true);
-    const { error } = await supabase.from("leads").insert({
-      name: name.trim(),
-      email: email.trim(),
-      company: company.trim() || null,
-      message: [context ? `[${context}]` : "", message.trim()].filter(Boolean).join(" ") || null,
-      source: variant,
-    });
-    setBusy(false);
-    if (error) {
-      toast.error("Couldn't send", { description: error?.message ?? "Unknown error" });
-      return;
+    try {
+      const { error } = await supabase.from("leads").insert({
+        name: name.trim(),
+        email: email.trim(),
+        company: company.trim() || null,
+        message: [context ? `[${context}]` : "", message.trim()].filter(Boolean).join(" ") || null,
+        source: variant,
+      });
+      if (error) {
+        toast.error("Couldn't send", { description: "Please try again later." });
+        return;
+      }
+      toast.success(copy.success, {
+        description: context ? `Plan: ${context} · ${email}` : email,
+      });
+      setName(""); setEmail(""); setCompany(""); setMessage("");
+      setOpen(false);
+    } catch {
+      toast.error("Couldn't send", { description: "Network error. Please try again." });
+    } finally {
+      setBusy(false);
     }
-    toast.success(copy.success, {
-      description: context ? `Plan: ${context} · ${email}` : email,
-    });
-    setName(""); setEmail(""); setCompany(""); setMessage("");
-    setOpen(false);
   };
 
   return (

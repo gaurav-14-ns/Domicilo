@@ -11,6 +11,7 @@ import {
 
 type Props = {
   children: React.ReactNode;
+  fallbackRender?: (props: { error: any; resetErrorBoundary: () => void }) => React.ReactNode;
 };
 
 type State = {
@@ -64,6 +65,14 @@ export class AppErrorBoundary extends React.Component<
     if (
       this.state.hasError
     ) {
+      // Use custom fallback render if provided
+      if (this.props.fallbackRender) {
+        return this.props.fallbackRender({
+          error: this.state.error,
+          resetErrorBoundary: () => this.setState({ hasError: false, error: undefined, errorKey: 0 }),
+        });
+      }
+
       const msg =
         this.state.error
           ?.message ??

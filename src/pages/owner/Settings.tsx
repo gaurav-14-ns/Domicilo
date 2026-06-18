@@ -114,7 +114,7 @@ export default function Settings() {
         planNoticeTimer.current = undefined;
       }
     };
-  }, [!!planNotice]);
+  }, [planNotice]);
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -124,8 +124,8 @@ export default function Settings() {
       toast.success("Settings saved", {
         description: "Your preferences have been updated.",
       });
-    } catch (err: any) {
-      toast.error("Save failed", { description: err?.message ?? "Unknown error" });
+    } catch {
+      toast.error("Save failed", { description: "Please try again later." });
     } finally {
       setBusy(false);
     }
@@ -184,14 +184,9 @@ export default function Settings() {
         confirmPassword: "",
       });
 
-    } catch (
-      err: any
-    ) {
+    } catch {
 
-      toast.error(
-        err?.message ??
-          "Failed to update password."
-      );
+      toast.error("Failed to update password.");
 
     } finally {
 
@@ -213,8 +208,8 @@ export default function Settings() {
       toast.success(`Switched to ${PLAN_LABEL[plan]}`, {
         description: `${plan === "scale" ? "Custom" : formatMoney(PLAN_PRICES_INR[plan])} / month`,
       });
-    } catch (err: any) {
-      toast.error("Couldn't change plan", { description: err?.message ?? "Unknown error" });
+    } catch {
+      toast.error("Couldn't change plan", { description: "Please try again later." });
     } finally {
       setBusy(false);
     }
@@ -233,8 +228,8 @@ export default function Settings() {
       toast.success("Subscription cancelled", {
         description: "You can re-activate anytime.",
       });
-    } catch (err: any) {
-      toast.error("Couldn't cancel", { description: err?.message ?? "Unknown error" });
+    } catch {
+      toast.error("Couldn't cancel", { description: "Please try again later." });
     } finally {
       setBusy(false);
     }
@@ -526,6 +521,7 @@ export default function Settings() {
         />
         <button
           type="button"
+          aria-label={showNewPwd ? "Hide password" : "Show password"}
           onClick={() => setShowNewPwd(!showNewPwd)}
           className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
           tabIndex={-1}
@@ -558,6 +554,7 @@ export default function Settings() {
         />
         <button
           type="button"
+          aria-label={showConfirmPwd ? "Hide password" : "Show password"}
           onClick={() => setShowConfirmPwd(!showConfirmPwd)}
           className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
           tabIndex={-1}

@@ -288,8 +288,7 @@ toast.success(
       toast.error(
         "Payment failed",
         {
-          description:
-            err?.message ?? "Unknown error",
+          description: "Please try again or contact support.",
         }
       );
 

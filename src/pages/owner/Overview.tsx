@@ -29,7 +29,7 @@ const KpiCard = ({
   value,
   delta,
 }: any) => (
-  <div className="rounded-xl border border-border bg-gradient-card p-5 transition-smooth hover:-translate-y-1 hover:border-primary/30 hover:shadow-elegant">
+  <div className="group rounded-xl border border-border bg-gradient-card p-5 transition-smooth hover:-translate-y-1 hover:border-primary/30 hover:shadow-elegant">
     <div className="flex items-center justify-between">
       <div className="text-xs uppercase tracking-wider text-muted-foreground">
         {label}
@@ -85,32 +85,39 @@ export default function OwnerOverview() {
     );
 
   const activeTenants =
+  useMemo(() =>
     tenants.filter(
       (t) =>
         t?.status ===
         "active"
-    ).length;
+    ).length,
+  [tenants]
+  );
 
   const monthlyRevenue =
-  transactions
-    .filter(
-      (t) =>
-        t?.status ===
-        "completed"
-    )
-    .reduce(
-      (sum, t) =>
-        sum +
-        Math.max(
-          0,
-          Number(
-            t?.amount ?? 0
-          )
-        ),
-      0
-    );
+  useMemo(() =>
+    transactions
+      .filter(
+        (t) =>
+          t?.status ===
+          "completed"
+      )
+      .reduce(
+        (sum, t) =>
+          sum +
+          Math.max(
+            0,
+            Number(
+              t?.amount ?? 0
+            )
+          ),
+        0
+      ),
+  [transactions]
+  );
 
   const totalUnits =
+  useMemo(() =>
     properties.reduce(
       (sum, p) =>
         sum +
@@ -118,9 +125,12 @@ export default function OwnerOverview() {
           p?.units ?? 0
         ),
       0
-    );
+    ),
+  [properties]
+  );
 
   const totalOccupied =
+  useMemo(() =>
     properties.reduce(
       (sum, p) =>
         sum +
@@ -128,56 +138,67 @@ export default function OwnerOverview() {
           p?.occupied ?? 0
         ),
       0
-    );
+    ),
+  [properties]
+  );
 
   const occupancy =
+  useMemo(() =>
     totalUnits > 0
       ? (
           (totalOccupied /
             totalUnits) *
           100
         )
-      : 0;
+      : 0,
+  [totalUnits, totalOccupied]
+  );
 
   const pendingDues =
-  transactions
-    .filter(
-      (t) =>
-        t?.status ===
-        "pending"
-    )
-    .reduce(
-      (sum, t) =>
-        sum +
-        Math.max(
-          0,
-          Number(
-            t?.amount ??
-              0
-          )
-        ),
-      0
-    );
+  useMemo(() =>
+    transactions
+      .filter(
+        (t) =>
+          t?.status ===
+          "pending"
+      )
+      .reduce(
+        (sum, t) =>
+          sum +
+          Math.max(
+            0,
+            Number(
+              t?.amount ??
+                0
+            )
+          ),
+        0
+      ),
+  [transactions]
+  );
 
 const overdueDues =
-  transactions
-    .filter(
-      (t) =>
-        t?.status ===
-        "overdue"
-    )
-    .reduce(
-      (sum, t) =>
-        sum +
-        Math.max(
-          0,
-          Number(
-            t?.amount ??
-              0
-          )
-        ),
-      0
-    );
+  useMemo(() =>
+    transactions
+      .filter(
+        (t) =>
+          t?.status ===
+          "overdue"
+      )
+      .reduce(
+        (sum, t) =>
+          sum +
+          Math.max(
+            0,
+            Number(
+              t?.amount ??
+                0
+            )
+          ),
+        0
+      ),
+  [transactions]
+  );
 
   const trend =
     useMemo(() => {
@@ -273,9 +294,15 @@ const overdueDues =
     });
   }, [trend, rangeMonths]);
 
-  const trendMax = Math.max(1, ...filteredTrend.map((m) => Number(m?.total ?? 0)));
+  const trendMax = useMemo(
+  () => Math.max(1, ...filteredTrend.map((m) => Number(m?.total ?? 0))),
+  [filteredTrend]
+);
 
-  const hasTrendData = filteredTrend.some((m) => Number(m?.total ?? 0) > 0);
+  const hasTrendData = useMemo(
+  () => filteredTrend.some((m) => Number(m?.total ?? 0) > 0),
+  [filteredTrend]
+);
 
   const rangeOptions = [
     { value: 3, label: "3m" },

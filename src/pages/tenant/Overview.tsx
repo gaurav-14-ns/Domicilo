@@ -12,7 +12,7 @@ export default function TenantOverview() {
   const tenant = useCurrentTenant(data?.tenants ?? [], user?.email);
   const txs = useTenantTransactions(data?.transactions ?? [], tenant?.id);
   const outstanding = useTenantDues(data?.transactions ?? [], tenant?.id);
-  const lastPayment = [...txs].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).find((t) => t.status === "completed");
+  const lastPayment = [...txs].filter((t) => t.date).sort((a, b) => new Date(b.date!).getTime() - new Date(a.date!).getTime()).find((t) => t.status === "completed");
   const fmt = (amount: number) => formatMoney(amount);
 
   if (error) return <ErrorState title="Failed to load overview" description={error} onRetry={refresh} />;

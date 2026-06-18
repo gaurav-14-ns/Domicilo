@@ -83,6 +83,7 @@ export function useMaintenance() {
         title,
         description,
         priority,
+        status: "open",
       });
       if (error) throw error;
       toast.success("Maintenance request created");

@@ -32,18 +32,23 @@ export default function Contact() {
       return;
     }
     setBusy(true);
-    const { error } = await supabase.from("leads").insert({
-      name: n, email: em,
-      company: company.trim() || null, message: msg,
-      source: "contact-page",
-    });
-    setBusy(false);
-    if (error) {
-      toast.error("Couldn't send", { description: error?.message ?? "Unknown error" });
-      return;
+    try {
+      const { error } = await supabase.from("leads").insert({
+        name: n, email: em,
+        company: company.trim() || null, message: msg,
+        source: "contact-page",
+      });
+      if (error) {
+        toast.error("Couldn't send", { description: "Please try again later." });
+        return;
+      }
+      toast.success("Message sent", { description: "We'll get back to you within one business day." });
+      setName(""); setEmail(""); setCompany(""); setMessage("");
+    } catch {
+      toast.error("Couldn't send", { description: "Network error. Please try again." });
+    } finally {
+      setBusy(false);
     }
-    toast.success("Message sent", { description: "We'll get back to you within one business day." });
-    setName(""); setEmail(""); setCompany(""); setMessage("");
   };
 
   return (

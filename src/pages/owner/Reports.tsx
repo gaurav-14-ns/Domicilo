@@ -241,11 +241,11 @@ export default function Reports() {
         </div>
 
         <div className="space-y-1">
-          <label className="text-xs text-muted-foreground">
+          <label htmlFor="report-from-date" className="text-xs text-muted-foreground">
             From
           </label>
 
-          <Input
+          <Input id="report-from-date"
             type="date"
             value={fromDate}
             onChange={(e) =>
@@ -256,11 +256,11 @@ export default function Reports() {
         </div>
 
         <div className="space-y-1">
-          <label className="text-xs text-muted-foreground">
+          <label htmlFor="report-to-date" className="text-xs text-muted-foreground">
             To
           </label>
 
-          <Input
+          <Input id="report-to-date"
             type="date"
             value={toDate}
             onChange={(e) =>

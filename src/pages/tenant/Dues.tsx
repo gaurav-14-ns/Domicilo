@@ -64,28 +64,40 @@ export default function Dues() {
     );
 
   const tenantTransactions =
-  (data?.transactions ?? []).filter(
-    (t) =>
-      t.tenantId === tenant?.id
+  useMemo(() =>
+    (data?.transactions ?? []).filter(
+      (t) =>
+        t.tenantId === tenant?.id
+    ),
+  [data?.transactions, tenant?.id]
   );
 
 const pending =
-  tenantTransactions.filter(
-    (t) =>
-      t.status === "pending" ||
-      t.status === "overdue"
+  useMemo(() =>
+    tenantTransactions.filter(
+      (t) =>
+        t.status === "pending" ||
+        t.status === "overdue"
+    ),
+  [tenantTransactions]
   );
 
 const overdue =
-  tenantTransactions.filter(
-    (t) =>
-      t.status === "overdue"
+  useMemo(() =>
+    tenantTransactions.filter(
+      (t) =>
+        t.status === "overdue"
+    ),
+  [tenantTransactions]
   );
 
 const completed =
-  tenantTransactions.filter(
-    (t) =>
-      t.status === "completed"
+  useMemo(() =>
+    tenantTransactions.filter(
+      (t) =>
+        t.status === "completed"
+    ),
+  [tenantTransactions]
   );
 
 const now = new Date();
@@ -105,23 +117,46 @@ const periodFilter = useMemo(() => {
   }
 }, [viewMode, selectedYear, selectedMonth]);
 
-const periodKey = viewMode === "monthly"
-  ? `${selectedYear}-${String(selectedMonth).padStart(2, "0")}`
-  : String(selectedYear);
+const periodKey =
+  useMemo(() =>
+    viewMode === "monthly"
+      ? `${selectedYear}-${String(selectedMonth).padStart(2, "0")}`
+      : String(selectedYear),
+  [viewMode, selectedYear, selectedMonth]
+  );
 
-const pendingInPeriod = pending.filter(periodFilter);
-const overdueInPeriod = overdue.filter(periodFilter);
-const completedInPeriod = completed.filter(periodFilter);
-const paidInPeriodAmount = completedInPeriod.reduce((s, t) => s + Math.max(0, t.amount), 0);
+const pendingInPeriod =
+  useMemo(() =>
+    pending.filter(periodFilter),
+  [pending, periodFilter]
+  );
+const overdueInPeriod =
+  useMemo(() =>
+    overdue.filter(periodFilter),
+  [overdue, periodFilter]
+  );
+const completedInPeriod =
+  useMemo(() =>
+    completed.filter(periodFilter),
+  [completed, periodFilter]
+  );
+const paidInPeriodAmount =
+  useMemo(() =>
+    completedInPeriod.reduce((s, t) => s + Math.max(0, t.amount), 0),
+  [completedInPeriod]
+  );
 
 const lastPayment =
-  completed
-    .slice()
-    .sort(
-      (a, b) =>
-        new Date(b.date).getTime() -
-        new Date(a.date).getTime()
-    )[0];
+  useMemo(() =>
+    completed
+      .slice()
+      .sort(
+        (a, b) =>
+          new Date(b.date).getTime() -
+          new Date(a.date).getTime()
+      )[0],
+  [completed]
+  );
 
 const pendingByType = useMemo(() => {
   const groups: Record<string, typeof tenantTransactions> = {};

@@ -109,7 +109,7 @@ export function FloatingActionMenu() {
         className={`fixed bottom-6 z-50 flex flex-col items-end gap-3 md:hidden ${
           position === "right" ? "right-6" : "left-6"
         }`}
-        style={{ position: "fixed" }}
+
       >
         {open && (
           <div

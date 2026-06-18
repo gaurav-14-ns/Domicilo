@@ -32,6 +32,14 @@ import {
 } from "lucide-react";
 
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+import {
   downloadCSV,
 } from "@/lib/format";
 
@@ -166,9 +174,11 @@ export default function TenantTransactions() {
     filteredTransactions
       .slice()
       .sort(
-        (a, b) =>
-          new Date(b.date).getTime() -
-          new Date(a.date).getTime()
+        (a, b) => {
+          const da = a.date ? new Date(a.date).getTime() : 0;
+          const db = b.date ? new Date(b.date).getTime() : 0;
+          return db - da;
+        }
       )
       .slice(
         (safeCurrentPage - 1) * pageSize,
@@ -284,16 +294,17 @@ export default function TenantTransactions() {
       Status
     </div>
 
-    <select
-      value={statusFilter}
-      onChange={(e) => setStatusFilter(e.target.value)}
-      className="flex h-10 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
-    >
-      <option value="all">All</option>
-      <option value="pending">Pending</option>
-      <option value="completed">Completed</option>
-      <option value="overdue">Overdue</option>
-    </select>
+    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                                <SelectTrigger className="w-full">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="all">All</SelectItem>
+                                  <SelectItem value="pending">Pending</SelectItem>
+                                  <SelectItem value="completed">Completed</SelectItem>
+                                  <SelectItem value="overdue">Overdue</SelectItem>
+                                </SelectContent>
+                              </Select>
 
   </div>
 

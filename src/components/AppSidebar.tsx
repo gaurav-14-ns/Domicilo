@@ -42,6 +42,7 @@ const adminItems = [
   { title: "Users", url: "/admin/users", icon: Users },
   { title: "Leads", url: "/admin/leads", icon: BarChart3 },
   { title: "System", url: "/admin/system", icon: ShieldCheck },
+  { title: "Maintenance", url: "/admin/maintenance", icon: Wrench },
   { title: "Audit Log", url: "/admin/audit", icon: ScrollText },
 ];
 
