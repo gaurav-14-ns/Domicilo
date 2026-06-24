@@ -24,4 +24,16 @@ export default defineConfig(() => ({
       "@tanstack/query-core",
     ],
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id: string) {
+          if (id.includes("node_modules/recharts") || id.includes("node_modules/date-fns")) {
+            return "vendor-charts";
+          }
+        },
+      },
+    },
+    chunkSizeWarningLimit: 600,
+  },
 }));

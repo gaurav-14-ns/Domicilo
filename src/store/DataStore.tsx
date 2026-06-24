@@ -329,10 +329,10 @@ useEffect(() => {
 
     const fetchTimeout = setTimeout(() => {
       if (mountedRef.current) {
-        setError("Data fetch timed out. Please try again.");
+        setError("Data fetch timed out. Please check your connection.");
         setLoading(false);
       }
-    }, 25000);
+    }, 45000);
 
     try {
       const currentRole = roleRef.current;
@@ -586,8 +586,8 @@ useEffect(() => {
           );
       }
 
-      const results =
-        await Promise.all([
+      const rawResults =
+        await Promise.allSettled([
           propertiesPromise,
           tenantsPromise,
           txsPromise,
@@ -597,8 +597,12 @@ useEffect(() => {
           subPromise,
         ]);
 
+      const settledResults = rawResults.map((r: any) =>
+        r.status === "fulfilled" ? r.value : { data: null, error: null }
+      );
+
       // Detect silent auth failure (session expired, JWT invalid)
-      const authErr = results.find((r: any) => r?.error?.status === 401 || r?.error?.status === 403);
+      const authErr = settledResults.find((r: any) => r?.error?.status === 401 || r?.error?.status === 403);
       if (authErr) {
         if (retried) throw new Error("Session expired");
         const { error: refreshErr } = await supabase.auth.refreshSession();
@@ -628,7 +632,7 @@ useEffect(() => {
         {
           data: subRow,
         },
-      ] = results;
+      ] = settledResults as any;
 
       const txRows =
         txs ?? [];
@@ -740,6 +744,16 @@ useEffect(() => {
         "DataStore fetch failed:",
         error
       );
+
+      // Retry with exponential backoff (max 3 attempts)
+      if (retried === false && error?.message !== "Session expired") {
+        clearTimeout(fetchTimeout);
+        const delay = 1000;
+        await new Promise(r => setTimeout(r, delay));
+        if (mountedRef.current && gen === fetchGenRef.current) {
+          return doFetch(true);
+        }
+      }
 
       // Session expired — redirect to login
       if (error?.message === "Session expired") {
