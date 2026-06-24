@@ -327,9 +327,7 @@ useEffect(() => {
       setError(null);
     }
 
-    const controller = new AbortController();
     const fetchTimeout = setTimeout(() => {
-      controller.abort();
       if (mountedRef.current) {
         setError("Data fetch timed out. Please check your connection.");
         setLoading(false);
@@ -758,7 +756,7 @@ useEffect(() => {
       );
 
       // Retry with exponential backoff (max 3 attempts)
-      if (retryCount < 3 && error?.name !== "AbortError") {
+      if (retryCount < 3) {
         clearTimeout(fetchTimeout);
         const delay = Math.min(1000 * Math.pow(2, retryCount), 8000);
         await new Promise(r => setTimeout(r, delay));
@@ -864,10 +862,9 @@ useEffect(() => {
     fetchedRef.current = true;
     lastFetchedRoleRef.current = role;
     lastFetchedUserIdRef.current = user.id;
-    if (!reconcileRef.current) {
-      setLoading(true);
-      fetchAll();
-    }
+    reconcileRef.current = null;
+    setLoading(true);
+    fetchAll();
   }, [user?.id, role, fetchAll]);
 
   // Safety timeout: show error after 15 s of loading
