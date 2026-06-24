@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    /* Light theme: Apple-inspired clean white/gray */
+    /* BMW M PERFORMANCE LIGHT — clean white with BMW blue/red accents */
     --background: 0 0% 98%;
     --foreground: 0 0% 12%;
 
@@ -14,49 +14,49 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 12%;
 
-    --primary: 240 60% 26%;
-    --primary-foreground: 45 100% 50%;
-    --primary-glow: 240 55% 40%;
-    --primary-deep: 240 65% 16%;
+    --primary: 210 90% 50%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 210 55% 40%;
+    --primary-deep: 210 85% 30%;
 
     --secondary: 0 0% 92%;
-    --secondary-foreground: 0 0% 20%;
+    --secondary-foreground: 210 90% 30%;
 
     --muted: 0 0% 94%;
     --muted-foreground: 0 0% 45%;
 
-    --accent: 45 60% 85%;
-    --accent-foreground: 240 60% 22%;
+    --accent: 350 80% 50%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 70% 50%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 75% 50%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 88%;
-    --input: 0 0% 88%;
-    --ring: 240 60% 26%;
+    --border: 210 20% 88%;
+    --input: 210 20% 88%;
+    --ring: 210 90% 50%;
 
     --radius: 0.75rem;
 
-    --gradient-primary: linear-gradient(135deg, hsl(240 60% 26%), hsl(240 55% 36%));
-    --gradient-hero: linear-gradient(180deg, hsl(0 0% 96%), hsl(0 0% 92%) 60%, hsl(0 0% 90%));
-    --gradient-card: linear-gradient(135deg, hsl(0 0% 100%), hsl(0 0% 96%));
-    --gradient-text: linear-gradient(135deg, hsl(240 60% 26%), hsl(240 50% 40%));
+    --gradient-primary: linear-gradient(135deg, hsl(210 90% 50%), hsl(210 80% 35%));
+    --gradient-hero: linear-gradient(180deg, hsl(210 60% 96%), hsl(210 50% 92%) 60%, hsl(210 40% 90%));
+    --gradient-card: linear-gradient(135deg, hsl(0 0% 100%), hsl(210 40% 96%));
+    --gradient-text: linear-gradient(135deg, hsl(210 90% 50%), hsl(350 80% 50%));
 
     --shadow-sm: 0 1px 2px hsl(0 0% 0% / 0.04);
-    --shadow-md: 0 8px 24px -6px hsl(0 0% 0% / 0.08);
-    --shadow-lg: 0 20px 60px -12px hsl(0 0% 0% / 0.12);
-    --shadow-glow: 0 0 40px hsl(240 60% 26% / 0.1);
+    --shadow-md: 0 8px 24px -6px hsl(210 90% 50% / 0.10);
+    --shadow-lg: 0 20px 60px -12px hsl(210 90% 50% / 0.15);
+    --shadow-glow: 0 0 40px hsl(210 90% 50% / 0.1);
 
     --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 0 0% 15%;
-    --sidebar-primary: 240 60% 26%;
-    --sidebar-primary-foreground: 45 100% 50%;
+    --sidebar-primary: 210 90% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 0 0% 92%;
-    --sidebar-accent-foreground: 0 0% 20%;
-    --sidebar-border: 0 0% 88%;
-    --sidebar-ring: 240 55% 40%;
+    --sidebar-accent-foreground: 210 90% 30%;
+    --sidebar-border: 210 20% 88%;
+    --sidebar-ring: 210 90% 50%;
   }
 
   .dark {
@@ -71,21 +71,21 @@
     --popover-foreground: 0 0% 95%;
 
     --primary: 210 90% 50%;
-    --primary-foreground: 210 90% 55%;
+    --primary-foreground: 0 0% 100%;
     --primary-glow: 210 90% 60%;
     --primary-deep: 210 85% 30%;
 
     --secondary: 220 20% 10%;
-    --secondary-foreground: 0 0% 85%;
+    --secondary-foreground: 0 0% 95%;
 
     --muted: 220 18% 6%;
     --muted-foreground: 0 0% 55%;
 
     --accent: 350 80% 50%;
-    --accent-foreground: 0 0% 95%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 75% 50%;
-    --destructive-foreground: 0 0% 95%;
+    --destructive-foreground: 0 0% 100%;
 
     --border: 210 25% 15%;
     --input: 210 25% 15%;
@@ -280,19 +280,19 @@
     box-shadow: 0 0 40px hsl(210 90% 50% / 0.06);
   }
 
-  /* Gold shimmer text */
+  /* BMW M shimmer text — blue/white/red speed */
   .text-gold-shimmer {
-    background: linear-gradient(135deg, hsl(210 90% 50%), hsl(0 0% 95%), hsl(210 90% 50%));
-    background-size: 300% 100%;
+    background: linear-gradient(135deg, hsl(210 90% 50%), hsl(0 0% 100%), hsl(350 80% 50%), hsl(210 90% 50%));
+    background-size: 400% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    animation: shimmer 4s ease-in-out infinite;
+    animation: shimmer 3s ease-in-out infinite;
   }
 
   .dark .text-gold-shimmer {
-    background: linear-gradient(135deg, hsl(210 90% 60%), hsl(0 0% 95%), hsl(210 90% 60%));
-    background-size: 300% 100%;
+    background: linear-gradient(135deg, hsl(210 90% 60%), hsl(0 0% 100%), hsl(350 80% 55%), hsl(210 90% 60%));
+    background-size: 400% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -1929,6 +1929,225 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
+}
+
+/* =========================================================================
+   BMW M PERFORMANCE — Motion blur, speed lines, fast-paced effects
+   ========================================================================= */
+
+/* Motion blur reveal — elements blur in from below, like a car at full speed */
+@keyframes blur-reveal {
+  0% { opacity: 0; transform: translateY(40px) scale(0.98); filter: blur(12px); }
+  30% { opacity: 0.6; filter: blur(6px); }
+  60% { opacity: 0.9; filter: blur(2px); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+.animate-blur-reveal {
+  animation: blur-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Fast blur entrance — shorter, more aggressive */
+@keyframes blur-in-fast {
+  0% { opacity: 0; filter: blur(20px); transform: scale(1.05); }
+  40% { opacity: 0.5; filter: blur(10px); }
+  100% { opacity: 1; filter: blur(0); transform: scale(1); }
+}
+.animate-blur-in-fast {
+  animation: blur-in-fast 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Speed line — horizontal streak suggesting motion */
+@keyframes speed-line {
+  0% { transform: translateX(-100%) scaleX(0.3); opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translateX(200%) scaleX(1.5); opacity: 0; }
+}
+.speed-line {
+  position: relative;
+  overflow: hidden;
+}
+.speed-line::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -10%;
+  width: 40%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, hsl(210 90% 50% / 0.4), hsl(0 0% 100% / 0.6), hsl(350 80% 50% / 0.4), transparent);
+  transform: translateY(-50%);
+  animation: speed-line 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Speed line variant — faster, for hero sections */
+.speed-line-fast::after {
+  animation-duration: 0.8s;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, hsl(210 90% 50% / 0.3), hsl(0 0% 100% / 0.5), transparent);
+  width: 60%;
+}
+
+/* BMW M tri-color accent stripe */
+.bmw-stripe {
+  position: relative;
+}
+.bmw-stripe::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, hsl(210 90% 50%), hsl(200 80% 70%), hsl(350 80% 50%));
+  background-size: 200% 100%;
+  animation: bmw-stripe-shift 3s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes bmw-stripe-shift {
+  0%, 100% { background-position: 0% 0%; }
+  50% { background-position: 100% 0%; }
+}
+
+/* Vertical BMW M stripe (for side accents) */
+.bmw-stripe-vert::before {
+  top: 0;
+  left: 0;
+  right: auto;
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(180deg, hsl(210 90% 50%), hsl(350 80% 50%), hsl(210 90% 50%));
+  background-size: 100% 200%;
+  animation: bmw-stripe-shift-vert 4s ease-in-out infinite;
+}
+@keyframes bmw-stripe-shift-vert {
+  0%, 100% { background-position: 0% 0%; }
+  50% { background-position: 0% 100%; }
+}
+
+/* Motion blur hover — elements get motion blur on hover like a speeding car */
+.motion-blur-hover {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.motion-blur-hover:hover {
+  transform: translateX(6px) scale(1.02);
+  filter: blur(0.5px);
+  opacity: 0.92;
+}
+
+/* Button speed streak — BMW M button hover effect */
+.btn-bmw {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-bmw::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.15), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+.btn-bmw:hover::before {
+  transform: translateX(100%);
+}
+.btn-bmw:hover {
+  transform: scale(1.04);
+  box-shadow: 0 0 30px hsl(210 90% 50% / 0.3), 0 0 60px hsl(210 90% 50% / 0.1);
+}
+
+/* Speed drift entrance — elements slide in with blur like a fast car passing */
+@keyframes drift-in-left {
+  0% { opacity: 0; transform: translateX(-60px) skewX(-3deg); filter: blur(8px); }
+  50% { opacity: 0.7; filter: blur(3px); }
+  100% { opacity: 1; transform: translateX(0) skewX(0deg); filter: blur(0); }
+}
+@keyframes drift-in-right {
+  0% { opacity: 0; transform: translateX(60px) skewX(3deg); filter: blur(8px); }
+  50% { opacity: 0.7; filter: blur(3px); }
+  100% { opacity: 1; transform: translateX(0) skewX(0deg); filter: blur(0); }
+}
+.animate-drift-in-left {
+  animation: drift-in-left 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.animate-drift-in-right {
+  animation: drift-in-right 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Fast stagger entrance — quicker version of existing stagger */
+.stagger-fast > * {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: blur-reveal 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.stagger-fast > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-fast > *:nth-child(2) { animation-delay: 50ms; }
+.stagger-fast > *:nth-child(3) { animation-delay: 100ms; }
+.stagger-fast > *:nth-child(4) { animation-delay: 150ms; }
+.stagger-fast > *:nth-child(5) { animation-delay: 200ms; }
+.stagger-fast > *:nth-child(6) { animation-delay: 250ms; }
+.stagger-fast > *:nth-child(7) { animation-delay: 300ms; }
+.stagger-fast > *:nth-child(8) { animation-delay: 350ms; }
+
+/* Pulsing glow — like BMW M sport mode indicator */
+@keyframes m-pulse {
+  0%, 100% { box-shadow: 0 0 20px hsl(210 90% 50% / 0.2), 0 0 40px hsl(350 80% 50% / 0.1); }
+  50% { box-shadow: 0 0 40px hsl(210 90% 50% / 0.4), 0 0 80px hsl(350 80% 50% / 0.2), 0 0 120px hsl(210 90% 50% / 0.1); }
+}
+.m-pulse {
+  animation: m-pulse 2s ease-in-out infinite;
+}
+
+/* BMW M logo-style ring (circular badge glow) */
+.m-ring {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.m-ring::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: conic-gradient(from 0deg, hsl(210 90% 50%), hsl(200 80% 70%), hsl(350 80% 50%), hsl(210 90% 50%)) border-box;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: m-ring-spin 3s linear infinite;
+}
+@keyframes m-ring-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Fast count-up animation */
+@keyframes count-up-fast {
+  from { opacity: 0; transform: translateY(10px); filter: blur(4px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+.animate-count-up-fast {
+  animation: count-up-fast 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Speed flash — quick white flash like a camera in a race */
+@keyframes speed-flash {
+  0% { opacity: 0; }
+  10% { opacity: 0.08; }
+  20% { opacity: 0; }
+  100% { opacity: 0; }
+}
+.speed-flash {
+  animation: speed-flash 0.6s ease-out;
+}
+
+/* BMW M profile ring conic */
+@keyframes bmw-conic {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 
