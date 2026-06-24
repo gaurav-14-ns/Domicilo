@@ -174,11 +174,6 @@ export default function Auth() {
     setShowRecoveryPwd,
   ] = useState(false);
 
-  const [
-    showConfirmRecoveryPwd,
-    setShowConfirmRecoveryPwd,
-  ] = useState(false);
-
   const recoveredRef =
     useRef(false);
 
@@ -190,8 +185,6 @@ useEffect(() => {
   const isRecovery =
     hash.includes(
       "type=recovery"
-    ) || hash.includes(
-      "access_token"
     );
 
   if (
@@ -200,12 +193,6 @@ useEffect(() => {
     recoveredRef.current = true;
     setRecoveryMode(
       true
-    );
-    // Clean URL after detecting recovery mode
-    window.history.replaceState(
-      null,
-      "",
-      window.location.pathname
     );
     return;
   }
@@ -619,15 +606,6 @@ useEffect(() => {
       e.preventDefault();
 
       if (
-        recoveryPassword.length < 6
-      ) {
-        toast.error(
-          "Password must be at least 6 characters."
-        );
-        return;
-      }
-
-      if (
         recoveryPassword !==
         confirmRecoveryPassword
       ) {
@@ -661,10 +639,8 @@ useEffect(() => {
           "Password updated successfully."
         );
 
-        setRecoveryMode(false);
-        setRecoveryPassword("");
-        setConfirmRecoveryPassword("");
-        nav("/auth", { replace: true });
+        window.location.href =
+          "/auth";
 
       } catch (
         err: any
@@ -693,16 +669,14 @@ useEffect(() => {
     </div>
 
     <div className="space-y-2">
-      <Label htmlFor="recovery-pwd">
+      <Label>
         New password
       </Label>
 
       <div className="relative">
         <Input
-          id="recovery-pwd"
           type={showRecoveryPwd ? "text" : "password"}
           required
-          minLength={6}
           value={
             recoveryPassword
           }
@@ -726,16 +700,14 @@ useEffect(() => {
     </div>
 
     <div className="space-y-2">
-      <Label htmlFor="confirm-recovery-pwd">
+      <Label>
         Confirm new password
       </Label>
 
       <div className="relative">
         <Input
-          id="confirm-recovery-pwd"
           type={showConfirmRecoveryPwd ? "text" : "password"}
           required
-          minLength={6}
           value={
             confirmRecoveryPassword
           }

@@ -24,31 +24,4 @@ export default defineConfig(() => ({
       "@tanstack/query-core",
     ],
   },
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks(id: string) {
-          if (id.includes("node_modules/react-dom") || id.includes("node_modules/react/")) {
-            return "vendor-react";
-          }
-          if (id.includes("node_modules/@supabase")) {
-            return "vendor-supabase";
-          }
-          if (id.includes("node_modules/@radix-ui") || id.includes("node_modules/radix-ui")) {
-            return "vendor-ui";
-          }
-          if (id.includes("node_modules/lucide-react")) {
-            return "vendor-icons";
-          }
-          if (id.includes("node_modules/recharts") || id.includes("node_modules/date-fns")) {
-            return "vendor-charts";
-          }
-          if (id.includes("node_modules")) {
-            return "vendor-other";
-          }
-        },
-      },
-    },
-    chunkSizeWarningLimit: 600,
-  },
 }));
