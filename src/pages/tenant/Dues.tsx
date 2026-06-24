@@ -151,9 +151,11 @@ const lastPayment =
     completed
       .slice()
       .sort(
-        (a, b) =>
-          new Date(b.date).getTime() -
-          new Date(a.date).getTime()
+        (a, b) => {
+          const da = a.date ? new Date(a.date).getTime() : 0;
+          const db = b.date ? new Date(b.date).getTime() : 0;
+          return db - da;
+        }
       )[0],
   [completed]
   );
@@ -501,9 +503,11 @@ const typeTotal = (txs: typeof tenantTransactions) =>
         overdue
           .slice()
           .sort(
-            (a, b) =>
-              new Date(b.date).getTime() -
-              new Date(a.date).getTime()
+            (a, b) => {
+              const da = a.date ? new Date(a.date).getTime() : 0;
+              const db = b.date ? new Date(b.date).getTime() : 0;
+              return db - da;
+            }
           )
           .map((t) => (
 
@@ -552,9 +556,11 @@ const typeTotal = (txs: typeof tenantTransactions) =>
           )
           .slice()
           .sort(
-            (a, b) =>
-              new Date(b.date).getTime() -
-              new Date(a.date).getTime()
+            (a, b) => {
+              const da = a.date ? new Date(a.date).getTime() : 0;
+              const db = b.date ? new Date(b.date).getTime() : 0;
+              return db - da;
+            }
           )
           .map((t) => (
 
@@ -661,9 +667,11 @@ const typeTotal = (txs: typeof tenantTransactions) =>
                 : 5
             )
             .sort(
-              (a, b) =>
-                new Date(b.date).getTime() -
-                new Date(a.date).getTime()
+              (a, b) => {
+                const da = a.date ? new Date(a.date).getTime() : 0;
+                const db = b.date ? new Date(b.date).getTime() : 0;
+                return db - da;
+              }
             )
             .map((t) => (
 

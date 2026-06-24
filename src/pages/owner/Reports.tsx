@@ -88,12 +88,12 @@ export default function Reports() {
     .reduce((s, t) => s + Math.max(0, t.amount), 0);
 
   const totalUnits = properties.reduce(
-    (s, p) => s + p.units,
+    (s, p) => s + Number(p.units ?? 0),
     0
   );
 
   const totalOccupied = properties.reduce(
-    (s, p) => s + p.occupied,
+    (s, p) => s + Number(p.occupied ?? 0),
     0
   );
 

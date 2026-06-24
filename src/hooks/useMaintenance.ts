@@ -28,8 +28,12 @@ export function useMaintenance() {
     let query = supabase.from("maintenance_requests").select("*");
     if (role === "owner") {
       query = query.eq("owner_id", user.id);
-    } else if (tenant) {
+    } else if (role === "tenant" && tenant) {
       query = query.eq("tenant_id", tenant.id);
+    } else if (role === "tenant") {
+      setLoading(false);
+      setRequests([]);
+      return;
     }
     const { data: rows, error } = await query.order("created_at", { ascending: false });
 
@@ -57,22 +61,25 @@ export function useMaintenance() {
     ) => {
       if (!user) throw new Error("Not authenticated");
 
-      // Resolve ownerId: try local store first, then fallback to DB
       let ownerId: string | undefined;
-      const currentTenants = data.tenants ?? [];
-      const localTenant = currentTenants.find(
-        (t) => user.email && t.email.toLowerCase() === user.email.toLowerCase(),
-      );
-      if (localTenant?.ownerId) {
-        ownerId = localTenant.ownerId;
+      if (role === "owner") {
+        ownerId = user.id;
       } else {
-        const { data: dbTenant } = await supabase
-          .from("tenants")
-          .select("owner_id")
-          .ilike("email", user.email)
-          .maybeSingle();
-        if (dbTenant?.owner_id) {
-          ownerId = dbTenant.owner_id;
+        const currentTenants = data.tenants ?? [];
+        const localTenant = currentTenants.find(
+          (t) => user.email && t.email.toLowerCase() === user.email.toLowerCase(),
+        );
+        if (localTenant?.ownerId) {
+          ownerId = localTenant.ownerId;
+        } else {
+          const { data: dbTenant } = await supabase
+            .from("tenants")
+            .select("owner_id")
+            .ilike("email", user.email)
+            .maybeSingle();
+          if (dbTenant?.owner_id) {
+            ownerId = dbTenant.owner_id;
+          }
         }
       }
       if (!ownerId) throw new Error("Could not determine property owner. Please try again.");
@@ -89,7 +96,7 @@ export function useMaintenance() {
       toast.success("Maintenance request created");
       await fetchRequests();
     },
-    [user?.id, fetchRequests, data.tenants],
+    [user?.id, role, fetchRequests, data.tenants],
   );
 
   const updateStatus = useCallback(

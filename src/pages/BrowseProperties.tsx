@@ -153,14 +153,13 @@ export default function BrowseProperties() {
         setListings(results);
       }
       setLoading(false);
-    }).catch((err) => {
+    }).catch(() => {
       if (cancelled) return;
-      console.error("Failed to fetch properties:", err);
-      setFetchError(err?.message ?? "Failed to fetch properties");
+      setFetchError("Failed to fetch properties");
       setLoading(false);
     });
     return () => { cancelled = true; };
-  }, [selectedState, selectedCity, selectedType, maxPrice, minBed, selectedAmenities, q, retryCount]);
+  }, [selectedState, selectedCity, selectedType, maxPrice, minBed, selectedAmenities, retryCount]);
 
   const toggleAmenity = (a: string) => {
     setSelectedAmenities((prev) => prev.includes(a) ? prev.filter((x) => x !== a) : [...prev, a]);
@@ -467,10 +466,10 @@ export default function BrowseProperties() {
                     />
                     {selectedListing.images.length > 1 && (
                       <>
-                        <button onClick={() => setCurrentImageIndex(i => (i - 1 + selectedListing.images.length) % selectedListing.images.length)} className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1.5 hover:bg-background transition-smooth">
+                        <button aria-label="Previous image" onClick={() => setCurrentImageIndex(i => (i - 1 + selectedListing.images.length) % selectedListing.images.length)} className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1.5 hover:bg-background transition-smooth">
                           <ChevronLeft className="h-4 w-4" />
                         </button>
-                        <button onClick={() => setCurrentImageIndex(i => (i + 1) % selectedListing.images.length)} className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1.5 hover:bg-background transition-smooth">
+                        <button aria-label="Next image" onClick={() => setCurrentImageIndex(i => (i + 1) % selectedListing.images.length)} className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1.5 hover:bg-background transition-smooth">
                           <ChevronRight className="h-4 w-4" />
                         </button>
                         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
@@ -607,11 +606,11 @@ export default function BrowseProperties() {
                   toast.success("Enquiry sent! The owner will contact you shortly.");
                   setEnquiryOpen(false);
                   setEnquiryMessage("");
-                } catch (e: any) {
+                } catch {
                   if (!mountedRef.current) return;
-                  toast.error(e?.message ?? "Failed to send enquiry. Try again.");
+                  toast.error("Failed to send enquiry. Try again.");
                 } finally {
-                  if (mountedRef.current) setSendingEnquiry(false);
+                  setSendingEnquiry(false);
                 }
               }} disabled={sendingEnquiry || !enquiryMessage.trim()} className="font-alt text-xs">
                 {sendingEnquiry ? <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Sending...</> : "Send Enquiry"}

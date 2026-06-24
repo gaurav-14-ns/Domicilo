@@ -13,10 +13,10 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['"Times New Roman"', 'Times', 'Georgia', 'serif'],
-        display: ['"Times New Roman"', 'Times', 'Georgia', 'serif'],
-        alt: ['"Times New Roman"', 'Times', 'Georgia', 'serif'],
-        num: ['"Times New Roman"', 'Times', 'Georgia', 'serif'],
+        sans: ['"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['"Space Grotesk"', '"Inter"', 'system-ui', 'sans-serif'],
+        alt: ['"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
+        num: ['"JetBrains Mono"', '"Inter"', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",

@@ -221,6 +221,14 @@ useEffect(() => {
     > | null
   >(null);
 
+  const settingsRef =
+  useRef(data.settings);
+  settingsRef.current = data.settings;
+
+  const adminOrgsRef =
+  useRef(data.adminOrgs);
+  adminOrgsRef.current = data.adminOrgs;
+
   // -------------------------------------------------------------------------
   // Periodic maintenance: auto-generate rent + overdue escalation.
   // Runs every 30 minutes and on mount, but NOT on every data fetch.
@@ -1516,7 +1524,6 @@ const removeProperty = useCallback(async (id: string) => {
 }, [
   user?.id,
   refresh,
-  data.settings.locale,
 ]);
 
   const updateTransaction =
@@ -1780,7 +1787,7 @@ const removeProperty = useCallback(async (id: string) => {
     } catch {
       toast.error("Failed to update organizations.");
     }
-  }, [data.adminOrgs, refresh]);
+  }, [refresh]);
 
   const updateSettings = useCallback(async (patch: Partial<Settings>) => {
     try {
@@ -1804,7 +1811,7 @@ const removeProperty = useCallback(async (id: string) => {
     } catch {
       toast.error("Failed to update settings.");
     }
-  }, [user?.id, data.settings]);
+  }, [user?.id]);
 
   const updateTenantProfile = useCallback(async (patch: Partial<TenantProfile>) => {
     try {

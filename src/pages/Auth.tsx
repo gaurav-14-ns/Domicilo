@@ -174,10 +174,8 @@ export default function Auth() {
     setShowRecoveryPwd,
   ] = useState(false);
 
-  const [
-    showConfirmRecoveryPwd,
-    setShowConfirmRecoveryPwd,
-  ] = useState(false);
+  const recoveredRef =
+    useRef(false);
 
 useEffect(() => {
 
@@ -192,20 +190,15 @@ useEffect(() => {
   if (
     isRecovery
   ) {
-
+    recoveredRef.current = true;
     setRecoveryMode(
       true
     );
-
     return;
   }
 
-  /*
-    Prevent redirecting during password recovery flow.
-  */
-
   if (
-    recoveryMode
+    recoveredRef.current
   ) {
     return;
   }
@@ -231,7 +224,6 @@ useEffect(() => {
   role,
   loading,
   nav,
-  recoveryMode,
 ]);
   // check admin availability
 
