@@ -307,7 +307,7 @@ useEffect(() => {
     }
 
     const gen = ++fetchGenRef.current;
-    const doFetch = async (retried = false) => {
+    const doFetch = async (retryCount = 0) => {
     if (!user) {
       if (
         mountedRef.current
@@ -327,12 +327,14 @@ useEffect(() => {
       setError(null);
     }
 
+    const controller = new AbortController();
     const fetchTimeout = setTimeout(() => {
+      controller.abort();
       if (mountedRef.current) {
-        setError("Data fetch timed out. Please try again.");
+        setError("Data fetch timed out. Please check your connection.");
         setLoading(false);
       }
-    }, 25000);
+    }, 45000);
 
     try {
       const currentRole = roleRef.current;
@@ -587,7 +589,7 @@ useEffect(() => {
       }
 
       const results =
-        await Promise.all([
+        await Promise.allSettled([
           propertiesPromise,
           tenantsPromise,
           txsPromise,
@@ -597,38 +599,52 @@ useEffect(() => {
           subPromise,
         ]);
 
-      // Detect silent auth failure (session expired, JWT invalid)
-      const authErr = results.find((r: any) => r?.error?.status === 401 || r?.error?.status === 403);
-      if (authErr) {
-        if (retried) throw new Error("Session expired");
-        const { error: refreshErr } = await supabase.auth.refreshSession();
-        if (refreshErr) throw new Error("Session expired");
-        return doFetch(true);
-      }
+      const extract = (r: PromiseSettledResult<any>) =>
+        r.status === "fulfilled" ? r.value : { data: null, error: null };
 
       const [
-        {
-          data: properties,
-        },
-        {
-          data: tenants,
-        },
-        {
-          data: txs,
-        },
-        {
-          data: settings,
-        },
-        {
-          data: profile,
-        },
-        {
-          data: orgs,
-        },
-        {
-          data: subRow,
-        },
-      ] = results;
+        propertiesRes,
+        tenantsRes,
+        txsRes,
+        settingsRes,
+        profileRes,
+        orgsRes,
+        subRes,
+      ] = results.map(extract);
+
+      // Distinct auth check on fulfilled results
+      const authErr = results
+        .filter((r): r is PromiseFulfilledResult<any> => r.status === "fulfilled")
+        .map((r) => r.value)
+        .find((r: any) => r?.error?.status === 401 || r?.error?.status === 403);
+      if (authErr) {
+        if (retryCount >= 1) throw new Error("Session expired");
+        const { error: refreshErr } = await supabase.auth.refreshSession();
+        if (refreshErr) throw new Error("Session expired");
+        return doFetch(1);
+      }
+
+      const {
+        data: properties,
+      } = propertiesRes;
+      const {
+        data: tenants,
+      } = tenantsRes;
+      const {
+        data: txs,
+      } = txsRes;
+      const {
+        data: settings,
+      } = settingsRes;
+      const {
+        data: profile,
+      } = profileRes;
+      const {
+        data: orgs,
+      } = orgsRes;
+      const {
+        data: subRow,
+      } = subRes;
 
       const txRows =
         txs ?? [];
@@ -741,6 +757,16 @@ useEffect(() => {
         error
       );
 
+      // Retry with exponential backoff (max 3 attempts)
+      if (retryCount < 3 && error?.name !== "AbortError") {
+        clearTimeout(fetchTimeout);
+        const delay = Math.min(1000 * Math.pow(2, retryCount), 8000);
+        await new Promise(r => setTimeout(r, delay));
+        if (mountedRef.current && gen === fetchGenRef.current) {
+          return doFetch(retryCount + 1);
+        }
+      }
+
       // Session expired — redirect to login
       if (error?.message === "Session expired") {
         try { localStorage.removeItem("domicilo_user"); localStorage.removeItem("domicilo_role"); } catch { /* ignore */ }
@@ -838,9 +864,10 @@ useEffect(() => {
     fetchedRef.current = true;
     lastFetchedRoleRef.current = role;
     lastFetchedUserIdRef.current = user.id;
-    reconcileRef.current = null;
-    setLoading(true);
-    fetchAll();
+    if (!reconcileRef.current) {
+      setLoading(true);
+      fetchAll();
+    }
   }, [user?.id, role, fetchAll]);
 
   // Safety timeout: show error after 15 s of loading

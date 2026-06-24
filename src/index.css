@@ -60,60 +60,60 @@
   }
 
   .dark {
-    /* HOLI COLOR EXPLOSION — deep dark canvas with vivid powder-burst accents */
-    --background: 270 35% 4%;
-    --foreground: 45 85% 90%;
+    /* BMW M PERFORMANCE — deep obsidian canvas with blue/red/white accents */
+    --background: 220 40% 3%;
+    --foreground: 0 0% 95%;
 
-    --card: 270 30% 8% / 0.65;
-    --card-foreground: 45 85% 90%;
+    --card: 220 35% 7% / 0.65;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 270 30% 9% / 0.75;
-    --popover-foreground: 45 85% 90%;
+    --popover: 220 35% 8% / 0.75;
+    --popover-foreground: 0 0% 95%;
 
-    --primary: 280 85% 55%;
-    --primary-foreground: 45 100% 50%;
-    --primary-glow: 280 85% 65%;
-    --primary-deep: 280 75% 35%;
+    --primary: 210 90% 50%;
+    --primary-foreground: 210 90% 55%;
+    --primary-glow: 210 90% 60%;
+    --primary-deep: 210 85% 30%;
 
-    --secondary: 270 25% 11%;
-    --secondary-foreground: 45 65% 85%;
+    --secondary: 220 20% 10%;
+    --secondary-foreground: 0 0% 85%;
 
-    --muted: 270 20% 7%;
-    --muted-foreground: 45 35% 60%;
+    --muted: 220 18% 6%;
+    --muted-foreground: 0 0% 55%;
 
-    --accent: 330 60% 14%;
-    --accent-foreground: 45 75% 82%;
+    --accent: 350 80% 50%;
+    --accent-foreground: 0 0% 95%;
 
-    --destructive: 0 70% 52%;
-    --destructive-foreground: 45 65% 88%;
+    --destructive: 0 75% 50%;
+    --destructive-foreground: 0 0% 95%;
 
-    --border: 280 30% 16%;
-    --input: 280 30% 16%;
-    --ring: 280 85% 55%;
+    --border: 210 25% 15%;
+    --input: 210 25% 15%;
+    --ring: 210 90% 50%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(280 85% 55%), hsl(330 75% 55%), hsl(175 70% 50%));
-    --gradient-hero: radial-gradient(ellipse 70% 45% at 25% 15%, hsl(330 80% 55% / 0.18) 0%, transparent 55%),
-                    radial-gradient(ellipse 60% 40% at 75% 25%, hsl(175 75% 50% / 0.14) 0%, transparent 50%),
-                    radial-gradient(ellipse 50% 35% at 50% 60%, hsl(42 85% 55% / 0.12) 0%, transparent 45%),
-                    radial-gradient(ellipse 40% 30% at 20% 80%, hsl(280 85% 55% / 0.1) 0%, transparent 40%),
-                    radial-gradient(ellipse 45% 35% at 80% 70%, hsl(10 80% 55% / 0.08) 0%, transparent 45%),
-                    radial-gradient(ellipse 55% 40% at 50% 40%, hsl(220 80% 55% / 0.06) 0%, transparent 50%),
-                    linear-gradient(180deg, hsl(270 35% 3%), hsl(270 30% 2%) 60%, hsl(270 35% 1%));
-    --gradient-card: linear-gradient(180deg, hsl(270 30% 9% / 0.55), hsl(270 25% 6% / 0.35));
-    --gradient-text: linear-gradient(135deg, hsl(330 80% 55%), hsl(42 85% 55%), hsl(175 75% 50%), hsl(280 85% 55%));
+    --gradient-primary: linear-gradient(135deg, hsl(210 90% 50%), hsl(210 80% 35%));
+    --gradient-hero: radial-gradient(ellipse 70% 45% at 25% 15%, hsl(210 90% 50% / 0.15) 0%, transparent 55%),
+                    radial-gradient(ellipse 60% 40% at 75% 25%, hsl(0 0% 98% / 0.08) 0%, transparent 50%),
+                    radial-gradient(ellipse 50% 35% at 50% 60%, hsl(210 90% 50% / 0.10) 0%, transparent 45%),
+                    radial-gradient(ellipse 40% 30% at 20% 80%, hsl(350 80% 50% / 0.08) 0%, transparent 40%),
+                    radial-gradient(ellipse 45% 35% at 80% 70%, hsl(0 0% 95% / 0.06) 0%, transparent 45%),
+                    radial-gradient(ellipse 55% 40% at 50% 40%, hsl(210 90% 50% / 0.05) 0%, transparent 50%),
+                    linear-gradient(180deg, hsl(220 35% 2%), hsl(220 30% 1%) 60%, hsl(220 35% 0%));
+    --gradient-card: linear-gradient(180deg, hsl(220 30% 8% / 0.55), hsl(220 25% 5% / 0.35));
+    --gradient-text: linear-gradient(135deg, hsl(210 90% 50%), hsl(0 0% 98%), hsl(350 80% 50%));
 
-    --shadow-md: 0 8px 28px -6px hsl(280 85% 55% / 0.15), 0 0 40px hsl(330 75% 55% / 0.06);
-    --shadow-lg: 0 20px 60px -12px hsl(280 85% 55% / 0.12), 0 0 60px hsl(175 70% 50% / 0.05);
-    --shadow-glow: 0 0 50px hsl(280 85% 55% / 0.15), 0 0 80px hsl(330 75% 55% / 0.08);
+    --shadow-md: 0 8px 28px -6px hsl(210 90% 50% / 0.15), 0 0 40px hsl(210 80% 40% / 0.06);
+    --shadow-lg: 0 20px 60px -12px hsl(210 90% 50% / 0.12), 0 0 60px hsl(0 0% 95% / 0.04);
+    --shadow-glow: 0 0 50px hsl(210 90% 50% / 0.15), 0 0 80px hsl(210 80% 40% / 0.08);
 
-    --sidebar-background: 270 30% 6% / 0.65;
-    --sidebar-foreground: 45 60% 82%;
-    --sidebar-primary: 280 85% 55%;
-    --sidebar-primary-foreground: 45 100% 50%;
-    --sidebar-accent: 270 25% 12% / 0.55;
-    --sidebar-accent-foreground: 45 70% 82%;
-    --sidebar-border: 280 30% 14% / 0.2;
-    --sidebar-ring: 280 85% 55%;
+    --sidebar-background: 220 30% 5% / 0.65;
+    --sidebar-foreground: 0 0% 82%;
+    --sidebar-primary: 210 90% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 25% 10% / 0.55;
+    --sidebar-accent-foreground: 0 0% 82%;
+    --sidebar-border: 210 25% 12% / 0.2;
+    --sidebar-ring: 210 90% 50%;
   }
 }
 
@@ -225,11 +225,11 @@
 
   .dark .bg-sunset {
     background:
-      radial-gradient(ellipse 140% 50% at 50% 100%, hsl(280 85% 55% / 0.14) 0%, transparent 70%),
-      radial-gradient(ellipse 100% 40% at 30% 100%, hsl(330 75% 55% / 0.1) 0%, transparent 60%),
-      radial-gradient(ellipse 80% 30% at 70% 100%, hsl(175 70% 50% / 0.08) 0%, transparent 50%),
-      radial-gradient(ellipse 60% 25% at 50% 0%, hsl(42 80% 55% / 0.06) 0%, transparent 50%),
-      linear-gradient(180deg, hsl(270 35% 4%) 0%, hsl(270 30% 2%) 60%, hsl(270 35% 1%) 100%);
+      radial-gradient(ellipse 140% 50% at 50% 100%, hsl(210 90% 50% / 0.14) 0%, transparent 70%),
+      radial-gradient(ellipse 100% 40% at 30% 100%, hsl(210 80% 40% / 0.10) 0%, transparent 60%),
+      radial-gradient(ellipse 80% 30% at 70% 100%, hsl(0 0% 95% / 0.06) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 25% at 50% 0%, hsl(350 80% 50% / 0.05) 0%, transparent 50%),
+      linear-gradient(180deg, hsl(220 35% 4%) 0%, hsl(220 30% 2%) 60%, hsl(220 35% 1%) 100%);
   }
 
   /* Indian palace silhouette skyline deco */
@@ -257,13 +257,13 @@
 
   .dark .bg-skyline::after {
     background:
-      radial-gradient(ellipse 40px 30px at 15% 100%, hsl(280 80% 40% / 0.15) 0%, transparent 100%),
-      radial-gradient(ellipse 50px 35px at 25% 100%, hsl(330 70% 40% / 0.12) 0%, transparent 100%),
-      radial-gradient(ellipse 35px 25px at 35% 100%, hsl(280 80% 40% / 0.1) 0%, transparent 100%),
-      radial-gradient(ellipse 60px 40px at 50% 100%, hsl(42 80% 40% / 0.15) 0%, transparent 100%),
-      radial-gradient(ellipse 45px 30px at 62% 100%, hsl(175 70% 35% / 0.12) 0%, transparent 100%),
-      radial-gradient(ellipse 55px 38px at 75% 100%, hsl(330 70% 40% / 0.1) 0%, transparent 100%),
-      radial-gradient(ellipse 38px 28px at 88% 100%, hsl(280 80% 40% / 0.12) 0%, transparent 100%);
+      radial-gradient(ellipse 40px 30px at 15% 100%, hsl(210 90% 40% / 0.15) 0%, transparent 100%),
+      radial-gradient(ellipse 50px 35px at 25% 100%, hsl(210 80% 35% / 0.12) 0%, transparent 100%),
+      radial-gradient(ellipse 35px 25px at 35% 100%, hsl(350 80% 40% / 0.10) 0%, transparent 100%),
+      radial-gradient(ellipse 60px 40px at 50% 100%, hsl(210 90% 50% / 0.15) 0%, transparent 100%),
+      radial-gradient(ellipse 45px 30px at 62% 100%, hsl(0 0% 95% / 0.10) 0%, transparent 100%),
+      radial-gradient(ellipse 55px 38px at 75% 100%, hsl(350 80% 40% / 0.10) 0%, transparent 100%),
+      radial-gradient(ellipse 38px 28px at 88% 100%, hsl(210 90% 40% / 0.12) 0%, transparent 100%);
   }
 
   /* Liquid glass — Apple-inspired frosted material */
@@ -275,9 +275,9 @@
   }
 
   .dark .glass-premium {
-    background: hsl(270 30% 8% / 0.35);
-    border: 1px solid hsl(280 85% 55% / 0.08);
-    box-shadow: 0 0 40px hsl(280 85% 55% / 0.06);
+    background: hsl(220 30% 8% / 0.35);
+    border: 1px solid hsl(210 90% 50% / 0.08);
+    box-shadow: 0 0 40px hsl(210 90% 50% / 0.06);
   }
 
   /* Gold shimmer text */
@@ -291,7 +291,7 @@
   }
 
   .dark .text-gold-shimmer {
-    background: linear-gradient(135deg, hsl(280 85% 60%), hsl(330 75% 60%), hsl(42 80% 58%), hsl(330 75% 60%), hsl(280 85% 60%));
+    background: linear-gradient(135deg, hsl(210 90% 60%), hsl(0 0% 95%), hsl(210 90% 60%));
     background-size: 300% 100%;
     -webkit-background-clip: text;
     background-clip: text;
@@ -306,7 +306,7 @@
   }
 
   .dark .divider-royal {
-    background: linear-gradient(90deg, transparent, hsl(280 85% 55% / 0.4), hsl(330 75% 55% / 0.6), hsl(42 80% 55% / 0.4), transparent);
+    background: linear-gradient(90deg, transparent, hsl(210 90% 50% / 0.4), hsl(0 0% 95% / 0.5), hsl(350 80% 50% / 0.4), transparent);
   }
 
   /* Card hover premium effect */
@@ -328,7 +328,7 @@
   }
   .dark .btn-royal {
     @apply bg-primary text-primary-foreground;
-    box-shadow: 0 4px 24px hsl(280 85% 55% / 0.3);
+    box-shadow: 0 4px 24px hsl(210 90% 50% / 0.3);
   }
 
   /* Stat card with gold accent */
@@ -575,8 +575,8 @@
     text-shadow: 0 0 40px hsl(240 55% 40% / 0.15), 0 2px 4px hsl(240 60% 10% / 0.08);
   }
   .dark .text-royal-glow {
-    color: hsl(280 85% 70%);
-    text-shadow: 0 0 40px hsl(280 85% 55% / 0.2), 0 0 80px hsl(330 75% 55% / 0.1), 0 2px 4px hsl(0 0% 0% / 0.3);
+    color: hsl(210 90% 70%);
+    text-shadow: 0 0 40px hsl(210 90% 50% / 0.2), 0 0 80px hsl(210 80% 40% / 0.1), 0 2px 4px hsl(0 0% 0% / 0.3);
   }
 
   /* Light-on-dark text with glow */
@@ -585,8 +585,8 @@
     text-shadow: 0 0 30px hsl(260 50% 50% / 0.2);
   }
   .dark .text-light-glow {
-    color: hsl(45 70% 92%);
-    text-shadow: 0 0 30px hsl(280 85% 55% / 0.25), 0 0 60px hsl(330 75% 55% / 0.1), 0 2px 8px hsl(0 0% 0% / 0.4);
+    color: hsl(0 0% 92%);
+    text-shadow: 0 0 30px hsl(210 90% 50% / 0.25), 0 0 60px hsl(210 80% 40% / 0.1), 0 2px 8px hsl(0 0% 0% / 0.4);
   }
 
   /* Primary text with extra pop on colored backgrounds */
@@ -637,7 +637,7 @@
     animation: shimmer 5s ease-in-out infinite;
   }
   .dark .text-premium-shimmer {
-    background: linear-gradient(135deg, hsl(42 80% 55%) 0%, hsl(175 70% 50%) 25%, hsl(270 70% 60%) 50%, hsl(340 75% 60%) 75%, hsl(42 80% 55%) 100%);
+    background: linear-gradient(135deg, hsl(210 90% 50%) 0%, hsl(0 0% 95%) 30%, hsl(350 80% 50%) 60%, hsl(210 90% 50%) 100%);
     background-size: 300% 100%;
     -webkit-background-clip: text;
     background-clip: text;
@@ -649,9 +649,9 @@
   background: linear-gradient(
     105deg,
     transparent 40%,
-    hsl(280 85% 55% / 0.1) 45%,
-    hsl(330 75% 55% / 0.18) 50%,
-    hsl(280 85% 55% / 0.1) 55%,
+    hsl(210 90% 50% / 0.1) 45%,
+    hsl(0 0% 95% / 0.15) 50%,
+    hsl(210 90% 50% / 0.1) 55%,
     transparent 60%
   );
 }
@@ -668,8 +668,8 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: hsl(280 85% 55%);
-  box-shadow: 0 0 10px hsl(280 85% 55% / 0.6);
+  background: hsl(210 90% 50%);
+  box-shadow: 0 0 10px hsl(210 90% 50% / 0.6);
   animation: sparkle 3s ease-in-out infinite;
   pointer-events: none;
 }
@@ -720,9 +720,9 @@
   }
 
   .dark .glass-card-premium {
-    background: hsl(270 30% 8% / 0.3);
-    border: 1px solid hsl(280 85% 55% / 0.08);
-    box-shadow: 0 4px 24px hsl(280 85% 55% / 0.08);
+    background: hsl(220 30% 8% / 0.3);
+    border: 1px solid hsl(210 90% 50% / 0.08);
+    box-shadow: 0 4px 24px hsl(210 90% 50% / 0.08);
   }
 
 /* Premium scrollbar */
@@ -909,8 +909,8 @@
 }
 
 .dark .bg-liquid-glass {
-  background: hsl(270 30% 8% / 0.3);
-  border: 1px solid hsl(280 85% 55% / 0.06);
+  background: hsl(220 30% 8% / 0.3);
+  border: 1px solid hsl(210 90% 50% / 0.06);
 }
 
 /* Apple-style separator — ultra thin */
@@ -937,18 +937,18 @@
   overflow: hidden;
 }
 
-/* Nebula glow - Holi powder clouds that drift */
+/* Nebula glow - BMW M-style blue/white/red drifting */
 .starfield-bg::before {
   content: '';
   position: absolute;
   inset: -50%;
   background:
-    radial-gradient(ellipse 45% 32% at 20% 20%, hsl(330 80% 55% / 0.18) 0%, transparent 55%),
-    radial-gradient(ellipse 40% 28% at 75% 30%, hsl(175 75% 50% / 0.15) 0%, transparent 50%),
-    radial-gradient(ellipse 35% 25% at 50% 70%, hsl(42 85% 55% / 0.13) 0%, transparent 48%),
-    radial-gradient(ellipse 30% 22% at 15% 75%, hsl(280 85% 55% / 0.11) 0%, transparent 45%),
-    radial-gradient(ellipse 28% 20% at 85% 65%, hsl(10 80% 55% / 0.09) 0%, transparent 42%),
-    radial-gradient(ellipse 25% 18% at 40% 40%, hsl(220 80% 55% / 0.07) 0%, transparent 40%);
+    radial-gradient(ellipse 45% 32% at 20% 20%, hsl(210 90% 50% / 0.18) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 28% at 75% 30%, hsl(210 80% 40% / 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse 35% 25% at 50% 70%, hsl(0 0% 95% / 0.10) 0%, transparent 48%),
+    radial-gradient(ellipse 30% 22% at 15% 75%, hsl(350 80% 50% / 0.11) 0%, transparent 45%),
+    radial-gradient(ellipse 28% 20% at 85% 65%, hsl(210 90% 50% / 0.09) 0%, transparent 42%),
+    radial-gradient(ellipse 25% 18% at 40% 40%, hsl(350 80% 50% / 0.07) 0%, transparent 40%);
   animation: nebula-drift 30s ease-in-out infinite alternate;
 }
 
