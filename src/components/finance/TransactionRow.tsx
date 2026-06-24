@@ -91,7 +91,7 @@ export function TransactionRow({
               text-base font-semibold
               ${
                 t.amount < 0
-                  ? "text-blue-600"
+                  ? "text-primary"
                   : ""
               }
             `}

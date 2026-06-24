@@ -24,19 +24,19 @@ const slides = [
     icon: Wallet,
     title: "Rent collection on autopilot",
     body: "Auto-generated rent rows, one-tap Pay Now for tenants, instant receipts in any currency.",
-    accent: "from-emerald-500/30 to-emerald-500/5",
+    accent: "from-primary/30 to-primary/5",
   },
   {
     icon: BarChart3,
     title: "Reports that mean something",
     body: "Live revenue trends, occupancy by property, pending dues — straight from your data.",
-    accent: "from-purple-500/30 to-purple-500/5",
+    accent: "from-accent/30 to-accent/5",
   },
   {
     icon: ShieldCheck,
     title: "Owner · Tenant · Admin",
     body: "Strict role-based access, audit logs, secure auth. Built like the SaaS you want to run.",
-    accent: "from-amber-500/30 to-amber-500/5",
+    accent: "from-primary/30 to-primary/5",
   },
 ];
 

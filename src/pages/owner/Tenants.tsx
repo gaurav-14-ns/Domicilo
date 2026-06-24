@@ -759,10 +759,10 @@ const {
       ? "bg-primary/15 text-primary"
       : s ===
         "paused"
-      ? "bg-yellow-500/15 text-yellow-600 dark:text-yellow-400"
+      ? "bg-accent/15 text-accent"
       : s ===
         "moved_out"
-      ? "bg-blue-500/15 text-blue-600 dark:text-blue-400"
+      ? "bg-primary/15 text-primary"
       : "bg-muted text-muted-foreground";
 
   return (

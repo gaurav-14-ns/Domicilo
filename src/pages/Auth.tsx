@@ -567,7 +567,7 @@ useEffect(() => {
     <main className="min-h-screen grid place-items-center bg-sunset bg-skyline p-4 relative overflow-hidden">
       <div className="absolute inset-0 pattern-jaali opacity-30" aria-hidden />
       <div className="absolute top-1/4 left-1/4 h-72 w-72 bg-primary/10 blur-[150px] rounded-full animate-pulse-glow" aria-hidden />
-      <div className="absolute bottom-1/4 right-1/4 h-48 w-48 bg-amber-500/10 blur-[120px] rounded-full animate-pulse-glow" aria-hidden style={{ animationDelay: "1s" }} />
+      <div className="absolute bottom-1/4 right-1/4 h-48 w-48 bg-primary/10 blur-[120px] rounded-full animate-pulse-glow" aria-hidden style={{ animationDelay: "1s" }} />
 
       <div className="w-full max-w-md relative">
 

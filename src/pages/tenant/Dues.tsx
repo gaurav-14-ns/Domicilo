@@ -321,7 +321,7 @@ const typeTotal = (txs: typeof tenantTransactions) =>
         Pending
       </div>
 
-      <Receipt className="h-4 w-4 text-yellow-600" />
+      <Receipt className="h-4 w-4 text-accent" />
     </div>
 
     <div className="text-2xl font-bold font-display mt-3">
@@ -339,7 +339,7 @@ const typeTotal = (txs: typeof tenantTransactions) =>
         Overdue
       </div>
 
-      <AlertTriangle className="h-4 w-4 text-red-600" />
+      <AlertTriangle className="h-4 w-4 text-destructive" />
     </div>
 
     <div className="text-2xl font-bold font-display mt-3">
@@ -357,7 +357,7 @@ const typeTotal = (txs: typeof tenantTransactions) =>
         Paid
       </div>
 
-      <CheckCircle2 className="h-4 w-4 text-green-600" />
+      <CheckCircle2 className="h-4 w-4 text-primary" />
     </div>
 
     <div className="text-2xl font-bold font-display mt-3">
@@ -397,7 +397,7 @@ const typeTotal = (txs: typeof tenantTransactions) =>
       (p) =>
         p.status === "overdue"
     ) && (
-      <div className="mt-2 text-red-600 font-medium">
+      <div className="mt-2 text-destructive font-medium">
         Some dues are overdue and require immediate attention.
       </div>
     )
@@ -489,9 +489,9 @@ const typeTotal = (txs: typeof tenantTransactions) =>
 
         <div className="flex items-center gap-2">
 
-          <AlertTriangle className="h-4 w-4 text-red-600" />
+          <AlertTriangle className="h-4 w-4 text-destructive" />
 
-          <div className="font-medium text-red-600">
+          <div className="font-medium text-destructive">
             Overdue
           </div>
 
@@ -534,13 +534,13 @@ const typeTotal = (txs: typeof tenantTransactions) =>
 
     <div>
 
-      <div className="px-4 py-3 bg-yellow-500/5 border-y border-border">
+      <div className="px-4 py-3 bg-accent/5 border-y border-border">
 
         <div className="flex items-center gap-2">
 
-          <Receipt className="h-4 w-4 text-yellow-600" />
+          <Receipt className="h-4 w-4 text-accent" />
 
-          <div className="font-medium text-yellow-600">
+          <div className="font-medium text-accent">
             Pending
           </div>
 
@@ -584,15 +584,15 @@ const typeTotal = (txs: typeof tenantTransactions) =>
 
     <div>
 
-      <div className="px-4 py-3 bg-green-500/5 border-y border-border">
+      <div className="px-4 py-3 bg-primary/5 border-y border-border">
 
         <div className="flex items-center gap-2">
 
-          <CheckCircle2 className="h-4 w-4 text-green-600" />
+          <CheckCircle2 className="h-4 w-4 text-primary" />
 
             <div className="flex items-center justify-between w-full">
 
-  <div className="font-medium text-green-600">
+  <div className="font-medium text-primary">
     Completed
   </div>
 

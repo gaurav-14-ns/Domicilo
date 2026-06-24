@@ -239,7 +239,7 @@ export default function Settings() {
     s === "active"
       ? "bg-primary/15 text-primary"
       : s === "trial"
-      ? "bg-yellow-500/15 text-yellow-600 dark:text-yellow-400"
+      ? "bg-accent/15 text-accent"
       : "bg-destructive/15 text-destructive";
 
   if (error) return <ErrorState title="Failed to load settings" description={error} onRetry={refreshData} />;
@@ -280,7 +280,7 @@ export default function Settings() {
         <div
           className={`rounded-lg border px-4 py-3 text-sm flex items-center justify-between ${
             planNotice.type === "success"
-              ? "border-green-500/30 bg-green-500/10 text-green-400"
+              ? "border-primary/30 bg-primary/10 text-primary"
               : "border-red-500/30 bg-red-500/10 text-red-400"
           }`}
         >

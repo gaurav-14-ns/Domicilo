@@ -42,7 +42,7 @@ const DashboardMock = () => (
             {[["Sara M.", "+₹1,200"], ["Apt 4B", "+₹950"], ["John D.", "−₹50"], ["Tower A", "+₹2,100"]].map(([n, a]) => (
               <div key={n} className="flex items-center justify-between text-xs py-0.5">
                 <span className="text-muted-foreground font-alt">{n}</span>
-                <span className={`font-medium ${a.startsWith("+") ? "text-green-600 dark:text-green-400" : "text-destructive"}`}>{a}</span>
+                <span className={`font-medium ${a.startsWith("+") ? "text-primary dark:text-primary" : "text-destructive"}`}>{a}</span>
               </div>
             ))}
           </div>
@@ -294,7 +294,7 @@ export const Hero = () => {
       <div className="absolute top-32 left-[45%] sparkle-dot opacity-50" style={{ animationDelay: "3.2s" }} />
       <div className="absolute top-1/4 left-1/3 h-96 w-96 bg-primary/20 blur-[150px] rounded-full animate-pulse-glow" aria-hidden />
       <div className="absolute bottom-0 right-1/4 h-64 w-64 bg-primary/10 blur-[100px] rounded-full" aria-hidden />
-      <div className="absolute top-1/3 right-1/4 h-48 w-48 bg-amber-500/10 blur-[120px] rounded-full animate-pulse-glow" aria-hidden style={{ animationDelay: "1s" }} />
+      <div className="absolute top-1/3 right-1/4 h-48 w-48 bg-primary/10 blur-[120px] rounded-full animate-pulse-glow" aria-hidden style={{ animationDelay: "1s" }} />
       <div className="container relative">
         <div className="mx-auto max-w-4xl text-center animate-fade-up">
           <div className="mb-8 flex items-center justify-center gap-3">
@@ -341,8 +341,8 @@ export const Hero = () => {
             <div className="flex items-center gap-2 px-4 py-3 border-b border-border/40 bg-muted/30">
               <div className="flex gap-1.5">
                 <div className="h-3 w-3 rounded-full bg-destructive/60" />
-                <div className="h-3 w-3 rounded-full bg-yellow-500/60" />
-                <div className="h-3 w-3 rounded-full bg-green-500/60" />
+                <div className="h-3 w-3 rounded-full bg-primary/60" />
+                <div className="h-3 w-3 rounded-full bg-accent/60" />
               </div>
               <div className="ml-2 text-xs font-alt text-muted-foreground tracking-wide">domicilo.app / dashboard</div>
             </div>

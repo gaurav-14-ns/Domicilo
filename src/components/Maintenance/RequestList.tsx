@@ -10,17 +10,17 @@ type Props = {
 };
 
 const priorityColor: Record<string, string> = {
-  low: "bg-gray-100 text-gray-700",
-  medium: "bg-blue-100 text-blue-700",
-  high: "bg-amber-100 text-amber-700",
-  urgent: "bg-red-100 text-red-700",
+  low: "bg-muted/50 text-muted-foreground",
+  medium: "bg-muted text-muted-foreground",
+  high: "bg-accent/10 text-accent",
+  urgent: "bg-accent/10 text-accent",
 };
 
 const statusColor: Record<string, string> = {
-  open: "bg-yellow-100 text-yellow-700",
-  in_progress: "bg-blue-100 text-blue-700",
-  resolved: "bg-green-100 text-green-700",
-  closed: "bg-gray-100 text-gray-500",
+  open: "bg-muted text-muted-foreground",
+  in_progress: "bg-primary/10 text-primary",
+  resolved: "bg-primary/10 text-primary",
+  closed: "bg-muted text-muted-foreground",
 };
 
 const statusLabel: Record<string, string> = {

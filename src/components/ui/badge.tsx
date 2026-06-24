@@ -33,16 +33,16 @@ export function transactionStatusClass(
   switch (status) {
 
     case "completed":
-      return "border-green-500/30 bg-green-500/10 text-green-600";
+      return "border-transparent bg-primary text-primary-foreground";
 
     case "pending":
-      return "border-yellow-500/30 bg-yellow-500/10 text-yellow-600";
+      return "border-transparent bg-accent text-accent-foreground";
 
     case "overdue":
-      return "border-red-500/30 bg-red-500/10 text-red-600";
+      return "border-transparent bg-destructive text-destructive-foreground";
 
     case "refund":
-      return "border-blue-500/30 bg-blue-500/10 text-blue-600";
+      return "border-primary/30 bg-primary/10 text-primary";
 
     case "paused":
       return "border-muted bg-muted text-muted-foreground";

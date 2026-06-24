@@ -190,15 +190,15 @@ export default function BrowseProperties() {
       {/* Header */}
       <div className="bg-gradient-primary py-16 md:py-24 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 25% 25%, white 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
-        <div className="absolute top-1/3 left-1/4 h-48 w-48 bg-amber-500/20 blur-[120px] rounded-full animate-pulse-glow" aria-hidden />
-        <div className="absolute bottom-0 right-1/4 h-32 w-32 bg-primary/20 blur-[100px] rounded-full animate-pulse-glow" aria-hidden style={{ animationDelay: "1s" }} />
+        <div className="absolute top-1/3 left-1/4 h-48 w-48 bg-primary/20 blur-[120px] rounded-full animate-pulse-glow" aria-hidden />
+        <div className="absolute bottom-0 right-1/4 h-32 w-32 bg-accent/15 blur-[100px] rounded-full animate-pulse-glow" aria-hidden style={{ animationDelay: "1s" }} />
         <div className="container relative">
           <AnimatedSection className="text-center">
-            <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-bmw-blue/90 mb-3 font-display [text-shadow:0_0_20px_hsl(210_90%_50%/0.4)]">
-              <Crown className="h-3.5 w-3.5 text-bmw-blue" />
+            <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-primary-foreground/90 mb-3 font-display [text-shadow:0_0_20px_hsl(210_90%_50%/0.4)]">
+              <Crown className="h-3.5 w-3.5 text-primary-foreground" />
               Find Your Home
             </div>
-            <h1 className="font-display text-4xl md:text-6xl font-bold text-balance text-bmw-blue [text-shadow:0_0_30px_hsl(210_90%_50%/0.5),0_0_60px_hsl(210_90%_50%/0.3)]">
+            <h1 className="font-display text-4xl md:text-6xl font-bold text-balance text-primary-foreground [text-shadow:0_0_30px_hsl(210_90%_50%/0.5),0_0_60px_hsl(210_90%_50%/0.3)]">
               Browse Properties
             </h1>
             <p className="mt-4 text-primary-foreground/80 text-lg max-w-2xl mx-auto font-alt">
@@ -516,7 +516,7 @@ export default function BrowseProperties() {
                     <span className="font-alt">{selectedListing.propertyType} · {selectedListing.units} unit{selectedListing.units !== 1 ? "s" : ""}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
-                    <CheckCircle2 className={`h-4 w-4 shrink-0 ${selectedListing.available ? "text-green-600" : "text-muted-foreground"}`} />
+                    <CheckCircle2 className={`h-4 w-4 shrink-0 ${selectedListing.available ? "text-primary" : "text-muted-foreground"}`} />
                     <span className="font-alt">{selectedListing.available ? "Available for rent" : "Currently occupied"}</span>
                   </div>
                 </div>
