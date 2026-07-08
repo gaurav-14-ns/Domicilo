@@ -4,8 +4,10 @@
 
 @layer base {
   :root {
-    /* GOLD PREMIUM — rich gold, warm white, amber accents */
-    --background: 40 25% 98%;
+    /* BLUE/RED/WHITE — clean with gold glow on interactive elements */
+    --gold: 45 85% 52%;
+
+    --background: 0 0% 98%;
     --foreground: 0 0% 12%;
 
     --card: 0 0% 100%;
@@ -14,106 +16,106 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 12%;
 
-    --primary: 42 85% 52%;
+    --primary: 210 90% 50%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 42 85% 48%;
-    --primary-deep: 42 80% 38%;
+    --primary-glow: 210 55% 40%;
+    --primary-deep: 210 85% 30%;
 
-    --secondary: 40 20% 92%;
-    --secondary-foreground: 42 80% 38%;
+    --secondary: 0 0% 92%;
+    --secondary-foreground: 210 90% 30%;
 
-    --muted: 40 15% 94%;
+    --muted: 0 0% 94%;
     --muted-foreground: 0 0% 45%;
 
-    --accent: 35 85% 50%;
+    --accent: 350 80% 50%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 75% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 42 25% 85%;
-    --input: 42 25% 85%;
-    --ring: 42 85% 52%;
+    --border: 210 20% 88%;
+    --input: 210 20% 88%;
+    --ring: 45 85% 52%;
 
     --radius: 0.75rem;
 
-    --gradient-primary: linear-gradient(135deg, hsl(42 85% 52%), hsl(42 80% 42%));
-    --gradient-hero: linear-gradient(180deg, hsl(42 60% 96%), hsl(42 50% 92%) 60%, hsl(40 40% 90%));
-    --gradient-card: linear-gradient(135deg, hsl(0 0% 100%), hsl(42 35% 96%));
-    --gradient-text: linear-gradient(135deg, hsl(42 85% 52%), hsl(35 85% 48%));
+    --gradient-primary: linear-gradient(135deg, hsl(210 90% 50%), hsl(210 80% 35%));
+    --gradient-hero: linear-gradient(180deg, hsl(210 60% 96%), hsl(210 50% 92%) 60%, hsl(210 40% 90%));
+    --gradient-card: linear-gradient(135deg, hsl(0 0% 100%), hsl(210 40% 96%));
+    --gradient-text: linear-gradient(135deg, hsl(210 90% 50%), hsl(350 80% 50%));
 
     --shadow-sm: 0 1px 2px hsl(0 0% 0% / 0.04);
-    --shadow-md: 0 8px 24px -6px hsl(42 60% 45% / 0.10);
-    --shadow-lg: 0 20px 60px -12px hsl(42 60% 45% / 0.15);
-    --shadow-glow: 0 0 40px hsl(42 60% 45% / 0.1);
+    --shadow-md: 0 8px 24px -6px hsl(210 90% 50% / 0.10);
+    --shadow-lg: 0 20px 60px -12px hsl(210 90% 50% / 0.15);
+    --shadow-glow: 0 0 40px hsl(210 90% 50% / 0.1);
 
     --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 0 0% 15%;
-    --sidebar-primary: 42 85% 52%;
+    --sidebar-primary: 210 90% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 40 20% 92%;
-    --sidebar-accent-foreground: 42 80% 38%;
-    --sidebar-border: 42 25% 85%;
-    --sidebar-ring: 42 85% 52%;
+    --sidebar-accent: 0 0% 92%;
+    --sidebar-accent-foreground: 210 90% 30%;
+    --sidebar-border: 210 20% 88%;
+    --sidebar-ring: 45 85% 52%;
   }
 
   .dark {
-    /* GOLD PREMIUM DARK — deep warm canvas with brilliant gold */
-    --background: 40 20% 4%;
-    --foreground: 40 25% 88%;
+    /* DARK — deep obsidian with blue/red accents, white text, gold glow */
+    --background: 220 40% 3%;
+    --foreground: 0 0% 95%;
 
-    --card: 40 20% 8% / 0.65;
-    --card-foreground: 40 25% 88%;
+    --card: 220 35% 7% / 0.65;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 40 20% 9% / 0.75;
-    --popover-foreground: 40 25% 88%;
+    --popover: 220 35% 8% / 0.75;
+    --popover-foreground: 0 0% 95%;
 
-    --primary: 42 90% 58%;
+    --primary: 210 90% 50%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 42 90% 62%;
-    --primary-deep: 42 80% 40%;
+    --primary-glow: 210 90% 60%;
+    --primary-deep: 210 85% 30%;
 
-    --secondary: 40 20% 12%;
-    --secondary-foreground: 40 25% 88%;
+    --secondary: 220 20% 10%;
+    --secondary-foreground: 0 0% 95%;
 
-    --muted: 40 15% 8%;
-    --muted-foreground: 40 12% 55%;
+    --muted: 220 18% 6%;
+    --muted-foreground: 0 0% 55%;
 
-    --accent: 35 80% 55%;
+    --accent: 350 80% 50%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 75% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 42 25% 16%;
-    --input: 42 25% 16%;
-    --ring: 42 90% 58%;
+    --border: 210 25% 15%;
+    --input: 210 25% 15%;
+    --ring: 45 85% 52%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(42 90% 55%), hsl(42 80% 45%));
-    --gradient-hero: radial-gradient(ellipse 70% 45% at 25% 15%, hsl(42 80% 50% / 0.15) 0%, transparent 55%),
+    --gradient-primary: linear-gradient(135deg, hsl(210 90% 50%), hsl(210 80% 35%));
+    --gradient-hero: radial-gradient(ellipse 70% 45% at 25% 15%, hsl(210 90% 50% / 0.15) 0%, transparent 55%),
                     radial-gradient(ellipse 60% 40% at 75% 25%, hsl(0 0% 98% / 0.08) 0%, transparent 50%),
-                    radial-gradient(ellipse 50% 35% at 50% 60%, hsl(42 80% 50% / 0.10) 0%, transparent 45%),
-                    radial-gradient(ellipse 40% 30% at 20% 80%, hsl(35 80% 45% / 0.08) 0%, transparent 40%),
+                    radial-gradient(ellipse 50% 35% at 50% 60%, hsl(210 90% 50% / 0.10) 0%, transparent 45%),
+                    radial-gradient(ellipse 40% 30% at 20% 80%, hsl(350 80% 50% / 0.08) 0%, transparent 40%),
                     radial-gradient(ellipse 45% 35% at 80% 70%, hsl(0 0% 95% / 0.06) 0%, transparent 45%),
-                    radial-gradient(ellipse 55% 40% at 50% 40%, hsl(42 80% 50% / 0.05) 0%, transparent 50%),
-                    linear-gradient(180deg, hsl(40 20% 3%), hsl(40 18% 2%) 60%, hsl(40 20% 1%));
-    --gradient-card: linear-gradient(180deg, hsl(40 20% 9% / 0.55), hsl(40 15% 6% / 0.35));
-    --gradient-text: linear-gradient(135deg, hsl(42 85% 58%), hsl(0 0% 98%), hsl(35 85% 52%));
+                    radial-gradient(ellipse 55% 40% at 50% 40%, hsl(210 90% 50% / 0.05) 0%, transparent 50%),
+                    linear-gradient(180deg, hsl(220 35% 2%), hsl(220 30% 1%) 60%, hsl(220 35% 0%));
+    --gradient-card: linear-gradient(180deg, hsl(220 30% 8% / 0.55), hsl(220 25% 5% / 0.35));
+    --gradient-text: linear-gradient(135deg, hsl(210 90% 50%), hsl(0 0% 98%), hsl(350 80% 50%));
 
-    --shadow-md: 0 8px 28px -6px hsl(42 60% 45% / 0.15), 0 0 40px hsl(42 70% 40% / 0.06);
-    --shadow-lg: 0 20px 60px -12px hsl(42 60% 45% / 0.12), 0 0 60px hsl(0 0% 95% / 0.04);
-    --shadow-glow: 0 0 50px hsl(42 60% 45% / 0.15), 0 0 80px hsl(42 70% 40% / 0.08);
+    --shadow-md: 0 8px 28px -6px hsl(210 90% 50% / 0.15), 0 0 40px hsl(210 80% 40% / 0.06);
+    --shadow-lg: 0 20px 60px -12px hsl(210 90% 50% / 0.12), 0 0 60px hsl(0 0% 95% / 0.04);
+    --shadow-glow: 0 0 50px hsl(210 90% 50% / 0.15), 0 0 80px hsl(210 80% 40% / 0.08);
 
-    --sidebar-background: 40 18% 6% / 0.65;
-    --sidebar-foreground: 40 20% 82%;
-    --sidebar-primary: 42 85% 55%;
+    --sidebar-background: 220 30% 5% / 0.65;
+    --sidebar-foreground: 0 0% 82%;
+    --sidebar-primary: 210 90% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 40 18% 12% / 0.55;
-    --sidebar-accent-foreground: 40 20% 82%;
-    --sidebar-border: 42 20% 14% / 0.2;
-    --sidebar-ring: 42 85% 55%;
+    --sidebar-accent: 220 25% 10% / 0.55;
+    --sidebar-accent-foreground: 0 0% 82%;
+    --sidebar-border: 210 25% 12% / 0.2;
+    --sidebar-ring: 45 85% 52%;
   }
 }
 
@@ -140,7 +142,6 @@
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-display tracking-tight;
-    color: hsl(var(--primary));
   }
 
   h1 {
@@ -153,18 +154,6 @@
 
   ::selection {
     @apply bg-primary/30 text-primary-foreground;
-    text-shadow: 0 0 12px hsl(var(--primary) / 0.4);
-  }
-
-  /* Strong/em gold tint */
-  strong, b {
-    color: hsl(var(--primary));
-  }
-
-  /* Labels and small headings */
-  label, .label {
-    color: hsl(var(--primary));
-    font-weight: 500;
   }
 }
 
@@ -221,28 +210,52 @@
   }
 
   .text-gold {
-    color: hsl(42 85% 52%);
+    color: hsl(45 85% 52%);
   }
   .dark .text-gold {
-    color: hsl(42 90% 60%);
+    color: hsl(45 85% 58%);
+  }
+
+  /* Gold glow for buttons and interactive elements */
+  .btn-gold-glow {
+    position: relative;
+    transition: all 0.3s var(--transition-smooth);
+  }
+  .btn-gold-glow:hover {
+    box-shadow: 0 0 24px hsl(45 85% 52% / 0.35), 0 0 48px hsl(45 80% 45% / 0.15);
+    transform: translateY(-1px);
+  }
+  .btn-gold-glow:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(45 85% 52% / 0.5), 0 0 24px hsl(45 85% 52% / 0.3);
+  }
+
+  .dark .btn-gold-glow:hover {
+    box-shadow: 0 0 30px hsl(45 85% 52% / 0.4), 0 0 60px hsl(45 80% 45% / 0.2);
+  }
+
+  /* Gold ring on active/focused elements */
+  .ring-gold:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(45 85% 52% / 0.6), 0 0 30px hsl(45 85% 52% / 0.25);
   }
 
   .bg-sunset {
     position: relative;
     background:
-      radial-gradient(ellipse 140% 50% at 50% 100%, hsl(42 80% 50% / 0.15) 0%, transparent 70%),
-      radial-gradient(ellipse 100% 40% at 30% 100%, hsl(42 85% 55% / 0.1) 0%, transparent 60%),
-      radial-gradient(ellipse 80% 30% at 70% 100%, hsl(35 85% 48% / 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse 140% 50% at 50% 100%, hsl(30 80% 55% / 0.15) 0%, transparent 70%),
+      radial-gradient(ellipse 100% 40% at 30% 100%, hsl(40 90% 60% / 0.1) 0%, transparent 60%),
+      radial-gradient(ellipse 80% 30% at 70% 100%, hsl(20 85% 50% / 0.08) 0%, transparent 50%),
       var(--gradient-hero);
   }
 
   .dark .bg-sunset {
     background:
-      radial-gradient(ellipse 140% 50% at 50% 100%, hsl(42 80% 50% / 0.14) 0%, transparent 70%),
-      radial-gradient(ellipse 100% 40% at 30% 100%, hsl(42 75% 45% / 0.10) 0%, transparent 60%),
-      radial-gradient(ellipse 80% 30% at 70% 100%, hsl(35 80% 45% / 0.08) 0%, transparent 50%),
-      radial-gradient(ellipse 60% 25% at 50% 0%, hsl(35 80% 45% / 0.05) 0%, transparent 50%),
-      linear-gradient(180deg, hsl(40 20% 4%) 0%, hsl(40 18% 2%) 60%, hsl(40 20% 1%) 100%);
+      radial-gradient(ellipse 140% 50% at 50% 100%, hsl(210 90% 50% / 0.14) 0%, transparent 70%),
+      radial-gradient(ellipse 100% 40% at 30% 100%, hsl(210 80% 40% / 0.10) 0%, transparent 60%),
+      radial-gradient(ellipse 80% 30% at 70% 100%, hsl(0 0% 95% / 0.06) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 25% at 50% 0%, hsl(350 80% 50% / 0.05) 0%, transparent 50%),
+      linear-gradient(180deg, hsl(220 35% 4%) 0%, hsl(220 30% 2%) 60%, hsl(220 35% 1%) 100%);
   }
 
   /* Indian palace silhouette skyline deco */
@@ -293,9 +306,9 @@
     box-shadow: 0 0 40px hsl(42 85% 52% / 0.06);
   }
 
-  /* Gold shimmer text */
+  /* Blue/red/white shimmer text */
   .text-gold-shimmer {
-    background: linear-gradient(135deg, hsl(42 85% 52%), hsl(42 90% 65%), hsl(35 85% 50%), hsl(42 85% 52%));
+    background: linear-gradient(135deg, hsl(210 90% 50%), hsl(0 0% 100%), hsl(350 80% 50%), hsl(210 90% 50%));
     background-size: 400% 100%;
     -webkit-background-clip: text;
     background-clip: text;
@@ -304,7 +317,7 @@
   }
 
   .dark .text-gold-shimmer {
-    background: linear-gradient(135deg, hsl(42 85% 55%), hsl(42 90% 70%), hsl(35 85% 55%), hsl(42 85% 55%));
+    background: linear-gradient(135deg, hsl(210 90% 50%), hsl(0 0% 100%), hsl(350 80% 50%), hsl(210 90% 50%));
     background-size: 400% 100%;
     -webkit-background-clip: text;
     background-clip: text;
@@ -312,14 +325,14 @@
     animation: shimmer 4s ease-in-out infinite;
   }
 
-  /* Royal divider */
+  /* Royal divider with gold accents */
   .divider-royal {
     height: 2px;
-    background: linear-gradient(90deg, transparent, hsl(42 85% 52% / 0.4), hsl(42 85% 52% / 0.6), hsl(42 85% 52% / 0.4), transparent);
+    background: linear-gradient(90deg, transparent, hsl(45 85% 52% / 0.4), hsl(45 85% 52% / 0.6), hsl(45 85% 52% / 0.4), transparent);
   }
 
   .dark .divider-royal {
-    background: linear-gradient(90deg, transparent, hsl(42 80% 50% / 0.4), hsl(0 0% 95% / 0.5), hsl(35 80% 50% / 0.4), transparent);
+    background: linear-gradient(90deg, transparent, hsl(45 85% 52% / 0.4), hsl(0 0% 95% / 0.5), hsl(45 85% 52% / 0.4), transparent);
   }
 
   /* Card hover premium effect */
@@ -950,22 +963,22 @@
   overflow: hidden;
 }
 
-/* Nebula glow - golden powder clouds that drift */
+/* Nebula glow — blue/red clouds that drift */
 .starfield-bg::before {
   content: '';
   position: absolute;
   inset: -50%;
   background:
-    radial-gradient(ellipse 45% 32% at 20% 20%, hsl(42 85% 52% / 0.18) 0%, transparent 55%),
-    radial-gradient(ellipse 40% 28% at 75% 30%, hsl(42 75% 45% / 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse 45% 32% at 20% 20%, hsl(210 90% 50% / 0.18) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 28% at 75% 30%, hsl(210 80% 40% / 0.15) 0%, transparent 50%),
     radial-gradient(ellipse 35% 25% at 50% 70%, hsl(0 0% 95% / 0.10) 0%, transparent 48%),
-    radial-gradient(ellipse 30% 22% at 15% 75%, hsl(35 80% 50% / 0.11) 0%, transparent 45%),
-    radial-gradient(ellipse 28% 20% at 85% 65%, hsl(42 80% 48% / 0.09) 0%, transparent 42%),
-    radial-gradient(ellipse 25% 18% at 40% 40%, hsl(35 80% 48% / 0.07) 0%, transparent 40%);
+    radial-gradient(ellipse 30% 22% at 15% 75%, hsl(350 80% 50% / 0.11) 0%, transparent 45%),
+    radial-gradient(ellipse 28% 20% at 85% 65%, hsl(210 90% 50% / 0.09) 0%, transparent 42%),
+    radial-gradient(ellipse 25% 18% at 40% 40%, hsl(350 80% 50% / 0.07) 0%, transparent 40%);
   animation: nebula-drift 30s ease-in-out infinite alternate;
 }
 
-/* Tiny stars layer - golden color powder speckles */
+/* Tiny stars layer — blue/red color powder speckles */
 .starfield-bg::after {
   content: '';
   position: absolute;
@@ -974,21 +987,21 @@
   height: 200%;
   background: transparent;
   box-shadow:
-    0.5px 0.5px 0 hsl(42 80% 75% / 0.35), 22px 8px 0 hsl(42 75% 65% / 0.3), 35px 28px 0 hsl(42 85% 75% / 0.4), 48px 5px 0 hsl(42 85% 70% / 0.25),
-    60px 18px 0 hsl(35 80% 70% / 0.35), 75px 12px 0 hsl(42 80% 70% / 0.3), 88px 25px 0 hsl(42 80% 75% / 0.4), 95px 8px 0 hsl(42 75% 65% / 0.25),
-    12px 35px 0 hsl(42 85% 75% / 0.3), 28px 42px 0 hsl(42 85% 70% / 0.35), 40px 55px 0 hsl(35 80% 70% / 0.25), 52px 38px 0 hsl(42 80% 75% / 0.4),
-    65px 50px 0 hsl(42 80% 70% / 0.3), 78px 35px 0 hsl(42 75% 65% / 0.35), 85px 60px 0 hsl(42 85% 75% / 0.3), 92px 45px 0 hsl(42 85% 70% / 0.25),
-    5px 65px 0 hsl(35 80% 70% / 0.35), 18px 72px 0 hsl(42 80% 75% / 0.3), 30px 85px 0 hsl(42 75% 65% / 0.4), 42px 68px 0 hsl(42 85% 75% / 0.25),
-    55px 78px 0 hsl(42 85% 70% / 0.35), 68px 88px 0 hsl(42 80% 70% / 0.3), 80px 72px 0 hsl(42 80% 75% / 0.4), 90px 82px 0 hsl(42 75% 65% / 0.25),
-    15px 92px 0 hsl(35 80% 70% / 0.3), 25px 10px 0 hsl(42 85% 75% / 0.35), 38px 18px 0 hsl(42 85% 70% / 0.25), 50px 25px 0 hsl(42 80% 75% / 0.4),
-    62px 15px 0 hsl(42 80% 70% / 0.3), 72px 45px 0 hsl(42 75% 65% / 0.35), 82px 55px 0 hsl(42 85% 75% / 0.3), 98px 35px 0 hsl(42 85% 70% / 0.25),
-    8px 48px 0 hsl(35 80% 70% / 0.35), 32px 60px 0 hsl(42 80% 75% / 0.3), 45px 12px 0 hsl(42 75% 65% / 0.4), 58px 65px 0 hsl(42 85% 75% / 0.25),
-    70px 30px 0 hsl(42 85% 70% / 0.35), 85px 18px 0 hsl(42 80% 70% / 0.3), 92px 55px 0 hsl(42 80% 75% / 0.4), 3px 80px 0 hsl(42 75% 65% / 0.25),
-    20px 55px 0 hsl(42 85% 75% / 0.3), 36px 35px 0 hsl(42 85% 70% / 0.35), 48px 48px 0 hsl(35 80% 70% / 0.25), 63px 72px 0 hsl(42 80% 75% / 0.4),
-    76px 58px 0 hsl(42 80% 70% / 0.3), 88px 68px 0 hsl(42 75% 65% / 0.35), 95px 18px 0 hsl(42 85% 75% / 0.3), 6px 28px 0 hsl(42 85% 70% / 0.25),
-    42px 8px 0 hsl(35 80% 70% / 0.35), 55px 55px 0 hsl(42 80% 75% / 0.3), 68px 5px 0 hsl(42 75% 65% / 0.4), 78px 42px 0 hsl(42 85% 75% / 0.25),
-    85px 38px 0 hsl(42 85% 70% / 0.35), 92px 72px 0 hsl(42 80% 70% / 0.3), 15px 18px 0 hsl(42 80% 75% / 0.4), 28px 68px 0 hsl(42 75% 65% / 0.25),
-    35px 75px 0 hsl(42 85% 75% / 0.3), 52px 85px 0 hsl(42 85% 70% / 0.35), 66px 22px 0 hsl(35 80% 70% / 0.25);
+    0.5px 0.5px 0 hsl(210 80% 75% / 0.35), 22px 8px 0 hsl(210 75% 65% / 0.3), 35px 28px 0 hsl(210 85% 75% / 0.4), 48px 5px 0 hsl(210 85% 70% / 0.25),
+    60px 18px 0 hsl(350 80% 70% / 0.35), 75px 12px 0 hsl(220 80% 70% / 0.3), 88px 25px 0 hsl(210 80% 75% / 0.4), 95px 8px 0 hsl(210 75% 65% / 0.25),
+    12px 35px 0 hsl(210 85% 75% / 0.3), 28px 42px 0 hsl(210 85% 70% / 0.35), 40px 55px 0 hsl(350 80% 70% / 0.25), 52px 38px 0 hsl(210 80% 75% / 0.4),
+    65px 50px 0 hsl(220 80% 70% / 0.3), 78px 35px 0 hsl(210 75% 65% / 0.35), 85px 60px 0 hsl(210 85% 75% / 0.3), 92px 45px 0 hsl(210 85% 70% / 0.25),
+    5px 65px 0 hsl(350 80% 70% / 0.35), 18px 72px 0 hsl(210 80% 75% / 0.3), 30px 85px 0 hsl(210 75% 65% / 0.4), 42px 68px 0 hsl(210 85% 75% / 0.25),
+    55px 78px 0 hsl(210 85% 70% / 0.35), 68px 88px 0 hsl(220 80% 70% / 0.3), 80px 72px 0 hsl(210 80% 75% / 0.4), 90px 82px 0 hsl(210 75% 65% / 0.25),
+    15px 92px 0 hsl(350 80% 70% / 0.3), 25px 10px 0 hsl(210 85% 75% / 0.35), 38px 18px 0 hsl(210 85% 70% / 0.25), 50px 25px 0 hsl(210 80% 75% / 0.4),
+    62px 15px 0 hsl(220 80% 70% / 0.3), 72px 45px 0 hsl(210 75% 65% / 0.35), 82px 55px 0 hsl(210 85% 75% / 0.3), 98px 35px 0 hsl(210 85% 70% / 0.25),
+    8px 48px 0 hsl(350 80% 70% / 0.35), 32px 60px 0 hsl(210 80% 75% / 0.3), 45px 12px 0 hsl(210 75% 65% / 0.4), 58px 65px 0 hsl(210 85% 75% / 0.25),
+    70px 30px 0 hsl(210 85% 70% / 0.35), 85px 18px 0 hsl(220 80% 70% / 0.3), 92px 55px 0 hsl(210 80% 75% / 0.4), 3px 80px 0 hsl(210 75% 65% / 0.25),
+    20px 55px 0 hsl(210 85% 75% / 0.3), 36px 35px 0 hsl(210 85% 70% / 0.35), 48px 48px 0 hsl(350 80% 70% / 0.25), 63px 72px 0 hsl(210 80% 75% / 0.4),
+    76px 58px 0 hsl(220 80% 70% / 0.3), 88px 68px 0 hsl(210 75% 65% / 0.35), 95px 18px 0 hsl(210 85% 75% / 0.3), 6px 28px 0 hsl(210 85% 70% / 0.25),
+    42px 8px 0 hsl(350 80% 70% / 0.35), 55px 55px 0 hsl(210 80% 75% / 0.3), 68px 5px 0 hsl(210 75% 65% / 0.4), 78px 42px 0 hsl(210 85% 75% / 0.25),
+    85px 38px 0 hsl(210 85% 70% / 0.35), 92px 72px 0 hsl(220 80% 70% / 0.3), 15px 18px 0 hsl(210 80% 75% / 0.4), 28px 68px 0 hsl(210 75% 65% / 0.25),
+    35px 75px 0 hsl(210 85% 75% / 0.3), 52px 85px 0 hsl(210 85% 70% / 0.35), 66px 22px 0 hsl(350 80% 70% / 0.25);
   transform: translateY(0);
   animation: star-drift 60s linear infinite;
 }
@@ -1008,19 +1021,19 @@
   width: 3px;
   height: 3px;
   border-radius: 50%;
-  background: hsl(42 80% 85% / 0.7);
+  background: hsl(210 80% 90% / 0.7);
   box-shadow:
-    0 0 8px 3px hsl(42 80% 55% / 0.3),
-    12% 18% 0 0 hsl(42 85% 80%),
-    55% 12% 0 0 hsl(42 85% 60%),
-    80% 60% 0 0 hsl(42 75% 55%),
-    30% 78% 0 0 hsl(35 80% 60%),
-    70% 38% 0 0 hsl(42 75% 55%),
-    8% 52% 0 0 hsl(42 80% 55%),
-    42% 8% 0 0 hsl(42 85% 80%),
-    88% 45% 0 0 hsl(42 75% 55%),
-    65% 70% 0 0 hsl(42 85% 60%),
-    18% 88% 0 0 hsl(35 80% 60%);
+    0 0 8px 3px hsl(210 80% 60% / 0.3),
+    12% 18% 0 0 hsl(210 85% 85%),
+    55% 12% 0 0 hsl(210 85% 65%),
+    80% 60% 0 0 hsl(210 75% 60%),
+    30% 78% 0 0 hsl(350 80% 65%),
+    70% 38% 0 0 hsl(210 75% 60%),
+    8% 52% 0 0 hsl(220 80% 60%),
+    42% 8% 0 0 hsl(210 85% 85%),
+    88% 45% 0 0 hsl(210 75% 60%),
+    65% 70% 0 0 hsl(210 85% 65%),
+    18% 88% 0 0 hsl(350 80% 65%);
   animation: twinkle-bright 3s ease-in-out infinite alternate, star-float 8s ease-in-out infinite alternate;
   top: 0;
   left: 0;
@@ -1032,32 +1045,32 @@
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: hsl(42 80% 60% / 0.4);
+  background: hsl(210 80% 65% / 0.4);
   box-shadow:
-    15% 20% 0 0 hsl(42 85% 60% / 0.4),
-    35% 10% 0 0 hsl(42 75% 52% / 0.35),
-    50% 30% 0 0 hsl(42 85% 55% / 0.4),
-    65% 15% 0 0 hsl(35 80% 55% / 0.35),
-    80% 25% 0 0 hsl(42 80% 60% / 0.4),
-    10% 40% 0 0 hsl(42 85% 60% / 0.35),
-    28% 55% 0 0 hsl(42 75% 52% / 0.4),
-    45% 45% 0 0 hsl(42 85% 55% / 0.35),
-    60% 60% 0 0 hsl(35 80% 55% / 0.4),
-    78% 50% 0 0 hsl(42 80% 60% / 0.35),
-    90% 40% 0 0 hsl(42 85% 60% / 0.4),
-    20% 70% 0 0 hsl(42 75% 52% / 0.35),
-    40% 80% 0 0 hsl(42 85% 55% / 0.4),
-    55% 75% 0 0 hsl(35 80% 55% / 0.35),
-    70% 85% 0 0 hsl(42 80% 60% / 0.4),
-    88% 70% 0 0 hsl(42 85% 60% / 0.35),
-    5% 90% 0 0 hsl(42 75% 52% / 0.4),
-    25% 88% 0 0 hsl(42 85% 55% / 0.35),
-    48% 92% 0 0 hsl(35 80% 55% / 0.4),
-    68% 95% 0 0 hsl(42 80% 60% / 0.35),
-    82% 82% 0 0 hsl(42 85% 60% / 0.4),
-    38% 15% 0 0 hsl(42 75% 52% / 0.3),
-    72% 35% 0 0 hsl(42 85% 55% / 0.3),
-    58% 68% 0 0 hsl(35 80% 55% / 0.3);
+    15% 20% 0 0 hsl(210 85% 65% / 0.4),
+    35% 10% 0 0 hsl(210 75% 55% / 0.35),
+    50% 30% 0 0 hsl(210 85% 60% / 0.4),
+    65% 15% 0 0 hsl(350 80% 60% / 0.35),
+    80% 25% 0 0 hsl(210 80% 65% / 0.4),
+    10% 40% 0 0 hsl(210 85% 65% / 0.35),
+    28% 55% 0 0 hsl(210 75% 55% / 0.4),
+    45% 45% 0 0 hsl(210 85% 60% / 0.35),
+    60% 60% 0 0 hsl(350 80% 60% / 0.4),
+    78% 50% 0 0 hsl(210 80% 65% / 0.35),
+    90% 40% 0 0 hsl(210 85% 65% / 0.4),
+    20% 70% 0 0 hsl(210 75% 55% / 0.35),
+    40% 80% 0 0 hsl(210 85% 60% / 0.4),
+    55% 75% 0 0 hsl(350 80% 60% / 0.35),
+    70% 85% 0 0 hsl(210 80% 65% / 0.4),
+    88% 70% 0 0 hsl(210 85% 65% / 0.35),
+    5% 90% 0 0 hsl(210 75% 55% / 0.4),
+    25% 88% 0 0 hsl(210 85% 60% / 0.35),
+    48% 92% 0 0 hsl(350 80% 60% / 0.4),
+    68% 95% 0 0 hsl(210 80% 65% / 0.35),
+    82% 82% 0 0 hsl(210 85% 65% / 0.4),
+    38% 15% 0 0 hsl(210 75% 55% / 0.3),
+    72% 35% 0 0 hsl(210 85% 60% / 0.3),
+    58% 68% 0 0 hsl(350 80% 60% / 0.3);
   animation: particle-rise 18s linear infinite;
   top: 0;
   left: 0;
@@ -1077,9 +1090,9 @@
   position: absolute;
   width: 2px;
   height: 2px;
-  background: hsl(42 80% 85%);
+  background: hsl(210 80% 90%);
   border-radius: 50%;
-  box-shadow: 0 0 6px 3px hsl(42 80% 55% / 0.6), 0 0 12px 6px hsl(35 80% 50% / 0.3);
+  box-shadow: 0 0 6px 3px hsl(210 80% 60% / 0.6), 0 0 12px 6px hsl(350 80% 55% / 0.3);
   top: -5%;
   left: 75%;
   animation: shooting-star 7s ease-in-out infinite;
@@ -1090,9 +1103,9 @@
   position: absolute;
   width: 2px;
   height: 2px;
-  background: hsl(42 75% 80%);
+  background: hsl(210 75% 85%);
   border-radius: 50%;
-  box-shadow: 0 0 5px 2px hsl(42 75% 50% / 0.5), 0 0 10px 5px hsl(42 85% 50% / 0.25);
+  box-shadow: 0 0 5px 2px hsl(210 75% 55% / 0.5), 0 0 10px 5px hsl(210 85% 55% / 0.25);
   top: -5%;
   left: 25%;
   animation: shooting-star 10s ease-in-out infinite 3s;
@@ -1409,16 +1422,16 @@
   background:
     conic-gradient(from 0deg at 50% 60%,
       transparent 0deg,
-      hsl(42 85% 52% / 0.04) 30deg,
-      hsl(42 80% 48% / 0.03) 60deg,
+      hsl(210 80% 55% / 0.04) 30deg,
+      hsl(210 85% 55% / 0.03) 60deg,
       transparent 90deg,
-      hsl(42 75% 50% / 0.04) 120deg,
+      hsl(210 75% 50% / 0.04) 120deg,
       transparent 160deg,
-      hsl(42 80% 52% / 0.03) 200deg,
+      hsl(210 85% 55% / 0.03) 200deg,
       transparent 240deg,
-      hsl(35 80% 50% / 0.03) 280deg,
+      hsl(350 80% 55% / 0.03) 280deg,
       transparent 320deg,
-      hsl(42 85% 52% / 0.04) 350deg,
+      hsl(210 80% 55% / 0.04) 350deg,
       transparent 360deg
     );
   animation: aurora-rotate 40s linear infinite;
@@ -1429,8 +1442,8 @@
   position: absolute;
   inset: -50%;
   background:
-    radial-gradient(ellipse 80% 25% at 30% 40%, hsl(42 85% 52% / 0.05) 0%, transparent 55%),
-    radial-gradient(ellipse 60% 20% at 70% 55%, hsl(42 75% 48% / 0.04) 0%, transparent 50%);
+    radial-gradient(ellipse 80% 25% at 30% 40%, hsl(210 80% 55% / 0.05) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 20% at 70% 55%, hsl(210 75% 50% / 0.04) 0%, transparent 50%);
   animation: aurora-pulse 12s ease-in-out infinite alternate;
 }
 
@@ -1461,34 +1474,34 @@
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: hsl(42 85% 65% / 0.5);
+  background: hsl(210 85% 70% / 0.5);
   box-shadow:
-    8% 12% 0 0 hsl(42 80% 60% / 0.5),
-    22% 5% 0 0 hsl(42 75% 55% / 0.4),
-    35% 18% 0 0 hsl(42 85% 60% / 0.5),
-    48% 8% 0 0 hsl(42 85% 65% / 0.4),
-    60% 22% 0 0 hsl(35 80% 60% / 0.5),
-    72% 10% 0 0 hsl(42 80% 60% / 0.4),
-    85% 15% 0 0 hsl(42 80% 60% / 0.5),
-    15% 30% 0 0 hsl(42 75% 55% / 0.4),
-    30% 40% 0 0 hsl(42 85% 65% / 0.5),
-    50% 35% 0 0 hsl(42 85% 60% / 0.4),
-    68% 42% 0 0 hsl(35 80% 60% / 0.5),
-    82% 28% 0 0 hsl(42 80% 60% / 0.4),
-    10% 55% 0 0 hsl(42 80% 60% / 0.5),
-    25% 65% 0 0 hsl(42 85% 65% / 0.4),
-    42% 50% 0 0 hsl(42 75% 55% / 0.5),
-    58% 70% 0 0 hsl(42 85% 60% / 0.4),
-    75% 55% 0 0 hsl(35 80% 60% / 0.5),
-    90% 60% 0 0 hsl(42 80% 60% / 0.4),
-    5% 80% 0 0 hsl(42 80% 60% / 0.5),
-    20% 90% 0 0 hsl(42 75% 55% / 0.4),
-    38% 78% 0 0 hsl(42 85% 65% / 0.5),
-    55% 88% 0 0 hsl(42 85% 60% / 0.4),
-    70% 75% 0 0 hsl(35 80% 60% / 0.5),
-    88% 85% 0 0 hsl(42 80% 60% / 0.4),
-    45% 95% 0 0 hsl(42 80% 60% / 0.4),
-    65% 92% 0 0 hsl(42 85% 65% / 0.4);
+    8% 12% 0 0 hsl(210 80% 65% / 0.5),
+    22% 5% 0 0 hsl(210 75% 60% / 0.4),
+    35% 18% 0 0 hsl(210 85% 65% / 0.5),
+    48% 8% 0 0 hsl(210 85% 70% / 0.4),
+    60% 22% 0 0 hsl(350 80% 65% / 0.5),
+    72% 10% 0 0 hsl(220 80% 65% / 0.4),
+    85% 15% 0 0 hsl(210 80% 65% / 0.5),
+    15% 30% 0 0 hsl(210 75% 60% / 0.4),
+    30% 40% 0 0 hsl(210 85% 70% / 0.5),
+    50% 35% 0 0 hsl(210 85% 65% / 0.4),
+    68% 42% 0 0 hsl(350 80% 65% / 0.5),
+    82% 28% 0 0 hsl(220 80% 65% / 0.4),
+    10% 55% 0 0 hsl(210 80% 65% / 0.5),
+    25% 65% 0 0 hsl(210 85% 70% / 0.4),
+    42% 50% 0 0 hsl(210 75% 60% / 0.5),
+    58% 70% 0 0 hsl(210 85% 65% / 0.4),
+    75% 55% 0 0 hsl(350 80% 65% / 0.5),
+    90% 60% 0 0 hsl(220 80% 65% / 0.4),
+    5% 80% 0 0 hsl(210 80% 65% / 0.5),
+    20% 90% 0 0 hsl(210 75% 60% / 0.4),
+    38% 78% 0 0 hsl(210 85% 70% / 0.5),
+    55% 88% 0 0 hsl(210 85% 65% / 0.4),
+    70% 75% 0 0 hsl(350 80% 65% / 0.5),
+    88% 85% 0 0 hsl(220 80% 65% / 0.4),
+    45% 95% 0 0 hsl(210 80% 65% / 0.4),
+    65% 92% 0 0 hsl(210 85% 70% / 0.4);
   animation: particle-rise 20s linear infinite;
   opacity: 0.6;
 }
@@ -1498,20 +1511,20 @@
   width: 3px;
   height: 3px;
   border-radius: 50%;
-  background: hsl(42 85% 65% / 0.4);
+  background: hsl(210 85% 70% / 0.4);
   box-shadow:
-    14% 25% 0 0 hsl(42 85% 65% / 0.4),
-    38% 15% 0 0 hsl(42 80% 60% / 0.5),
-    52% 45% 0 0 hsl(42 75% 55% / 0.4),
-    66% 30% 0 0 hsl(35 80% 60% / 0.5),
-    80% 50% 0 0 hsl(42 85% 60% / 0.4),
-    95% 35% 0 0 hsl(42 80% 60% / 0.5),
-    12% 60% 0 0 hsl(42 85% 65% / 0.4),
-    28% 75% 0 0 hsl(42 80% 60% / 0.5),
-    44% 85% 0 0 hsl(42 75% 55% / 0.4),
-    60% 65% 0 0 hsl(35 80% 60% / 0.5),
-    78% 95% 0 0 hsl(42 85% 60% / 0.4),
-    92% 72% 0 0 hsl(42 80% 60% / 0.5);
+    14% 25% 0 0 hsl(210 85% 70% / 0.4),
+    38% 15% 0 0 hsl(210 80% 65% / 0.5),
+    52% 45% 0 0 hsl(210 75% 60% / 0.4),
+    66% 30% 0 0 hsl(350 80% 65% / 0.5),
+    80% 50% 0 0 hsl(210 85% 65% / 0.4),
+    95% 35% 0 0 hsl(220 80% 65% / 0.5),
+    12% 60% 0 0 hsl(210 85% 70% / 0.4),
+    28% 75% 0 0 hsl(210 80% 65% / 0.5),
+    44% 85% 0 0 hsl(210 75% 60% / 0.4),
+    60% 65% 0 0 hsl(350 80% 65% / 0.5),
+    78% 95% 0 0 hsl(210 85% 65% / 0.4),
+    92% 72% 0 0 hsl(220 80% 65% / 0.5);
   animation: particle-rise 25s linear infinite 3s;
   opacity: 0.5;
 }
