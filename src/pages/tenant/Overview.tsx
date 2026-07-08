@@ -1,3 +1,4 @@
+import { useCallback, useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useDataStore } from "@/store/DataStore";
 import { useCurrentTenant, useTenantDues, useTenantTransactions } from "@/hooks/useTenantData";
@@ -6,13 +7,30 @@ import { Wallet, Receipt, CalendarCheck } from "lucide-react";
 import { LoadingState } from "@/components/states/LoadingState";
 import { ErrorState } from "@/components/states/ErrorState";
 
+const fmtDate = (d: string | undefined | null) => {
+  if (!d) return "—";
+  try { return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }); }
+  catch { return d; }
+};
+
+const fmtShortDate = (d: string | undefined | null) => {
+  if (!d) return "—";
+  try { return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short" }); }
+  catch { return d; }
+};
+
 export default function TenantOverview() {
   const { user } = useAuth();
   const { data, loading, error, refresh } = useDataStore();
   const tenant = useCurrentTenant(data?.tenants ?? [], user?.email);
   const txs = useTenantTransactions(data?.transactions ?? [], tenant?.id);
   const outstanding = useTenantDues(data?.transactions ?? [], tenant?.id);
-  const lastPayment = [...txs].filter((t) => t.date).sort((a, b) => new Date(b.date!).getTime() - new Date(a.date!).getTime()).find((t) => t.status === "completed");
+  const lastPayment = useMemo(() =>
+    [...txs].filter((t) => t.date && t.status === "completed")
+      .sort((a, b) => new Date(b.date!).getTime() - new Date(a.date!).getTime())[0],
+    [txs],
+  );
+
   const fmt = (amount: number) => formatMoney(amount);
 
   if (error) return <ErrorState title="Failed to load overview" description={error} onRetry={refresh} />;
@@ -31,8 +49,8 @@ export default function TenantOverview() {
       <div className="grid sm:grid-cols-3 gap-4">
         {[
           { icon: Wallet, label: "Outstanding dues", value: fmt(outstanding), note: outstanding > 0 ? "Due this month" : "All clear" },
-          { icon: Receipt, label: "Last payment", value: lastPayment ? fmt(lastPayment.amount) : "—", note: lastPayment?.date ?? "No payments yet" },
-          { icon: CalendarCheck, label: "Tenant since", value: tenant?.startDate ?? "—", note: tenant?.status ?? "" },
+          { icon: Receipt, label: "Last payment", value: lastPayment ? fmt(lastPayment.amount) : "—", note: lastPayment ? fmtShortDate(lastPayment.date) : "No payments yet" },
+          { icon: CalendarCheck, label: "Tenant since", value: fmtDate(tenant?.startDate), note: "Active" },
         ].map((k) => (
           <div key={k.label} className="rounded-xl border border-border bg-gradient-card p-5">
             <k.icon className="h-5 w-5 text-primary" />
@@ -50,10 +68,8 @@ export default function TenantOverview() {
           <div className="space-y-2 text-sm">
             {txs.slice(0, 5).map((t) => (
               <div key={t.id} className="flex justify-between border-t border-border pt-2">
-                <span className="text-muted-foreground">{t.date} · {t.type}</span>
-                <span className="font-medium">
-                  {formatMoney(t.amount)}
-                </span>
+                <span className="text-muted-foreground">{fmtShortDate(t.date)} · {t.type}</span>
+                <span className="font-medium">{formatMoney(t.amount)}</span>
               </div>
             ))}
           </div>

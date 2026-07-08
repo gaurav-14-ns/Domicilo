@@ -3,14 +3,23 @@ import { CreateRequest } from "@/components/Maintenance/CreateRequest";
 import { RequestList } from "@/components/Maintenance/RequestList";
 import { useAuth } from "@/hooks/useAuth";
 import { useDataStore } from "@/store/DataStore";
+import { toast } from "sonner";
 
 export default function TenantMaintenance() {
   const { user } = useAuth();
   const { data } = useDataStore();
-  const { requests, loading, create } = useMaintenance();
+  const { requests, loading, create, updateStatus } = useMaintenance();
   const tenant = (data?.tenants ?? []).find(
     (t) => user?.email && t.email.toLowerCase() === user.email.toLowerCase(),
   );
+
+  const handleCreate = async (title: string, description: string, priority: any) => {
+    if (!tenant?.id) {
+      toast.error("Profile not loaded yet. Please wait and try again.");
+      return;
+    }
+    await create(title, description, priority, tenant.id);
+  };
 
   return (
     <div className="space-y-6">
@@ -20,12 +29,8 @@ export default function TenantMaintenance() {
           Submit and track maintenance requests.
         </p>
       </div>
-      <CreateRequest
-        onCreate={(title, description, priority) =>
-          create(title, description, priority, tenant?.id)
-        }
-      />
-      <RequestList requests={requests} loading={loading} />
+      <CreateRequest onCreate={handleCreate} />
+      <RequestList requests={requests} loading={loading} onUpdateStatus={updateStatus} />
     </div>
   );
 }

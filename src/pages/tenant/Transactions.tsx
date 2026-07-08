@@ -185,14 +185,8 @@ export default function TenantTransactions() {
       );
 
   useEffect(() => {
-
   setCurrentPage(1);
-
-}, [
-  search,
-  fromDate,
-  toDate,
-]);
+}, [search, fromDate, toDate, statusFilter, monthFilter]);
 
   const exportRows =
     filteredTransactions.map(

@@ -20,8 +20,11 @@ export const monthsBetween = (fromKey: string, toKey: string): string[] => {
 };
 
 export const prettyMonth = (key: string) => {
-  const [y, m] = key.split("-").map(Number);
-  return new Date(y, m - 1, 1).toLocaleString("en-IN", { month: "short", year: "numeric" });
+  const parts = key.split("-");
+  const y = Number(parts[0]);
+  if (parts.length === 1 || isNaN(y)) return key;
+  const m = Number(parts[1]);
+  return new Date(y, (m || 1) - 1, 1).toLocaleString("en-IN", { month: "short", year: "numeric" });
 };
 
 // ---------------------------------------------------------------------------
