@@ -97,6 +97,10 @@ export default function BrowseProperties() {
         setCities(unique);
         if (!unique.includes(selectedCity)) setSelectedCity("");
         setLoadingCities(false);
+      }).catch(() => {
+        if (cancelled) return;
+        setCities([]);
+        setLoadingCities(false);
       });
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps

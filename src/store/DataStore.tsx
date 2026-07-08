@@ -811,16 +811,20 @@ useEffect(() => {
     if (!user) return;
     let cancelled = false;
     (async () => {
-      const [settingsResult, profileResult] = await Promise.all([
-        supabase.from("app_settings").select("*").eq("user_id", user.id).maybeSingle(),
-        supabase.from("tenant_profiles").select("*").eq("user_id", user.id).maybeSingle(),
-      ]);
-      if (cancelled || !mountedRef.current) return;
-      setData((prev) => ({
-        ...prev,
-        settings: mapSettings(settingsResult.data),
-        tenantProfile: mapTenantProfile(profileResult.data),
-      }));
+      try {
+        const [settingsResult, profileResult] = await Promise.all([
+          supabase.from("app_settings").select("*").eq("user_id", user.id).maybeSingle(),
+          supabase.from("tenant_profiles").select("*").eq("user_id", user.id).maybeSingle(),
+        ]);
+        if (cancelled || !mountedRef.current) return;
+        setData((prev) => ({
+          ...prev,
+          settings: mapSettings(settingsResult.data),
+          tenantProfile: mapTenantProfile(profileResult.data),
+        }));
+      } catch (e) {
+        console.error("Early fetch failed:", e);
+      }
     })();
     return () => { cancelled = true; };
   }, [user?.id]);
@@ -1056,6 +1060,7 @@ useEffect(() => {
 }, [user?.id, refresh]);
 
 const updateProperty = useCallback(async (id: string, patch: Partial<Property>) => {
+  if (!user) return;
   try {
     const dbPatch: any = {};
 
@@ -1089,6 +1094,7 @@ const updateProperty = useCallback(async (id: string, patch: Partial<Property>) 
 }, [user?.id, refresh]);
 
 const removeProperty = useCallback(async (id: string) => {
+  if (!user) return;
   try {
     const { error: tenantError } = await supabase
       .from("tenants")
@@ -1215,6 +1221,7 @@ const removeProperty = useCallback(async (id: string) => {
       id: string,
       patch: Partial<Tenant>
     ) => {
+      if (!user) return;
       try {
         const dbPatch: any =
           {};
@@ -1331,6 +1338,7 @@ const removeProperty = useCallback(async (id: string) => {
       id: string,
       status: Tenant["status"]
     ) => {
+      if (!user) return;
       try {
         const {
           error,
@@ -1370,6 +1378,7 @@ const removeProperty = useCallback(async (id: string) => {
     async (
       id: string
     ) => {
+      if (!user) return;
       try {
         const {
           error,
@@ -1410,6 +1419,7 @@ const removeProperty = useCallback(async (id: string) => {
     async (
       id: string
     ) => {
+      if (!user) return;
       try {
         const {
           error,
@@ -1546,6 +1556,7 @@ const removeProperty = useCallback(async (id: string) => {
       id: string,
       patch: Partial<Transaction>
     ) => {
+      if (!user) return;
       try {
       /*
         Fetch existing row first
@@ -1714,10 +1725,12 @@ const removeProperty = useCallback(async (id: string) => {
     async (
       id: string
     ) => {
+      if (!user) return;
       try {
       /*
-        Protect settled
-        financial history.
+        Fetch existing row first
+        to protect completed
+        financial records.
       */
       const {
         data: existing,

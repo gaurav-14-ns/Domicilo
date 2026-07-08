@@ -571,8 +571,8 @@
 
   /* Enhanced text contrast on light backgrounds */
   .text-royal-glow {
-    color: hsl(240 60% 26%);
-    text-shadow: 0 0 40px hsl(240 55% 40% / 0.15), 0 2px 4px hsl(240 60% 10% / 0.08);
+    color: hsl(210 90% 50%);
+    text-shadow: 0 0 40px hsl(210 90% 50% / 0.15), 0 2px 4px hsl(210 90% 20% / 0.08);
   }
   .dark .text-royal-glow {
     color: hsl(210 90% 70%);
@@ -582,7 +582,7 @@
   /* Light-on-dark text with glow */
   .text-light-glow {
     color: hsl(40 60% 96%);
-    text-shadow: 0 0 30px hsl(260 50% 50% / 0.2);
+    text-shadow: 0 0 30px hsl(210 90% 50% / 0.2);
   }
   .dark .text-light-glow {
     color: hsl(0 0% 92%);
@@ -591,8 +591,8 @@
 
   /* Primary text with extra pop on colored backgrounds */
   .text-primary-pop {
-    color: hsl(240 60% 26%);
-    text-shadow: 0 1px 3px hsl(240 60% 10% / 0.12);
+    color: hsl(210 90% 50%);
+    text-shadow: 0 1px 3px hsl(210 90% 20% / 0.12);
   }
   .dark .text-primary-pop {
     color: hsl(210 85% 55%);
@@ -601,8 +601,8 @@
 
   /* Section heading with strong visual weight */
   .text-heading-premium {
-    color: hsl(240 60% 22%);
-    text-shadow: 0 2px 8px hsl(240 60% 10% / 0.06);
+    color: hsl(210 90% 50%);
+    text-shadow: 0 2px 8px hsl(210 90% 20% / 0.06);
   }
   .dark .text-heading-premium {
     color: hsl(0 0% 92%);
@@ -611,7 +611,7 @@
 
   /* Muted text with better readability */
   .text-muted-readable {
-    color: hsl(240 25% 38%);
+    color: hsl(210 25% 38%);
   }
   .dark .text-muted-readable {
     color: hsl(0 0% 65%);
@@ -620,7 +620,7 @@
   /* Enhanced background for cards with better contrast for children text */
   .bg-card-enhanced {
     background: hsl(40 60% 98%);
-    border: 1px solid hsl(240 30% 80% / 0.5);
+    border: 1px solid hsl(210 30% 80% / 0.5);
   }
   .dark .bg-card-enhanced {
     background: hsl(220 30% 9%);
@@ -891,7 +891,7 @@
 
 /* Premium glass overlay for modals */
 .glass-overlay-premium {
-  background: hsl(260 40% 3% / 0.5);
+  background: hsl(220 40% 3% / 0.5);
   backdrop-filter: blur(32px) saturate(1.4);
   -webkit-backdrop-filter: blur(32px) saturate(1.4);
 }
@@ -1187,9 +1187,9 @@
   text-shadow: 0 1px 3px hsl(0 0% 0% / 0.25);
 }
 
-.text-readable-secondary {
-  color: hsl(240 25% 38%);
-}
+  .text-readable-secondary {
+    color: hsl(210 25% 38%);
+  }
 .dark .text-readable-secondary {
   color: hsl(40 20% 68%);
   text-shadow: 0 1px 2px hsl(0 0% 0% / 0.15);
@@ -1324,7 +1324,7 @@
   border-radius: 50%;
   margin-right: 0.375rem;
 }
-.dot-green { background: hsl(142 75% 52%); box-shadow: 0 0 10px hsl(142 75% 52% / 0.5); }
+.dot-green { background: hsl(210 90% 50%); box-shadow: 0 0 10px hsl(210 90% 50% / 0.5); }
 .dot-amber { background: hsl(210 85% 55%); box-shadow: 0 0 10px hsl(210 85% 55% / 0.5); }
 .dot-red { background: hsl(350 80% 55%); box-shadow: 0 0 10px hsl(350 80% 55% / 0.5); }
 .dot-purple { background: hsl(210 85% 60%); box-shadow: 0 0 10px hsl(210 85% 60% / 0.5); }
@@ -1371,7 +1371,7 @@
 
 /* Success/green glow */
 .glow-green {
-  box-shadow: 0 0 24px hsl(142 75% 52% / 0.15), 0 0 48px hsl(142 75% 52% / 0.08);
+  box-shadow: 0 0 24px hsl(210 90% 50% / 0.15), 0 0 48px hsl(210 90% 50% / 0.08);
 }
 
 /* Root wrapper - content naturally above starfield (z-index: -1) */

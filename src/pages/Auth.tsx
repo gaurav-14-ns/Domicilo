@@ -242,18 +242,19 @@ useEffect(() => {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const {
-        data,
-        error,
-      } =
-        await supabase.rpc(
-          "admin_exists"
-        );
-
-      if (!cancelled && !error) {
-        setAdminAvailable(
-          !data
-        );
+      try {
+        const {
+          data,
+          error,
+        } =
+          await supabase.rpc(
+            "admin_exists"
+          );
+        if (!cancelled && !error) {
+          setAdminAvailable(!data);
+        }
+      } catch (e) {
+        console.error("admin_exists check failed:", e);
       }
     })();
     return () => { cancelled = true; };
