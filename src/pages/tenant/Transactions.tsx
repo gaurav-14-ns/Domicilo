@@ -28,7 +28,6 @@ from "@/components/states/ErrorState";
 import {
   Download,
   Search,
-  Filter,
 } from "lucide-react";
 
 import {

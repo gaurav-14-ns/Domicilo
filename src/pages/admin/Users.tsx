@@ -12,6 +12,7 @@ import {
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
@@ -130,6 +131,13 @@ export default function Users() {
     ids: string[];
     status: "active" | "suspended";
   } | null>(null);
+
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
 
   async function loadUsers() {
 
@@ -291,6 +299,7 @@ export default function Users() {
           }
         );
 
+      if (!mountedRef.current) return;
       setUsers(
         rows
       );
@@ -303,15 +312,18 @@ export default function Users() {
         err
       );
 
+      if (!mountedRef.current) return;
       toast.error(
         "Failed to load users"
       );
 
     } finally {
 
-      setLoading(
-        false
-      );
+      if (mountedRef.current) {
+        setLoading(
+          false
+        );
+      }
     }
   }
 
