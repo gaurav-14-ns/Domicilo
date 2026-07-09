@@ -1,30 +1,12 @@
-import {
-  Outlet,
-  useLocation,
-} from "react-router-dom";
-
-import {
-  useEffect,
-} from "react";
-
-import {
-  SidebarProvider,
-  SidebarTrigger,
-  useSidebar,
-} from "@/components/ui/sidebar";
-
+import { Outlet, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { SidebarProvider, SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-
 import { SafeSection } from "@/components/SafeSection";
-
-import { AppRole } from "@/hooks/useAuth";
-
+import { AppRole, useAuth } from "@/hooks/useAuth";
 import { useDataStore } from "@/store/DataStore";
-
 import { Crown } from "lucide-react";
-
 import { TrialBanner } from "@/components/TrialBanner";
-
 import { ErrorState } from "@/components/states/ErrorState";
 
 function DashboardContent({
@@ -32,18 +14,18 @@ function DashboardContent({
 }: {
   role: AppRole;
 }) {
-  const location =
-    useLocation();
+  const location = useLocation();
+  const { setOpenMobile } = useSidebar();
+  const { user } = useAuth();
+  const { data, loading, error, refresh } = useDataStore();
 
-  const {
-    setOpenMobile,
-  } = useSidebar();
-
-  const {
-    loading,
-    error,
-    refresh,
-  } = useDataStore();
+  const displayName = role === "owner"
+    ? data?.settings?.displayName || user?.email?.split("@")[0]
+    : role === "tenant"
+      ? (data?.tenants ?? []).find(
+          (t) => user?.email && t.email.toLowerCase() === user.email.toLowerCase(),
+        )?.name || user?.email?.split("@")[0]
+      : user?.email?.split("@")[0];
 
   useEffect(() => {
     setOpenMobile(
@@ -80,8 +62,8 @@ function DashboardContent({
 
           <div className="flex items-center gap-2">
             <Crown className="h-4 w-4 text-primary hidden sm:block animate-glow-pulse" />
-            <span className="font-display font-semibold capitalize truncate tracking-wide">
-              {role === "owner" ? <span className="text-gold-shimmer">Owner Dashboard</span> : <span className="text-gradient">{role} dashboard</span>}
+            <span className="font-display font-semibold truncate tracking-wide">
+              {displayName}
             </span>
           </div>
           </div>

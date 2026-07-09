@@ -17,7 +17,7 @@ import {
 import { useAuth, AppRole } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { useSubscriptionData } from "@/store/DataStore";
+import { useDataStore, useSubscriptionData } from "@/store/DataStore";
 
 const ownerItems = [
   { title: "Overview", url: "/owner", icon: LayoutDashboard, end: true },
@@ -50,6 +50,7 @@ export function AppSidebar({ role }: { role: AppRole }) {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const { signOut, user } = useAuth();
+  const { data } = useDataStore();
   const sub = useSubscriptionData();
   const trialEnd = sub?.trialEnd ? new Date(sub.trialEnd).getTime() : 0;
   const trialDaysLeft = trialEnd ? Math.max(0, Math.ceil((trialEnd - Date.now()) / 86400_000)) : null;
@@ -95,7 +96,15 @@ export function AppSidebar({ role }: { role: AppRole }) {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="capitalize font-display tracking-wide">{role} panel</SidebarGroupLabel>
+          <SidebarGroupLabel className="capitalize font-display tracking-wide">
+            {role === "owner"
+              ? data?.settings?.displayName || user?.email?.split("@")[0]
+              : role === "tenant"
+                ? (data?.tenants ?? []).find(
+                    (t) => user?.email && t.email.toLowerCase() === user.email.toLowerCase(),
+                  )?.name || user?.email?.split("@")[0]
+                : user?.email?.split("@")[0]}
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
@@ -124,8 +133,17 @@ export function AppSidebar({ role }: { role: AppRole }) {
       </div>
     )}
         {!collapsed && user && (
-      <div className="px-2 py-1 text-xs text-muted-foreground truncate font-alt">
-        {user.email}
+      <div className="px-2 py-1 text-xs font-alt truncate">
+        <div className="font-medium text-foreground truncate">
+          {role === "owner"
+            ? data?.settings?.displayName
+            : role === "tenant"
+              ? (data?.tenants ?? []).find(
+                  (t) => user?.email && t.email.toLowerCase() === user.email.toLowerCase(),
+                )?.name
+              : null || user.email?.split("@")[0]}
+        </div>
+        <div className="text-muted-foreground truncate">{user.email}</div>
         </div>
       )}
         <Button

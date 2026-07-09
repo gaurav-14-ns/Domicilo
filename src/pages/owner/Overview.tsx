@@ -1,27 +1,12 @@
 import { useMemo, useState } from "react";
-
-import {
-  ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-} from "recharts";
-
+import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useDataStore } from "@/store/DataStore";
-
 import { useCurrency } from "@/hooks/useCurrency";
-
+import { useAuth } from "@/hooks/useAuth";
 import { LoadingState } from "@/components/states/LoadingState";
 import { ErrorState } from "@/components/states/ErrorState";
-
-import {
-  monthKey,
-  prettyMonth,
-} from "@/lib/format";
-
-import {
-  TrendingUp,
-  Users,
-  DollarSign,
-  AlertCircle,
-} from "lucide-react";
+import { monthKey, prettyMonth } from "@/lib/format";
+import { TrendingUp, Users, DollarSign, AlertCircle } from "lucide-react";
 
 const KpiCard = ({
   icon: Icon,
@@ -49,8 +34,10 @@ const KpiCard = ({
 );
 
 export default function OwnerOverview() {
+  const { user } = useAuth();
   const { data, loading, error, refresh } =
     useDataStore();
+  const displayName = data?.settings?.displayName || user?.email?.split("@")[0];
 
   const {
     fmt,
@@ -317,7 +304,7 @@ const overdueDues =
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl md:text-3xl font-display font-bold text-gradient">
-          Welcome back
+          Welcome back, {displayName}
         </h1>
 
         <p className="text-muted-foreground font-alt tracking-wide">
