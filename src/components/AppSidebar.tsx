@@ -141,7 +141,7 @@ export function AppSidebar({ role }: { role: AppRole }) {
               ? (data?.tenants ?? []).find(
                   (t) => user?.email && t.email.toLowerCase() === user.email.toLowerCase(),
                 )?.name
-              : null || user.email?.split("@")[0]}
+              : user.email?.split("@")[0]}
         </div>
         <div className="text-muted-foreground truncate">{user.email}</div>
         </div>

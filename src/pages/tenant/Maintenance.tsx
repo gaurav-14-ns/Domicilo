@@ -4,6 +4,7 @@ import { RequestList } from "@/components/Maintenance/RequestList";
 import { useAuth } from "@/hooks/useAuth";
 import { useDataStore } from "@/store/DataStore";
 import { toast } from "sonner";
+import type { MaintenancePriority } from "@/types/maintenance";
 
 export default function TenantMaintenance() {
   const { user } = useAuth();
@@ -13,7 +14,7 @@ export default function TenantMaintenance() {
     (t) => user?.email && t.email.toLowerCase() === user.email.toLowerCase(),
   );
 
-  const handleCreate = async (title: string, description: string, priority: any) => {
+  const handleCreate = async (title: string, description: string, priority: MaintenancePriority) => {
     if (!tenant?.id) {
       toast.error("Profile not loaded yet. Please wait and try again.");
       return;

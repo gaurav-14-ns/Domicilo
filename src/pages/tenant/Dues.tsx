@@ -81,7 +81,7 @@ export default function Dues() {
 
   const years = useMemo(() => {
     const set = new Set<number>();
-    set.add(now.getFullYear());
+    set.add(new Date().getFullYear());
     for (const tx of tenantTransactions) {
       if (tx.date) {
         const y = new Date(tx.date).getFullYear();
