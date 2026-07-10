@@ -55,14 +55,15 @@ function DashboardContent({
       <SafeSection name="AppSidebar" fallback={null}>
         <AppSidebar role={role} />
       </SafeSection>
-      <div className="flex flex-col flex-1 min-w-0 bg-background/40 backdrop-blur-3xl">
-        <header className="h-14 flex items-center justify-between border-b border-white/[0.04] px-3 md:px-6 bg-background/60 backdrop-blur-3xl sticky top-0 z-30 shrink-0">
+      <div className="flex flex-col flex-1 min-w-0 bg-background/40 backdrop-blur-3xl relative">
+        <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-primary/5 via-transparent to-transparent opacity-60" />
+        <header className="h-14 flex items-center justify-between border-b border-white/[0.04] px-3 md:px-6 bg-background/60 backdrop-blur-3xl sticky top-0 z-30 shrink-0 relative">
           <div className="flex items-center gap-2 min-w-0">
             <SidebarTrigger />
 
           <div className="flex items-center gap-2">
-            <Crown className="h-4 w-4 text-primary hidden sm:block animate-glow-pulse" />
-            <span className="font-display font-semibold truncate tracking-wide">
+            <Crown className="h-4 w-4 text-gold hidden sm:block animate-glow-pulse" />
+            <span className="font-display font-semibold truncate tracking-wide text-gradient">
               {displayName}
             </span>
           </div>

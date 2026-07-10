@@ -56,6 +56,7 @@ const App = () => (
   <>
     <div className="starfield-bg" aria-hidden="true" />
     <div className="starfield-bright" aria-hidden="true" />
+    <div className="starfield-particles" aria-hidden="true" />
     <div className="starfield-shooting" aria-hidden="true" />
     <div className="starfield-aurora" aria-hidden="true" />
     <QueryClientProvider client={queryClient}>

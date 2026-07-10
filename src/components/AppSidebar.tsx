@@ -88,11 +88,12 @@ export function AppSidebar({ role }: { role: AppRole }) {
           </div>
 
           {!collapsed && (
-            <span className="font-display text-lg font-bold tracking-wide">
+            <span className="font-display text-lg font-bold tracking-wide text-gradient">
               Domicilo
             </span>
           )}
         </NavLink>
+        {!collapsed && <div className="divider-royal mx-4" />}
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
